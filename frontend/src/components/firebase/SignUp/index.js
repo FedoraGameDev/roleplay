@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
+import axios from "axios";
 import { compose } from "recompose";
 import { withFirebase } from "../Firebase";
 import * as ROUTES from "../../../constants/routes";
@@ -30,13 +31,34 @@ class SignUpFormBase extends Component
 
     onSubmit = event =>
     {
-        const { email, passwordOne } = this.state;
+        const { username, email, passwordOne } = this.state;
 
         this.props.firebase.doCreateUserWithEmailAndPassword(email, passwordOne)
             .then(authUser =>
             {
+                console.log("Created user at Firebase.");
                 this.setState({ ...INITIAL_STATE });
-                this.props.history.push(ROUTES.HOME);
+
+                this.props.firebase.auth.currentUser.getIdToken(true)
+                    .then(idToken =>
+                    {
+                        console.log("Acquired id token.");
+                        axios.post("http://localhost:3001/user/create", { token: idToken, username: username })
+                            .then(res =>
+                            {
+                                console.log("Created user in local DB");
+                                this.props.history.push(ROUTES.HOME);
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                            });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                    });
+
             })
             .catch(error =>
             {

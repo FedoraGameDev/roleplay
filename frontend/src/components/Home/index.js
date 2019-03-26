@@ -11,7 +11,7 @@ class HomePage extends React.Component
         this.props.firebase.auth.currentUser.getIdToken(true)
             .then(idToken =>
             {
-                axios.post("http://localhost:3001/api", { token: idToken })
+                axios.post("http://localhost:3001/user", { token: idToken })
                     .then(res =>
                     {
                         console.log(res);

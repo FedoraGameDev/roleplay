@@ -1,3 +1,4 @@
 module.exports = {
-    api: require("./apiController")
+    api: require("./apiController"),
+    user: require("./userController")
 };

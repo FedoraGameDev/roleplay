@@ -45,6 +45,7 @@ app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use("/api", routes.api);
+app.use("/user", routes.user);
 
 let port = process.env.PORT || 3001;
 app.listen(port, () =>

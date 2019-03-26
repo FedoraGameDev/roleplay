@@ -9,8 +9,7 @@ const userSchema = new Schema({
     },
     username: {
         type: String,
-        require: true,
-        unique: true
+        require: true
     },
     characters: [{
         type: Schema.Types.ObjectId,

@@ -1,3 +1,4 @@
 module.exports = {
-    api: require("./apiRoutes")
+    api: require("./apiRoutes"),
+    user: require("./userRoutes")
 };
