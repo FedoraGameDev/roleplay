@@ -1,8 +1,27 @@
 const express = require("express");
 const routes = require("./src/routes");
 const cors = require("cors");
+const bodyparser = require("body-parser");
+const firbaseadmin = require("firebase-admin");
 
 const app = express();
+
+if (process.env.NODE_ENV === "production")
+{
+    const serviceAccount = require("./serviceAccount.json");
+    firbaseadmin.initializeApp({
+        credential: firbaseadmin.credential.cert(serviceAccount),
+        databaseURL: "https://roleplay-e19d6.firebaseio.com"
+    });
+}
+else
+{
+    const serviceAccount = require("./serviceAccount_DEV.json");
+    firbaseadmin.initializeApp({
+        credential: firbaseadmin.credential.cert(serviceAccount),
+        databaseURL: "https://roleplay-development.firebaseio.com"
+    });
+}
 
 const allowedOrigins = [
     "http://localhost:3000"
@@ -21,6 +40,9 @@ app.use(cors({
         return callback(null, true);
     }
 }));
+
+app.use(bodyparser.urlencoded({ extended: true }));
+app.use(express.json());
 
 app.use("/api", routes.api);
 

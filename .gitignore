@@ -82,3 +82,6 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+
+serviceAccount.json
+serviceAccount_DEV.json

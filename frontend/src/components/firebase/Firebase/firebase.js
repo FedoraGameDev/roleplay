@@ -19,7 +19,6 @@ const devconfig = {
     messagingSenderId: process.env.REACT_APP_MESSAGING_SENDER_ID_DEV
 };
 
-
 const config = process.env.NODE_ENV === "production" ? liveconfig : devconfig;
 
 class Firebase
