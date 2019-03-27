@@ -47,6 +47,7 @@ class SignUpFormBase extends Component
                             .then(res =>
                             {
                                 console.log("Created user in local DB");
+                                localStorage.setItem("token", idToken);
                                 this.props.history.push(ROUTES.HOME);
                             })
                             .catch(error =>

@@ -8,18 +8,10 @@ class HomePage extends React.Component
     {
         super(props);
 
-        this.props.firebase.auth.currentUser.getIdToken(true)
-            .then(idToken =>
+        axios.post("http://localhost:3001/user", { token: localStorage.token })
+            .then(res =>
             {
-                axios.post("http://localhost:3001/user", { token: idToken })
-                    .then(res =>
-                    {
-                        console.log(res);
-                    })
-                    .catch(error =>
-                    {
-                        console.log(error);
-                    });
+                //
             })
             .catch(error =>
             {

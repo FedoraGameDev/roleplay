@@ -19,7 +19,24 @@ const withAuthentication = Component =>
             this.listener = this.props.firebase.auth.onAuthStateChanged(
                 authUser =>
                 {
-                    authUser ? this.setState({ authUser }) : this.setState({ authUser: null });
+                    if (authUser)
+                    {
+                        this.setState({ authUser });
+                        this.props.firebase.auth.currentUser.getIdToken(true)
+                            .then(idToken =>
+                            {
+                                localStorage.setItem("token", idToken);
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                            });
+                    }
+                    else
+                    {
+                        this.setState({ authUser: null });
+                        localStorage.setItem("token", null);
+                    };
                 }
             );
         }
