@@ -1,6 +1,7 @@
 import React from "react";
 import { withAuthorization } from "../firebase/Session";
 import axios from "axios";
+import { BACKEND } from "../../constants/routes";
 
 const INITIAL_STATE = {
     username: null
@@ -17,7 +18,7 @@ class HomePage extends React.Component
     {
         super(props);
 
-        axios.post("http://localhost:3001/user", { token: localStorage.token })
+        axios.post(`${BACKEND}/user`, { token: localStorage.token })
             .then(res =>
             {
                 this.setState({ username: res.data.data.username });

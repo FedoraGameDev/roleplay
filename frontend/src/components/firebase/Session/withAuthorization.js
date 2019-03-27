@@ -34,4 +34,5 @@ const withAuthorization = condition => Component =>
     return compose(withRouter, withFirebase)(WithAuthorization);
 };
 
+//TODO: reasses how this works and fix it to use user information from our backend via axios.
 export default withAuthorization;

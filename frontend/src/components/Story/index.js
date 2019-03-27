@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
+import { BACKEND } from "../../constants/routes";
 
 const INITIAL_STATE = {
     genres: []
@@ -15,7 +16,7 @@ class Story extends Component
 
     componentWillMount()
     {
-        axios.get("http://localhost:3001/story")
+        axios.get(`${BACKEND}/story`)
             .then(res =>
             {
                 this.setState({ genres: res.data.genres });

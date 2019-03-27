@@ -9,6 +9,7 @@ const AdminPage = () =>
         </div>
     );
 
+//TODO: Change how roles are pulled in (from backend via axios)
 const condition = authUser => authUser && authUser.roles.includes(ROLES.ADMIN);
 
 export default withAuthorization(condition)(AdminPage);

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+//TODO: Add Role
 const userSchema = new Schema({
     uuid: {
         type: String,
