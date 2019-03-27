@@ -14,6 +14,15 @@ const userSchema = new Schema({
     characters: [{
         type: Schema.Types.ObjectId,
         ref: "Character"
+    }],
+    subscriptions: [{
+        type: Schema.Types.ObjectId,
+        ref: "Story"
+    }],
+    notifications: [{
+        title: String,
+        description: String,
+        link: String
     }]
 });
 
