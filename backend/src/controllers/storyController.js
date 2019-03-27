@@ -13,5 +13,18 @@ module.exports = {
             {
                 console.log(error);
             });
+    },
+    genre: (req, res) =>
+    {
+        console.log(req.params.genre);
+        models.Genre.findOne({ name: req.params.genre }).populate("stories")
+            .then(genre =>
+            {
+                res.json({ stories: genre.stories });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+            });
     }
 };

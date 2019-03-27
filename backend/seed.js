@@ -86,7 +86,7 @@ async function GenerateCharacter(user)
 async function GenerateGenre()
 {
     const genre = new models.Genre({
-        name: "New Genre"
+        name: "New_Genre"
     });
 
     try
