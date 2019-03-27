@@ -10,6 +10,7 @@ import PasswordForget from "../firebase/PasswordForget";
 import Home from "../Home";
 import Account from "../Account";
 import Admin from "../Admin";
+import Story from "../Story";
 
 class App extends React.Component
 {
@@ -29,6 +30,7 @@ class App extends React.Component
                     <Route path={ROUTES.HOME} component={Home} />
                     <Route path={ROUTES.ACCOUNT} component={Account} />
                     <Route path={ROUTES.ADMIN} component={Admin} />
+                    <Route path={ROUTES.STORY} component={Story} />
                 </div>
             </Router>
         );
