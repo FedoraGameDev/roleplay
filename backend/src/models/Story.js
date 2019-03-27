@@ -4,6 +4,10 @@ const Schema = mongoose.Schema;
 const storySchema = new Schema({
     title: String,
     description: String,
+    characters: [{
+        type: Schema.Types.ObjectId,
+        ref: "Character"
+    }],
     genres: [{
         type: Schema.Types.ObjectId,
         ref: "Genre"

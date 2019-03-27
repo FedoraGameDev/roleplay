@@ -6,7 +6,11 @@ const characterSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
         ref: "User"
-    }
+    },
+    stories: [{
+        type: Schema.Types.ObjectId,
+        ref: "Story"
+    }]
 });
 
 const Character = mongoose.model('Character', characterSchema);
