@@ -30,7 +30,8 @@ const storySchema = new Schema({
     subscribers: [{
         type: Schema.Types.ObjectId,
         ref: "User"
-    }]
+    }],
+    closed_group: Boolean
 });
 
 const Story = mongoose.model("Story", storySchema);

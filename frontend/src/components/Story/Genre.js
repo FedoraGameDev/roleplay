@@ -1,7 +1,8 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { CreateStoryLink } from "./CreateStory";
-import { BACKEND } from "../../constants/routes";
+import { BACKEND, STORY_VIEW } from "../../constants/routes";
 
 const INITIAL_STATE = {
     stories: []
@@ -21,7 +22,6 @@ class Genre extends Component
         axios.get(`${BACKEND}/story/${this.props.match.params.genre}`)
             .then(res =>
             {
-                console.log(res);
                 this.setState({ stories: res.data.stories });
             })
             .catch(error =>
@@ -34,7 +34,7 @@ class Genre extends Component
     {
         let storyItems = state.state.stories.map((story, index) =>
             (
-                <li key={index}>{story.title}</li>
+                <li key={index}><Link to={`${STORY_VIEW.replace(":story_id", story._id)}`}>{story.title}</Link></li>
             ));
 
         return (<ul>{storyItems}</ul>);
@@ -43,9 +43,9 @@ class Genre extends Component
     render()
     {
         return ([
-            <h1>Hello!</h1>,
-            <this.listStories state={this.state} />,
-            <CreateStoryLink />
+            <h1 key="0">Hello!</h1>,
+            <this.listStories key="1" state={this.state} />,
+            <CreateStoryLink key="2" />
         ]);
     }
 }
