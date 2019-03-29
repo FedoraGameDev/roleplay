@@ -11,7 +11,7 @@ module.exports = {
                 models.User.findOne({ uuid: decodedToken.uid }).populate("characters").populate("subscriptions")
                     .then(currentUser =>
                     {
-                        console.log(`User fetch: ${currentUser.username}`);
+                        console.log(`User fetch: ${currentUser}`);
                         res.json({ data: currentUser });
                     })
                     .catch(error =>
@@ -32,17 +32,22 @@ module.exports = {
             {
                 console.log("User authenticated. Creating in local database.");
                 let form = { uuid: decodedToken.uid, username: req.body.username, characters: [] };
-                models.User.create(form, (err, newUser) =>
-                {
-                    console.log(`Operation complete. User '${newUser.username}' created.`);
-                    if (err) { res.status(500).json({ "ERROR": err }) }
-
-                    res.json({ data: newUser });
-                });
+                models.User.create(form)
+                    .then(newUser =>
+                    {
+                        console.log(`Operation complete. User '${newUser.username}' created.`);
+                        res.json({ data: newUser });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                        res.status(500).json({ "ERROR": err });
+                    });
             })
             .catch(error =>
             {
                 console.log(error);
+                res.status(500).json({ "ERROR": err });
             });
     }
 };
