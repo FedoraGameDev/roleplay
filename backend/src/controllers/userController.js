@@ -8,7 +8,7 @@ module.exports = {
         firebaseAdmin.auth().verifyIdToken(req.body.token)
             .then(decodedToken =>
             {
-                models.User.findOne({ uuid: decodedToken.uid })
+                models.User.findOne({ uuid: decodedToken.uid }).populate("characters").populate("subscriptions")
                     .then(currentUser =>
                     {
                         console.log(`User fetch: ${currentUser.username}`);

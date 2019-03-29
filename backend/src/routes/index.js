@@ -1,4 +1,5 @@
 module.exports = {
     api: require("./apiRoutes"),
-    user: require("./userRoutes")
+    user: require("./userRoutes"),
+    story: require("./storyRoutes")
 };

@@ -1,6 +1,8 @@
 import React from "react";
+import axios from "axios";
 import AuthUserContext from "./context";
 import { withFirebase } from "../Firebase";
+import { BACKEND } from "../../../constants/routes";
 
 const withAuthentication = Component =>
 {
@@ -10,7 +12,7 @@ const withAuthentication = Component =>
         {
             super(props);
             this.state = {
-                authUser: null
+                userInfo: null
             };
         }
 
@@ -21,11 +23,24 @@ const withAuthentication = Component =>
                 {
                     if (authUser)
                     {
-                        this.setState({ authUser });
                         this.props.firebase.auth.currentUser.getIdToken(true)
                             .then(idToken =>
                             {
-                                localStorage.setItem("token", idToken);
+                                axios.post(`${BACKEND}/user`, { token: idToken })
+                                    .then(user =>
+                                    {
+                                        this.setState({
+                                            userInfo: {
+                                                authUser: authUser,
+                                                user: user.data.data
+                                            }
+                                        });
+                                        localStorage.setItem("token", idToken);
+                                    })
+                                    .catch(error =>
+                                    {
+                                        console.log(error);
+                                    });
                             })
                             .catch(error =>
                             {
@@ -34,7 +49,7 @@ const withAuthentication = Component =>
                     }
                     else
                     {
-                        this.setState({ authUser: null });
+                        this.setState({ userInfo: null });
                         localStorage.setItem("token", null);
                     };
                 }
@@ -49,7 +64,7 @@ const withAuthentication = Component =>
         render()
         {
             return (
-                <AuthUserContext.Provider value={this.state.authUser}>
+                <AuthUserContext.Provider value={this.state.userInfo}>
                     <Component {...this.props} />
                 </AuthUserContext.Provider>
             );

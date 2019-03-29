@@ -43,7 +43,7 @@ class SignUpFormBase extends Component
                     .then(idToken =>
                     {
                         console.log("Acquired id token.");
-                        axios.post("http://localhost:3001/user/create", { token: idToken, username: username })
+                        axios.post(`${ROUTES.BACKEND}/user/create`, { token: idToken, username: username })
                             .then(res =>
                             {
                                 console.log("Created user in local DB");

@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+//TODO: Add Role
 const userSchema = new Schema({
     uuid: {
         type: String,
@@ -14,6 +15,18 @@ const userSchema = new Schema({
     characters: [{
         type: Schema.Types.ObjectId,
         ref: "Character"
+    }],
+    subscriptions: [{
+        type: Schema.Types.ObjectId,
+        ref: "Story"
+    }],
+    notifications: [{
+        title: String,
+        description: String,
+        link: String
+    }],
+    roles: [{
+        type: String
     }]
 });
 

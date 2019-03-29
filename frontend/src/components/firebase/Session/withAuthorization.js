@@ -4,15 +4,44 @@ import { compose } from "recompose";
 import AuthUserContext from "./context";
 import { withFirebase } from "../Firebase";
 import * as ROUTES from "../../../constants/routes";
+import Axios from "axios";
 
-const withAuthorization = condition => Component =>
+const withAuthorization = (condition, badCheck, renderAnyways = false) => Component =>
 {
     class WithAuthorization extends React.Component
     {
         componentDidMount()
         {
             this.listener = this.props.firebase.auth.onAuthStateChanged(
-                authUser => { if (!condition(authUser)) this.props.history.push(ROUTES.SIGN_IN); }
+                authUser =>
+                {
+                    if (authUser)
+                    {
+                        this.props.firebase.auth.currentUser.getIdToken(true)
+                            .then(token =>
+                            {
+                                Axios.post(`${ROUTES.BACKEND}/user`, { token: token })
+                                    .then(user =>
+                                    {
+                                        const userInfo = {
+                                            authUser: authUser,
+                                            user: user
+                                        }
+                                        if (!condition(userInfo)) badCheck(this.props.history);
+                                    })
+                                    .catch(error =>
+                                    {
+                                        console.log(error);
+                                    });
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                            });
+                    }
+                    else
+                        if (!renderAnyways) badCheck(this.props.history);//this.props.history.push(ROUTES.SIGN_IN);
+                }
             );
         }
 
@@ -25,7 +54,7 @@ const withAuthorization = condition => Component =>
         {
             return (
                 <AuthUserContext.Consumer>
-                    {authUser => condition(authUser) ? <Component {...this.props} /> : null}
+                    {userInfo => condition(userInfo) ? <Component {...this.props} userInfo={userInfo} /> : null}
                 </AuthUserContext.Consumer>
             );
         }

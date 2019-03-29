@@ -6,7 +6,11 @@ const genreSchema = new Schema({
         type: String,
         require: true,
         unique: true
-    }
+    },
+    stories: [{
+        type: Schema.Types.ObjectId,
+        ref: "Story"
+    }]
 });
 
 const Genre = mongoose.model("Genre", genreSchema);
