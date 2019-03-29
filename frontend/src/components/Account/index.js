@@ -19,6 +19,6 @@ class AccountPage extends React.Component
 }
 
 const condition = (userInfo) => !!(userInfo && userInfo.authUser);
-const badCheck = (history) => history.push(ROUTES.SIGN_IN);
+const badCheck = (history) => history.push(`${ROUTES.SIGN_IN}?forward=account`);
 
 export default withAuthorization(condition, badCheck)(AccountPage);

@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
 import axios from "axios";
 import { compose } from "recompose";
-import { BACKEND, CREATE_STORY, STORY_VIEW } from "../../constants/routes";
+import { BACKEND, CREATE_STORY, STORY_VIEW, SIGN_IN } from "../../constants/routes";
 import { withAuthorization } from "../firebase/Session";
 
 const INITIAL_STATE = {
@@ -103,5 +103,5 @@ const CreateStoryLink = () =>
         <p><Link to={CREATE_STORY}>New Story</Link></p>
     )
 
-export default compose(withRouter, withAuthorization(authUser => !!authUser))(CreateStory);
+export default compose(withRouter, withAuthorization(authUser => !!authUser, history => history.push(`${SIGN_IN}?forward=story/create`)))(CreateStory);
 export { CreateStoryLink };

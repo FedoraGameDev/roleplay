@@ -21,6 +21,6 @@ class AdminPage extends React.Component
 }
 
 const condition = userInfo => (userInfo && userInfo.user.roles.includes("Admin"));
-const badCheck = (history) => history.push(ROUTES.SIGN_IN);
+const badCheck = (history) => history.push(`${ROUTES.SIGN_IN}?forward=admin`);
 
 export default withAuthorization(condition, badCheck)(AdminPage);

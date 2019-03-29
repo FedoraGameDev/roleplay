@@ -39,4 +39,4 @@ class Navigation extends React.Component
     }
 }
 
-export default withAuthStatic()(Navigation);
+export default withAuthStatic(Navigation);
