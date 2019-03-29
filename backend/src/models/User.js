@@ -24,6 +24,9 @@ const userSchema = new Schema({
         title: String,
         description: String,
         link: String
+    }],
+    roles: [{
+        type: String
     }]
 });
 

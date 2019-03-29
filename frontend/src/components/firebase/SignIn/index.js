@@ -18,7 +18,8 @@ const SignInPage = () => (
 const INITIAL_STATE = {
     email: "",
     password: "",
-    error: null
+    error: null,
+    query: {}
 };
 
 class SignInFormBase extends Component
@@ -41,8 +42,20 @@ class SignInFormBase extends Component
                     .then(idToken =>
                     {
                         localStorage.setItem("token", idToken);
-                        this.setState({ ...INITIAL_STATE });
-                        this.props.history.push(ROUTES.HOME);
+                        const query = {};
+                        if (this.props.location.search)
+                        {
+                            const search = this.props.location.search.split("?")[1].split("&");
+                            search.forEach(element =>
+                            {
+                                const variable = element.split("=");
+                                query[variable[0]] = variable[1];
+                            });
+                        }
+                        if (!!query && !!query["forward"])
+                            this.props.history.push(query["forward"]);
+                        else
+                            this.props.history.push(ROUTES.HOME);
                     })
                     .catch(error =>
                     {

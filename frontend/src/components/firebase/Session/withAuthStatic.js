@@ -6,9 +6,9 @@ import { withFirebase } from "../Firebase";
 import * as ROUTES from "../../../constants/routes";
 import Axios from "axios";
 
-const withAuthorization = (condition, badCheck, renderAnyways = false) => Component =>
+const withAuthStatic = () => Component =>
 {
-    class WithAuthorization extends React.Component
+    class WithAuthStatic extends React.Component
     {
         componentDidMount()
         {
@@ -27,7 +27,6 @@ const withAuthorization = (condition, badCheck, renderAnyways = false) => Compon
                                             authUser: authUser,
                                             user: user
                                         }
-                                        if (!condition(userInfo)) badCheck(this.props.history);
                                     })
                                     .catch(error =>
                                     {
@@ -39,8 +38,6 @@ const withAuthorization = (condition, badCheck, renderAnyways = false) => Compon
                                 console.log(error);
                             });
                     }
-                    else
-                        if (!renderAnyways) badCheck(this.props.history);//this.props.history.push(ROUTES.SIGN_IN);
                 }
             );
         }
@@ -54,13 +51,13 @@ const withAuthorization = (condition, badCheck, renderAnyways = false) => Compon
         {
             return (
                 <AuthUserContext.Consumer>
-                    {userInfo => condition(userInfo) ? <Component {...this.props} userInfo={userInfo} /> : null}
+                    {userInfo => <Component {...this.props} userInfo={userInfo} />}
                 </AuthUserContext.Consumer>
             );
         }
     }
 
-    return compose(withRouter, withFirebase)(WithAuthorization);
+    return compose(withRouter, withFirebase)(WithAuthStatic);
 };
 
-export default withAuthorization;
+export default withAuthStatic;

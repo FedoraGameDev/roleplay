@@ -1,21 +1,24 @@
 import React from "react";
-import { AuthUserContext, withAuthorization } from "../firebase/Session";
+import { withAuthorization } from "../firebase/Session";
 import { PasswordForgetForm } from "../firebase/PasswordForget";
 import PasswordChangeForm from "../firebase/PasswordChange";
+import * as ROUTES from "../../constants/routes";
 
-const AccountPage = () =>
-    (
-        <AuthUserContext.Consumer>
-            {authUser => (
-                <div>
-                    <h1>Account: {authUser.email}</h1>
-                    <PasswordForgetForm />
-                    <PasswordChangeForm />
-                </div>
-            )}
-        </AuthUserContext.Consumer>
-    );
+class AccountPage extends React.Component
+{
+    render()
+    {
+        return (
+            <div>
+                <h1>Account: {this.props.userInfo.user.email}</h1>
+                <PasswordForgetForm />
+                <PasswordChangeForm />
+            </div>
+        );
+    }
+}
 
-const condition = (userAuth) => !!userAuth;
+const condition = (userInfo) => !!(userInfo && userInfo.authUser);
+const badCheck = (history) => history.push(ROUTES.SIGN_IN);
 
-export default withAuthorization(condition)(AccountPage);
+export default withAuthorization(condition, badCheck)(AccountPage);

@@ -1,15 +1,26 @@
 import React from "react";
-import * as ROLES from "../../constants/roles";
 import { withAuthorization } from "../firebase/Session";
+import * as ROUTES from "../../constants/routes";
 
-const AdminPage = () =>
-    (
-        <div>
-            <h1>Admin</h1>
-        </div>
-    );
+class AdminPage extends React.Component
+{
+    constructor(props)
+    {
+        super(props);
+        console.log(this.props);
+    }
 
-//TODO: Change how roles are pulled in (from backend via axios)
-const condition = authUser => authUser && authUser.roles.includes(ROLES.ADMIN);
+    render()
+    {
+        return (
+            <div>
+                <h1>Admin</h1>
+            </div>
+        )
+    }
+}
 
-export default withAuthorization(condition)(AdminPage);
+const condition = userInfo => (userInfo && userInfo.user.roles.includes("Admin"));
+const badCheck = (history) => history.push(ROUTES.SIGN_IN);
+
+export default withAuthorization(condition, badCheck)(AdminPage);

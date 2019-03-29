@@ -41,7 +41,7 @@ class CreateStory extends Component
 
     onSubmit = event =>
     {
-        const { title, description, closed_group, genres, error } = this.state;
+        const { title, description, closed_group, genres } = this.state;
 
         axios.post(`${BACKEND}/story/create`, {
             token: localStorage.getItem("token"),
@@ -80,7 +80,7 @@ class CreateStory extends Component
 
     render()
     {
-        const { title, description, closed_group, genres, error } = this.state;
+        const { title, description, closed_group, error } = this.state;
 
         const isInvalid = (title === "" || description === "");
 

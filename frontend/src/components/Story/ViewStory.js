@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { BACKEND, GENRENew_Genre, GENRE } from "../../constants/routes";
+import { BACKEND, GENRE } from "../../constants/routes";
 
 const INITIAL_STATE = {
     story: {
