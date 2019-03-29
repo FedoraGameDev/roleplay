@@ -38,57 +38,39 @@ module.exports = {
             .then(decodedToken =>
             {
                 console.log("User authenticated from firebase.");
-                models.User.findOne({ uuid: decodedToken.uid })
-                    .then(user =>
+                models.User.findOne({ uuid: decodedToken.uid }, (err, user) =>
+                {
+                    if (err) { res.status(500).json({ "ERROR": err }); };
+
+                    console.log(`${user.username} authenticated.`);
+                    req.body.story.author = user;
+
+                    models.Genre.find({ "name": { $in: req.body.story.genres } }, (err, genres) =>
                     {
-                        console.log(`${user.username} authenticated.`);
-                        req.body.story.author = user;
-                        console.log(req.body.story.genres);
+                        if (err) { res.status(500).json({ "ERROR": err }); };
+                        req.body.story.genres = genres.map(genre => mongoose.Types.ObjectId(genre._id));
+                        models.Story.create(req.body.story, (err, newStory) =>
+                        {
+                            if (err) { res.status(500).json({ "ERROR": err }); };
 
-                        models.Genre.find({ "name": { $in: req.body.story.genres } })
-                            .then(genres =>
+                            console.log(`New story "${newStory.title}" created with id ${newStory._id}.`);
+
+                            models.User.updateOne({ uuid: decodedToken.uid }, { $push: { stories: newStory } }, (err, updatedUser) =>
                             {
-                                req.body.story.genres = genres.map(genre => mongoose.Types.ObjectId(genre._id));
-                                models.Story.create(req.body.story)
-                                    .then(newStory =>
+                                if (err) { res.status(500).json({ "ERROR": err }); };
+
+                                console.log(req.body.story.genres);
+                                console.log(`Updated user '${updatedUser.username}'`);
+                                models.Genre.updateMany({ "_id": { $in: req.body.story.genres } },
+                                    { $push: { stories: newStory } }, (err, updatedGenres) =>
                                     {
-                                        console.log(`New story "${newStory.title}" created with id ${newStory._id}.`);
-
-                                        genres.forEach(element =>
-                                        {
-                                            newGenre = element;
-                                            newGenre.stories.splice(newGenre.stories.length, 0, newStory);
-                                            console.log(`Updating Genre "${newGenre.name}" with story ${newStory.title}`);
-                                            models.Genre.updateOne({ "_id": element._id }, newGenre)
-                                                .then(updatedGenre =>
-                                                {
-                                                    console.log(updatedGenre);
-                                                })
-                                                .catch(error =>
-                                                {
-                                                    console.log(error);
-                                                });
-                                        });
-
+                                        console.log(`Genres Updated "${updatedGenres}"`);
                                         res.json({ newStory: newStory });
-                                    })
-                                    .catch(error =>
-                                    {
-                                        console.log(error);
-                                        res.status(500).json({ "ERROR": error });
                                     });
-                            })
-                            .catch(error =>
-                            {
-                                console.log(error);
-                                res.status(500).json({ "ERROR": error });
                             });
-                    })
-                    .catch(error =>
-                    {
-                        console.log(error);
-                        res.status(500).json({ "ERROR": error });
+                        });
                     });
+                });
             })
             .catch(error =>
             {

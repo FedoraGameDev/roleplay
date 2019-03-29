@@ -25,8 +25,9 @@ const withAuthorization = (condition, badCheck, renderAnyways = false) => Compon
                                     {
                                         const userInfo = {
                                             authUser: authUser,
-                                            user: user
+                                            user: user.data.data
                                         }
+
                                         if (!condition(userInfo)) badCheck(this.props.history);
                                     })
                                     .catch(error =>

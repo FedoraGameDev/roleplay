@@ -32,17 +32,14 @@ module.exports = {
             {
                 console.log("User authenticated. Creating in local database.");
                 let form = { uuid: decodedToken.uid, username: req.body.username, characters: [] };
-                models.User.create(form)
-                    .then(newUser =>
-                    {
-                        console.log(`Operation complete. User '${newUser.username}' created.`);
-                        res.json({ data: newUser });
-                    })
-                    .catch(error =>
-                    {
-                        console.log(error);
-                        res.status(500).json({ "ERROR": err });
-                    });
+
+                models.User.create(form, (err, newUser) =>
+                {
+                    if (err) { res.status(500).json({ "ERROR": err }) };
+
+                    console.log(`Operation complete. User '${newUser.username}' created.`);
+                    res.json({ data: newUser });
+                });
             })
             .catch(error =>
             {
