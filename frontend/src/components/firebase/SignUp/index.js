@@ -36,17 +36,14 @@ class SignUpFormBase extends Component
         this.props.firebase.doCreateUserWithEmailAndPassword(email, passwordOne)
             .then(authUser =>
             {
-                console.log("Created user at Firebase.");
                 this.setState({ ...INITIAL_STATE });
 
                 this.props.firebase.auth.currentUser.getIdToken(true)
                     .then(idToken =>
                     {
-                        console.log("Acquired id token.");
                         axios.post(`${ROUTES.BACKEND}/user/create`, { token: idToken, username: username })
                             .then(res =>
                             {
-                                console.log("Created user in local DB");
                                 localStorage.setItem("token", idToken);
                                 this.props.history.push(ROUTES.HOME);
                             })
@@ -67,11 +64,6 @@ class SignUpFormBase extends Component
             });
 
         event.preventDefault();
-    };
-
-    onChange = event =>
-    {
-        //
     };
 
     onChange = event =>

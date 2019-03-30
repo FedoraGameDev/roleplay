@@ -27,6 +27,10 @@ const userSchema = new Schema({
     }],
     roles: [{
         type: String
+    }],
+    stories: [{
+        type: Schema.Types.ObjectId,
+        ref: "Story"
     }]
 });
 

@@ -44,13 +44,19 @@ async function GenerateUser()
 {
     const user = new models.User({
         uuid: "ilkajhdsvoiuhnawerfiuhaonsklfhoiakwejnfiu23h4r98234",
-        username: "New User",
-        characters: []
+        username: "New User"
     });
+
+    const fedora = new models.User({
+        uuid: "gRJkIknSGXWpg9xqvJMRCK8OFDD3",
+        username: "Fedora Dev",
+        roles: ["Admin"]
+    })
 
     try
     {
         await user.save();
+        await fedora.save();
         return user;
     }
     catch (err)

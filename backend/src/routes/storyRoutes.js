@@ -9,3 +9,4 @@ module.exports = router
     .get("/", controllers.story.index)
     .post("/create", controllers.story.create)
     .get("/view/:story_id", controllers.story.story)
+    .post("/add_chapter/:story_id", controllers.story.create_chapter)

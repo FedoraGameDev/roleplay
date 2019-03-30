@@ -10,6 +10,7 @@ const INITIAL_STATE = {
     description: "",
     closed_group: false,
     genres: [],
+    genresSelection: {},
     error: null
 }
 
@@ -21,7 +22,7 @@ class CreateStory extends Component
         this.state = { ...INITIAL_STATE };
     }
 
-    componentWillMount()
+    componentDidMount()
     {
         axios.get(`${BACKEND}/story`)
             .then(res =>
@@ -39,9 +40,24 @@ class CreateStory extends Component
         this.setState({ [event.target.name]: event.target.value });
     }
 
+    onGenreChecked = event =>
+    {
+        const newSel = this.state.genresSelection;
+        newSel[`${event.target.name}`] = event.target.checked;
+        this.setState({ genresSelection: newSel });
+    }
+
     onSubmit = event =>
     {
-        const { title, description, closed_group, genres } = this.state;
+        event.preventDefault();
+        const { title, description, closed_group, genresSelection } = this.state;
+        const genres = [];
+
+        for (var key in genresSelection)
+        {
+            if (genresSelection[key])
+                genres.splice(genres.length - 1, 0, key);
+        }
 
         axios.post(`${BACKEND}/story/create`, {
             token: localStorage.getItem("token"),
@@ -54,22 +70,18 @@ class CreateStory extends Component
             }
         }).then(res =>
         {
-            console.log(res.data);
             this.props.history.push(STORY_VIEW.replace(":story_id", res.data.newStory._id));
         }).catch(error =>
         {
             this.setState({ error: error });
         });
-
-        event.preventDefault();
     }
 
     renderGenres(myself)
     {
-        console.log(myself.this.state.genres);
         const allGenres = myself.this.state.genres.map((genre, index) => (
             <li key={index}>
-                <input type="checkbox" onChange={myself.this.onChange} name={genre.name} />
+                <input type="checkbox" onChange={myself.this.onGenreChecked} name={genre.name} />
                 <label>{genre.name}</label>
             </li>
         ));
@@ -86,8 +98,8 @@ class CreateStory extends Component
 
         return (
             <form onSubmit={this.onSubmit}>
-                <input type="text" onChange={this.onChange} name="title" value={title} />
-                <textarea onChange={this.onChange} name="description" value={description} />
+                <input type="text" onChange={this.onChange} name="title" value={title} placeholder="title" />
+                <textarea onChange={this.onChange} name="description" value={description} placeholder="description" />
                 <input type="checkbox" onChange={this.onChange} name="closed_group" value={closed_group} />
                 <this.renderGenres this={this} />
                 <button disabled={isInvalid} type="submit">Create</button>
@@ -103,5 +115,5 @@ const CreateStoryLink = () =>
         <p><Link to={CREATE_STORY}>New Story</Link></p>
     )
 
-export default compose(withRouter, withAuthorization(authUser => !!authUser, history => history.push(`${SIGN_IN}?forward=story/create`)))(CreateStory);
+export default compose(withRouter, withAuthorization(userInfo => !!userInfo, history => history.push(`${SIGN_IN}?forward=story/create`)))(CreateStory);
 export { CreateStoryLink };
