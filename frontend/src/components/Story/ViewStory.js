@@ -1,12 +1,14 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { BACKEND, GENRE } from "../../constants/routes";
+import { withAuthStatic } from "../firebase/Session";
+import { BACKEND, GENRE, STORY_VIEW, CREATE_CHAPTER } from "../../constants/routes";
 
 const INITIAL_STATE = {
     story: {
-        author: "",
-        genres: []
+        author: {},
+        genres: [],
+        chapters: []
     }
 }
 
@@ -21,7 +23,7 @@ class ViewStory extends Component
 
     componentWillMount()
     {
-        axios.get(`${BACKEND}/story/view/${this.props.match.params.story_id}`)
+        axios.get(`${BACKEND}${STORY_VIEW.replace(":story_id", this.props.match.params.story_id)}`)
             .then(res =>
             {
                 this.setState({ story: res.data.story });
@@ -43,18 +45,32 @@ class ViewStory extends Component
         )
     }
 
+    listChapters(chapters)
+    {
+        const chapterList = chapters.chapters.map((chapter, index) => (
+            <li key={index}>{chapter.title}</li>
+        ));
+
+        return (
+            <ul>{chapterList}</ul>
+        );
+    }
+
     render()
     {
         const { story } = this.state;
+
         return (
             <div>
                 <div>{story.author.username}</div>
                 <div><this.listGenres genres={story.genres} /></div>
                 <div>{story.title}</div>
                 <div>{story.description}</div>
+                <div><this.listChapters chapters={story.chapters} /></div>
+                {!!this.props.userInfo && this.props.userInfo.user.username === story.author.username ? <Link to={`${CREATE_CHAPTER.replace(":story_id", this.props.match.params.story_id)}`}>Create Chapter</Link> : null}
             </div>
         );
     }
 }
 
-export default ViewStory;
+export default withAuthStatic(ViewStory);

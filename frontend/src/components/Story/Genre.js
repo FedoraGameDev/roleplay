@@ -43,7 +43,6 @@ class Genre extends Component
     render()
     {
         return ([
-            <h1 key="0">Hello!</h1>,
             <this.listStories key="1" state={this.state} />,
             <CreateStoryLink key="2" />
         ]);

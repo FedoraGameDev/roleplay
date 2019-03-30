@@ -91,5 +91,34 @@ module.exports = {
             {
                 console.log(error);
             });
+    },
+    create_chapter: (req, res) =>
+    {
+        console.log(`Retrieving chapter for story "${req.body.story.title}"`);
+        firebaseAdmin.auth().verifyIdToken(req.body.token)
+            .then(decodedToken =>
+            {
+                console.log("User authenticated from firebase.");
+                models.User.findOne({ uuid: decodedToken.uid }, (err, user) =>
+                {
+                    if (err) { res.status(500).json({ "ERROR": err }); };
+                    console.log(`User "${user.username}" authenticated.`);
+
+                    console.log(req.body.story._id);
+
+                    models.Story.updateOne({ _id: req.body.story._id }, { $push: { chapters: req.body.chapter } }, (err, updatedStory) =>
+                    {
+                        if (err) { res.status(500).json({ "ERROR": err }) };
+
+                        console.log("Story updated with new chapter.");
+                        res.json({ updatedStory: updatedStory });
+                    });
+                });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+                res.status(500).json({ "ERROR": error });
+            })
     }
 };

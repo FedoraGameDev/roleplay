@@ -53,9 +53,9 @@ class CreateStory extends Component
         const { title, description, closed_group, genresSelection } = this.state;
         const genres = [];
 
-        for (var key in this.state.genresSelection)
+        for (var key in genresSelection)
         {
-            if (this.state.genresSelection[key])
+            if (genresSelection[key])
                 genres.splice(genres.length - 1, 0, key);
         }
 
@@ -98,8 +98,8 @@ class CreateStory extends Component
 
         return (
             <form onSubmit={this.onSubmit}>
-                <input type="text" onChange={this.onChange} name="title" value={title} />
-                <textarea onChange={this.onChange} name="description" value={description} />
+                <input type="text" onChange={this.onChange} name="title" value={title} placeholder="title" />
+                <textarea onChange={this.onChange} name="description" value={description} placeholder="description" />
                 <input type="checkbox" onChange={this.onChange} name="closed_group" value={closed_group} />
                 <this.renderGenres this={this} />
                 <button disabled={isInvalid} type="submit">Create</button>

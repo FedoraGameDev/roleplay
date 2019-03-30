@@ -65,7 +65,7 @@ const withAuthentication = Component =>
         {
             return (
                 <AuthUserContext.Provider value={this.state.userInfo}>
-                    <Component {...this.props} />
+                    {(!!this.state.userInfo) ? <Component {...this.props} /> : <h1>Loading...</h1>}
                 </AuthUserContext.Provider>
             );
         }

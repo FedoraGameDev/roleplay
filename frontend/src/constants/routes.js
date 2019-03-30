@@ -9,4 +9,5 @@ export const STORY = "/story";
 export const STORY_VIEW = "/story/view/:story_id";
 export const GENRE = "/genre/:genre";
 export const CREATE_STORY = "/story/create";
+export const CREATE_CHAPTER = "/story/chapter/create/:story_id";
 export const BACKEND = "http://localhost:3001";

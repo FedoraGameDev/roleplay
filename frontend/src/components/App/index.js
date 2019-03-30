@@ -10,7 +10,7 @@ import PasswordForget from "../firebase/PasswordForget";
 import Home from "../Home";
 import Account from "../Account";
 import Admin from "../Admin";
-import { Story, Genre, CreateStory, ViewStory } from "../Story";
+import { Story, Genre, CreateStory, ViewStory, CreateChapter } from "../Story";
 
 class App extends React.Component
 {
@@ -34,6 +34,7 @@ class App extends React.Component
                     <Route path={ROUTES.CREATE_STORY} component={CreateStory} />
                     <Route path={ROUTES.GENRE} component={Genre} />
                     <Route path={ROUTES.STORY_VIEW} component={ViewStory} />
+                    <Route path={ROUTES.CREATE_CHAPTER} component={CreateChapter} />
                 </div>
             </Router>
         );
