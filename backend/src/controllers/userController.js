@@ -11,7 +11,7 @@ module.exports = {
                 models.User.findOne({ uuid: decodedToken.uid }).populate("characters").populate("subscriptions")
                     .then(currentUser =>
                     {
-                        console.log(`User fetch: ${currentUser}`);
+                        console.log(`User fetch: ${currentUser.username}`);
                         res.json({ data: currentUser });
                     })
                     .catch(error =>

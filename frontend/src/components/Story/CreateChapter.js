@@ -58,7 +58,7 @@ class CreateChapter extends Component
         axios.get(`${BACKEND}${STORY_VIEW.replace(":story_id", this.props.match.params.story_id)}`)
             .then(res =>
             {
-                this.setState({ story: res.data.story });
+                this.setState({ story: res.data.story, chapter: { title: `Chapter ${res.data.story.chapters.length + 1}` } });
                 if (this.props.userInfo.user.username !== this.state.story.author.username)
                     this.props.history.push(`${STORY_VIEW.replace(":story_id", this.props.match.params.story_id)}`);
             })
@@ -72,13 +72,15 @@ class CreateChapter extends Component
     {
         return (
             <div>
-                {(!!this.state.story.author) ?
-                    <form onSubmit={this.onSubmit}>
-                        <input type="text" onChange={this.onChange} name="title" value={this.state.chapter.title} placeholder="title" />
-                        <textarea onChange={this.onChange} name="description" value={this.state.chapter.description} placeholder="description" />
-                        <button type="submit">Create Chapter</button>
-                    </form> :
-                    <div>Loading...</div>}
+                <div>
+                    <label name="name">{this.state.chapter.title}</label>
+                    {(!!this.state.story.author) ?
+                        <form onSubmit={this.onSubmit}>
+                            <textarea onChange={this.onChange} name="description" value={this.state.chapter.description} placeholder="description" />
+                            <button type="submit">Create Chapter</button>
+                        </form> :
+                        <div>Loading...</div>}
+                </div>
             </div>
         );
     }

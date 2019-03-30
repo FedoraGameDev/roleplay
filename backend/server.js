@@ -47,6 +47,7 @@ app.use(express.json());
 app.use("/api", routes.api);
 app.use("/user", routes.user);
 app.use("/story", routes.story);
+app.use("/character", routes.character);
 
 let port = process.env.PORT || 3001;
 app.listen(port, () =>

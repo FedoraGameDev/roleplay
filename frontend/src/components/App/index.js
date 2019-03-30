@@ -11,6 +11,7 @@ import Home from "../Home";
 import Account from "../Account";
 import Admin from "../Admin";
 import { Story, Genre, CreateStory, ViewStory, CreateChapter } from "../Story";
+import { ListCharacters, ViewCharacter, CreateCharacter } from "../Character";
 
 class App extends React.Component
 {
@@ -35,6 +36,9 @@ class App extends React.Component
                     <Route path={ROUTES.GENRE} component={Genre} />
                     <Route path={ROUTES.STORY_VIEW} component={ViewStory} />
                     <Route path={ROUTES.CREATE_CHAPTER} component={CreateChapter} />
+                    <Route path={ROUTES.LIST_CHARACTERS} component={ListCharacters} />
+                    <Route path={ROUTES.VIEW_CHARACTER} component={ViewCharacter} />
+                    <Route path={ROUTES.CREATE_CHARACTER} component={CreateCharacter} />
                 </div>
             </Router>
         );

@@ -16,6 +16,7 @@ class Navigation extends React.Component
                     <li><Link to={ROUTES.HOME}>Home</Link></li>
                     <li><Link to={ROUTES.ACCOUNT}>Account</Link></li>
                     <li><Link to={ROUTES.STORY}>Stories</Link></li>
+                    <li><Link to={ROUTES.LIST_CHARACTERS}>Characters</Link></li>
                     <li><SignOutButton /></li>
                 </ul>
             );
