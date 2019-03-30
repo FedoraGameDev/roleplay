@@ -12,7 +12,8 @@ const withAuthentication = Component =>
         {
             super(props);
             this.state = {
-                userInfo: null
+                userInfo: null,
+                checkedAuth: false
             };
         }
 
@@ -33,7 +34,8 @@ const withAuthentication = Component =>
                                             userInfo: {
                                                 authUser: authUser,
                                                 user: user.data.data
-                                            }
+                                            },
+                                            checkedAuth: true
                                         });
                                         localStorage.setItem("token", idToken);
                                     })
@@ -49,7 +51,7 @@ const withAuthentication = Component =>
                     }
                     else
                     {
-                        this.setState({ userInfo: null });
+                        this.setState({ userInfo: null, checkedAuth: true });
                         localStorage.setItem("token", null);
                     };
                 }
@@ -65,7 +67,7 @@ const withAuthentication = Component =>
         {
             return (
                 <AuthUserContext.Provider value={this.state.userInfo}>
-                    {(!!this.state.userInfo) ? <Component {...this.props} /> : <h1>Loading...</h1>}
+                    {(this.state.checkedAuth) ? <Component {...this.props} /> : <h1>Loading...</h1>}
                 </AuthUserContext.Provider>
             );
         }
