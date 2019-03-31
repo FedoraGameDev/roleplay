@@ -28,5 +28,40 @@ module.exports = {
             {
                 res.status(500).json({ "ERROR": error });
             });
+    },
+    create: (req, res) =>
+    {
+        console.log("New Character received...")
+        firebaseAdmin.auth().verifyIdToken(req.body.token)
+            .then(decodedToken =>
+            {
+                console.log("User authenticated through firebase...");
+                models.User.findOne({ uuid: decodedToken.uid })
+                    .then(user =>
+                    {
+                        console.log(`${user.username} authenticated. Creating new character...`);
+                        characterDoc = req.body.character;
+                        characterDoc.user = user;
+                        models.Character.create(characterDoc, (err, character) =>
+                        {
+                            if (err) { res.status(500).json({ "ERROR": err }) };
+
+                            console.log(`Character ${characterDoc.name} created!`);
+
+                            models.User.updateOne({}, { $push: { characters: character } }, (err, output) =>
+                            {
+                                if (err) { res.status(500).json({ "ERROR": err }) };
+
+                                console.log("User Updated.");
+
+                                res.json({ "character": character });
+                            })
+                        })
+                    })
+                    .catch(error =>
+                    {
+                        res.status(500).json({ "ERROR": error });
+                    });
+            })
     }
 }
