@@ -48,7 +48,7 @@ module.exports = {
 
                             console.log(`Character ${characterDoc.name} created!`);
 
-                            models.User.updateOne({}, { $push: { characters: character } }, (err, output) =>
+                            models.User.updateOne({ _id: user._id }, { $push: { characters: character } }, (err, output) =>
                             {
                                 if (err) { res.status(500).json({ "ERROR": err }) };
 

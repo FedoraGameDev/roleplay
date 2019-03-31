@@ -1,7 +1,8 @@
 import React, { Component } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { withAuthorization } from "../firebase/Session";
-import { SIGN_IN } from "../../constants/routes";
+import { BACKEND, SIGN_IN, CREATE_CHARACTER } from "../../constants/routes";
 
 const INITIAL_STATE = {
     character: {
@@ -29,7 +30,15 @@ class CreateCharacter extends Component
         event.preventDefault();
         console.log(this.state);
 
-
+        axios.post(`${BACKEND}${CREATE_CHARACTER}`, { token: localStorage.token, character: this.state.character })
+            .then(res =>
+            {
+                console.log(res);
+            })
+            .catch(error =>
+            {
+                console.log(error);
+            });
     }
 
     render()
@@ -48,7 +57,18 @@ class CreateCharacter extends Component
     }
 }
 
+class CreateCharacterButton extends Component
+{
+    render()
+    {
+        return (
+            <Link to={CREATE_CHARACTER}>Create Character</Link>
+        )
+    }
+}
+
 const condition = userInfo => !!userInfo;
 const badCheck = history => history.push(SIGN_IN);
 
 export default withAuthorization(condition, badCheck)(CreateCharacter);
+export { CreateCharacterButton };
