@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { withAuthorization } from "../firebase/Session";
 import { SIGN_IN, BACKEND, LIST_CHARACTERS, VIEW_CHARACTER } from "../../constants/routes";
-import { CreateCharacterButton } from "./";
+import { CreateCharacterButton, CharacterGrid } from "./";
 
 const INITIAL_STATE = {
     characters: []
@@ -30,22 +30,13 @@ class ListCharacters extends Component
             });
     }
 
-    listCharacters(characters)
-    {
-        const characterList = characters.characters.map((character, index) => (
-            <li key={index}><Link to={VIEW_CHARACTER.replace(":character_id", character._id)}>{character.name}</Link></li>
-        ));
-
-        return (<ul>{characterList}</ul>);
-    }
-
     render()
     {
         return (
             <div>
                 {!!this.state.characters ?
                     <div>
-                        <this.listCharacters characters={this.state.characters} />
+                        <CharacterGrid characters={this.state.characters} />
                         <CreateCharacterButton />
                     </div> :
                     <div>
