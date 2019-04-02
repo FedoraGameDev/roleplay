@@ -63,5 +63,26 @@ module.exports = {
                         res.status(500).json({ "ERROR": error });
                     });
             })
+    },
+    view: (req, res) =>
+    {
+        console.log("Retrieving character...");
+        firebaseAdmin.auth().verifyIdToken(req.body.token)
+            .then(decodedToken =>
+            {
+                console.log("User authenticated through firebase...");
+
+                models.Character.findOne({ _id: req.params.character_id }, (err, character) =>
+                {
+                    if (err) { res.status(500).json({ "ERROR": err }) };
+
+                    console.log(`Character "${character.name}" found.`);
+                    res.json({ "character": character });
+                });
+            })
+            .catch(error =>
+            {
+                res.status(500).json({ "ERROR": error });
+            });
     }
 }
