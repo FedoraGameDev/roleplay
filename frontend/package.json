@@ -5,6 +5,9 @@
   "private": true,
   "dependencies": {
     "axios": "^0.18.0",
+    "base64-img": "^1.0.4",
+    "cloudinary": "^1.14.0",
+    "cloudinary-react": "^1.1.0",
     "firebase": "^5.9.1",
     "node-sass": "^4.11.0",
     "react": "^16.8.5",

@@ -6,14 +6,16 @@ const characterSchema = new Schema({
     basicinfo: {
         age: Number,
         gender: String,
-        birthday: Date,
+        birthmonth: Number,
+        birthday: Number,
         relationships: String,
         backstory: String,
     },
     appearance: {
         hair: String,
         eyes: String,
-        description: String
+        description: String,
+        image: String
     },
     personality: {
         traits: String,

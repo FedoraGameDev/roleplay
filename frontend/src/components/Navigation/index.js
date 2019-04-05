@@ -14,10 +14,10 @@ class Navigation extends React.Component
         {
             return (
                 <Menu inverted>
-                    <Link to={ROUTES.HOME}><Menu.Item active={localStorage.page == "/home"}>Home</Menu.Item></Link>
-                    <Link to={ROUTES.ACCOUNT}><Menu.Item active={localStorage.page == "/account"}>Account</Menu.Item></Link>
-                    <Link to={ROUTES.STORY}><Menu.Item active={localStorage.page == "/story"}>Stories</Menu.Item></Link>
-                    <Link to={ROUTES.LIST_CHARACTERS}><Menu.Item active={localStorage.page == "/characters"}>Characters</Menu.Item></Link>
+                    <Link to={ROUTES.HOME}><Menu.Item >Home</Menu.Item></Link>
+                    <Link to={ROUTES.ACCOUNT}><Menu.Item >Account</Menu.Item></Link>
+                    <Link to={ROUTES.LIST_STORY}><Menu.Item >Stories</Menu.Item></Link>
+                    <Link to={ROUTES.LIST_CHARACTERS}><Menu.Item >Characters</Menu.Item></Link>
                     <Menu.Item><SignOutButton /></Menu.Item>
                 </Menu>
             );

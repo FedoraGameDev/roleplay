@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import axios from "axios";
+import { Grid } from "semantic-ui-react";
 import { withAuthorization } from "../firebase/Session";
-import { SIGN_IN, BACKEND, LIST_CHARACTERS, VIEW_CHARACTER } from "../../constants/routes";
+import { SIGN_IN, BACKEND, LIST_CHARACTERS } from "../../constants/routes";
 import { CreateCharacterButton, CharacterGrid } from "./";
 
 const INITIAL_STATE = {
@@ -36,8 +36,14 @@ class ListCharacters extends Component
             <div>
                 {!!this.state.characters ?
                     <div>
-                        <CharacterGrid characters={this.state.characters} />
-                        <CreateCharacterButton />
+                        <Grid>
+                            <Grid.Row><Grid.Column>
+                                <CreateCharacterButton />
+                            </Grid.Column></Grid.Row>
+                            <Grid.Row><Grid.Column>
+                                <CharacterGrid characters={this.state.characters} />
+                            </Grid.Column></Grid.Row>
+                        </Grid>
                     </div> :
                     <div>
                         <CreateCharacterButton />

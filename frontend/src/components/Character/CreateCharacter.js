@@ -1,24 +1,29 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
-import { Input, Form, Button, Card, Grid, TextArea, Label } from "semantic-ui-react";
+import { Link, withRouter } from "react-router-dom";
+import { compose } from "recompose";
+import { Input, Form, Button, Grid, TextArea, Label, Dropdown } from "semantic-ui-react";
+import cloudinary from "cloudinary/lib/cloudinary";
 import ReactCrop from "react-image-crop";
+import 'react-image-crop/lib/ReactCrop.scss';
 import axios from "axios";
 import { withAuthorization } from "../firebase/Session";
-import { BACKEND, SIGN_IN, CREATE_CHARACTER } from "../../constants/routes";
+import { BACKEND, SIGN_IN, CREATE_CHARACTER, VIEW_CHARACTER } from "../../constants/routes";
+import Months from "../../constants/months";
 
 const INITIAL_STATE = {
     character: {
+        name: "",
         basicinfo: {
-            name: "",
             age: "",
             gender: "",
-            birthday: "",
+            birthmonth: 0,
+            birthday: 1,
             relationships: "",
             backstory: ""
         },
         appearance: {
-            hair: "",
-            eyes: "",
+            hair: "#000000",
+            eyes: "#000000",
             description: "",
             image: ""
         },
@@ -36,7 +41,8 @@ const INITIAL_STATE = {
         width: 50,
         x: 0,
         y: 0
-    }
+    },
+    pixelCrop: {}
 }
 
 class CreateCharacter extends Component
@@ -54,32 +60,82 @@ class CreateCharacter extends Component
         this.setState({ character: character });
     }
 
-    onChangeSub = event =>
+    onChangeBasic = event =>
     {
-        console.log(event.target.sub);
         const character = this.state.character;
+        character.basicinfo[event.target.name] = event.target.value;
+        this.setState({ character: character });
+    }
+
+    onChangeAppearance = event =>
+    {
+        const character = this.state.character;
+        character.appearance[event.target.name] = event.target.value;
+        this.setState({ character: character });
+    }
+
+    onChangePersonality = event =>
+    {
+        const character = this.state.character;
+        character.personality[event.target.name] = event.target.value;
         this.setState({ character: character });
     }
 
     onChangeCrop = (crop, pixelCrop) =>
     {
-        this.setState({ crop });
+        this.setState({ crop, pixelCrop });
     }
 
     onSubmit = event =>
     {
         event.preventDefault();
-        console.log(this.state);
+        const { character, pixelCrop, crop } = this.state;
 
-        axios.post(`${BACKEND}${CREATE_CHARACTER}`, { token: localStorage.token, character: this.state.character })
-            .then(res =>
-            {
-                console.log(res);
-            })
-            .catch(error =>
-            {
-                console.log(error);
+        if (this.imageRef && crop.width && crop.height)
+        {
+            const canvas = document.createElement('canvas');
+            canvas.width = 250;
+            canvas.height = 250;
+            const ctx = canvas.getContext('2d');
+
+            ctx.drawImage(
+                this.imageRef,
+                pixelCrop.x,
+                pixelCrop.y,
+                pixelCrop.width,
+                pixelCrop.height,
+                0,
+                0,
+                250,
+                250
+            );
+
+            cloudinary.config({
+                cloud_name: process.env.REACT_APP_CLOUDINARY_NAME,
+                api_key: process.env.REACT_APP_CLOUDINARY_KEY,
+                api_secret: process.env.REACT_APP_CLOUDINARY_SECRET
             });
+
+            cloudinary.uploader.upload(canvas.toDataURL(), { tags: "user_image" })
+                .then(image =>
+                {
+                    character.appearance.image = image.url;
+                    axios.post(`${BACKEND}${CREATE_CHARACTER}`, { token: localStorage.token, character: character })
+                        .then(res =>
+                        {
+                            this.setState({ ...INITIAL_STATE });
+                            this.props.history.push(VIEW_CHARACTER.replace(":character_id", res.data.character._id));
+                        })
+                        .catch(error =>
+                        {
+                            console.log(error);
+                        });
+                })
+                .catch(error =>
+                {
+                    console.log(error);
+                });
+        }
     }
 
     onSelectFile = event =>
@@ -99,128 +155,104 @@ class CreateCharacter extends Component
         this.imageRef = image;
     };
 
-    onCropComplete = (crop, pixelCrop) =>
-    {
-        this.makeClientCrop(crop, pixelCrop);
-    };
-
-    async makeClientCrop(crop, pixelCrop)
-    {
-        if (this.imageRef && crop.width && crop.height)
-        {
-            const croppedImageUrl = await this.getCroppedImg(
-                this.imageRef,
-                pixelCrop,
-                'newFile.jpeg',
-            );
-            this.setState({ croppedImageUrl });
-        }
-    }
-
-    getCroppedImg(image, pixelCrop, fileName)
-    {
-        const canvas = document.createElement('canvas');
-        canvas.width = pixelCrop.width;
-        canvas.height = pixelCrop.height;
-        const ctx = canvas.getContext('2d');
-
-        ctx.drawImage(
-            image,
-            pixelCrop.x,
-            pixelCrop.y,
-            pixelCrop.width,
-            pixelCrop.height,
-            0,
-            0,
-            pixelCrop.width,
-            pixelCrop.height,
-        );
-
-        return new Promise((resolve, reject) =>
-        {
-            canvas.toBlob(blob =>
-            {
-                if (!blob)
-                {
-                    //reject(new Error('Canvas is empty'));
-                    console.error('Canvas is empty');
-                    return;
-                }
-                blob.name = fileName;
-                window.URL.revokeObjectURL(this.fileUrl);
-                this.fileUrl = window.URL.createObjectURL(blob);
-                resolve(this.fileUrl);
-            }, 'image/jpeg');
-        });
-    }
-
     render()
     {
         const { character } = this.state;
         const isInvalid = (
-            character.name === "" ||
-            character.age === "" ||
-            character.gender === "" ||
-            character.birthday === "" ||
-            character.relationships === "" ||
-            character.backstory === "" ||
-            character.hair === "" ||
-            character.eyes === "" ||
-            character.description === "" ||
-            character.traits === "" ||
-            character.likes === "" ||
-            character.dislikes === "" ||
-            character.habits === "" ||
-            character.quirks === ""
+            character.name === ""
         );
 
         return (
             <Form onSubmit={this.onSubmit}>
-                <Grid columns={2} stackable>
+                <Grid columns={2} centered stackable>
                     <Grid.Row>
                         <Grid.Column>
                             <Grid columns={2}>
                                 <Grid.Row columns={1}><Grid.Column>
-                                    <Label>General Info</Label>
+                                    <Label size="big">General Info</Label>
                                 </Grid.Column></Grid.Row>
                                 <Grid.Row>
                                     <Grid.Column>
-                                        <Input fluid sub="basicinfo" name="name" value={character.name} onChange={this.onChangeSub} placeholder="Name" />
+                                        <Input
+                                            error={isInvalid}
+                                            fluid
+                                            labelPosition='right corner'
+                                            label={{ icon: 'asterisk' }}
+                                            name="name"
+                                            value={character.name}
+                                            onChange={this.onChange}
+                                            placeholder="Name" />
                                     </Grid.Column>
                                     <Grid.Column>
-                                        <Input fluid sub="basicinfo" name="age" value={character.basicinfo.age} onChange={this.onChangeSub} placeholder="Age" />
+                                        <Input
+                                            fluid
+                                            type="number"
+                                            name="age"
+                                            value={character.basicinfo.age}
+                                            onChange={this.onChangeBasic}
+                                            placeholder="Age" />
                                     </Grid.Column>
                                 </Grid.Row>
-                                <Grid.Row>
-                                    <Grid.Column>
-                                        <Input fluid sub="basicinfo" name="gender" value={character.gender} onChange={this.onChangeSub} placeholder="Gender" />
+                                <Grid.Row columns={4}>
+                                    <Grid.Column width={8}>
+                                        <Input
+                                            fluid
+                                            name="gender"
+                                            value={character.basicinfo.gender}
+                                            onChange={this.onChangeBasic}
+                                            placeholder="Gender" />
                                     </Grid.Column>
                                     <Grid.Column>
-                                        <Input fluid sub="basicinfo" name="birthday" value={character.birthday} onChange={this.onChangeSub} placeholder="Birthday" />
+                                        <Dropdown
+                                            fluid
+                                            selection
+                                            options={Months}
+                                            placeholder="Month" />
+                                    </Grid.Column>
+                                    <Grid.Column>
+                                        <Input
+                                            fluid
+                                            type="number"
+                                            min="1"
+                                            max="31"
+                                            name="birthday"
+                                            value={character.basicinfo.birthday}
+                                            onChange={this.onChangeBasic}
+                                            placeholder="Birthday" />
                                     </Grid.Column>
                                 </Grid.Row>
                                 <Grid.Row columns={1}><Grid.Column>
-                                    <TextArea sub="basicinfo" name="relationships" value={character.relationships} onChange={this.onChangeSub} placeholder="Relationships" />
+                                    <TextArea
+                                        name="relationships"
+                                        value={character.basicinfo.relationships}
+                                        onChange={this.onChangeBasic}
+                                        placeholder="Relationships" />
                                 </Grid.Column></Grid.Row>
                                 <Grid.Row columns={1}><Grid.Column>
-                                    <TextArea sub="basicinfo" name="backstory" value={character.backstory} onChange={this.onChangeSub} placeholder="Backstory" />
+                                    <TextArea
+                                        name="backstory"
+                                        value={character.basicinfo.backstory}
+                                        onChange={this.onChangeBasic}
+                                        placeholder="Backstory" />
                                 </Grid.Column></Grid.Row>
                             </Grid>
                         </Grid.Column>
                         <Grid.Column>
                             <Grid columns={1}>
                                 <Grid.Row><Grid.Column>
-                                    <Label>Image</Label>
+                                    <Label size="big">Image</Label>
                                 </Grid.Column></Grid.Row>
                                 <Grid.Row><Grid.Column>
-                                    {this.state.imageSrc ?
-                                        <ReactCrop
-                                            src={this.state.imageSrc}
-                                            crop={this.state.crop}
-                                            onChange={this.onChangeCrop}
-                                            onImageLoaded={this.onImageLoaded}
-                                            onComplete={this.onCropComplete} /> :
-                                        <Input fluid type="file" onChange={this.onSelectFile} />}
+                                    <Input
+                                        fluid
+                                        type="file"
+                                        onChange={this.onSelectFile} />
+                                    <ReactCrop
+                                        src={this.state.imageSrc}
+                                        crop={this.state.crop}
+                                        onChange={this.onChangeCrop}
+                                        onImageLoaded={this.onImageLoaded}
+                                        onComplete={this.onCropComplete} />
                                 </Grid.Column></Grid.Row>
                             </Grid>
                         </Grid.Column>
@@ -229,31 +261,76 @@ class CreateCharacter extends Component
                         <Grid.Column>
                             <Grid columns={2}>
                                 <Grid.Row columns={1}><Grid.Column>
-                                    <Label>Appearance Info</Label>
+                                    <Label size="big">Appearance Info</Label>
                                 </Grid.Column></Grid.Row>
                                 <Grid.Row>
                                     <Grid.Column>
-                                        <Input fluid sub="appearance" name="hair" value={character.hair} onChange={this.onChangeSub} placeholder="Hair" />
+                                        <center>
+                                            <p>Hair Color: {character.appearance.hair}</p>
+                                            <input
+                                                type="color"
+                                                name="hair"
+                                                value={character.appearance.hair}
+                                                onChange={this.onChangeAppearance}
+                                                placeholder="Hair" />
+                                        </center>
                                     </Grid.Column>
                                     <Grid.Column>
-                                        <Input fluid sub="appearance" name="eyes" value={character.eyes} onChange={this.onChangeSub} placeholder="Eyes" />
+                                        <center>
+                                            <p>Eye Color: {character.appearance.eyes}</p>
+                                            <input
+                                                type="color"
+                                                name="eyes"
+                                                value={character.appearance.eyes}
+                                                onChange={this.onChangeAppearance}
+                                                placeholder="Eyes" />
+                                        </center>
                                     </Grid.Column>
                                 </Grid.Row>
                                 <Grid.Row columns={1}><Grid.Column>
-                                    <TextArea sub="appearance" name="description" value={character.description} onChange={this.onChangeSub} placeholder="Description" />
+                                    <TextArea
+                                        name="description"
+                                        value={character.appearance.description}
+                                        onChange={this.onChangeAppearance}
+                                        placeholder="Description" />
                                 </Grid.Column></Grid.Row>
                             </Grid>
                         </Grid.Column>
                         <Grid.Column>
                             <Grid columns={1}>
                                 <Grid.Row columns={1}><Grid.Column>
-                                    <Label>Personality Info</Label>
+                                    <Label size="big">Personality Info</Label>
                                 </Grid.Column></Grid.Row>
-                                <Grid.Row><Grid.Column><TextArea sub="personality" name="traits" value={character.traits} onChange={this.onChange} placeholder="Traits" /></Grid.Column></Grid.Row>
-                                <Grid.Row><Grid.Column><TextArea sub="personality" name="likes" value={character.likes} onChange={this.onChange} placeholder="Likes" /></Grid.Column></Grid.Row>
-                                <Grid.Row><Grid.Column><TextArea sub="personality" name="dislikes" value={character.dislikes} onChange={this.onChange} placeholder="Dislikes" /></Grid.Column></Grid.Row>
-                                <Grid.Row><Grid.Column><TextArea sub="personality" name="habits" value={character.habits} onChange={this.onChange} placeholder="Habits" /></Grid.Column></Grid.Row>
-                                <Grid.Row><Grid.Column><TextArea sub="personality" name="quirks" value={character.quirks} onChange={this.onChange} placeholder="Quirks" /></Grid.Column></Grid.Row>
+                                <Grid.Row><Grid.Column><TextArea
+                                    name="traits"
+                                    value={character.personality.traits}
+                                    onChange={this.onChangePersonality}
+                                    placeholder="Traits" />
+                                </Grid.Column></Grid.Row>
+                                <Grid.Row><Grid.Column><TextArea
+                                    name="likes"
+                                    value={character.personality.likes}
+                                    onChange={this.onChangePersonality}
+                                    placeholder="Likes" />
+                                </Grid.Column></Grid.Row>
+                                <Grid.Row><Grid.Column><TextArea
+                                    name="dislikes"
+                                    value={character.personality.dislikes}
+                                    onChange={this.onChangePersonality}
+                                    placeholder="Dislikes" />
+                                </Grid.Column></Grid.Row>
+                                <Grid.Row><Grid.Column><TextArea
+                                    name="habits"
+                                    value={character.personality.habits}
+                                    onChange={this.onChangePersonality}
+                                    placeholder="Habits" />
+                                </Grid.Column></Grid.Row>
+                                <Grid.Row><Grid.Column><TextArea
+                                    name="quirks"
+                                    value={character.personality.quirks}
+                                    onChange={this.onChangePersonality}
+                                    placeholder="Quirks" />
+                                </Grid.Column></Grid.Row>
                             </Grid>
                         </Grid.Column>
                     </Grid.Row>
@@ -269,7 +346,7 @@ class CreateCharacterButton extends Component
     render()
     {
         return (
-            <Link to={CREATE_CHARACTER}>Create Character</Link>
+            <center><Link to={CREATE_CHARACTER}><Button>Create Character</Button></Link></center>
         )
     }
 }
@@ -277,5 +354,5 @@ class CreateCharacterButton extends Component
 const condition = userInfo => !!userInfo;
 const badCheck = history => history.push(SIGN_IN);
 
-export default withAuthorization(condition, badCheck)(CreateCharacter);
+export default compose(withAuthorization(condition, badCheck), withRouter)(CreateCharacter);
 export { CreateCharacterButton };

@@ -3,7 +3,23 @@ const mongoose = require("mongoose");
 const firebaseAdmin = require("firebase-admin");
 
 module.exports = {
-    index: (req, res) =>
+    listStory: (req, res) =>
+    {
+        console.log("Retrieving Stories...");
+        models.Story.find({})
+            .then(stories =>
+            {
+                console.log(`Returning ${stories.length} Stories.`);
+                res.json({ stories: stories });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+                res.status(500).json({ "ERROR": error });
+            });
+    },
+
+    listGenre: (req, res) =>
     {
         console.log("Retrieving Genres...");
         models.Genre.find({})
@@ -15,8 +31,10 @@ module.exports = {
             .catch(error =>
             {
                 console.log(error);
+                res.status(500).json({ "ERROR": error });
             });
     },
+
     genre: (req, res) =>
     {
         console.log(`Retrieving Genre ${req.params.genre}...`);
