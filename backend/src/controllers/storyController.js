@@ -35,6 +35,9 @@ module.exports = {
             });
     },
 
+
+
+
     genre: (req, res) =>
     {
         console.log(`Retrieving Genre ${req.params.genre}...`);
@@ -77,14 +80,7 @@ module.exports = {
                             {
                                 if (err) { res.status(500).json({ "ERROR": err }); };
 
-                                console.log(req.body.story.genres);
-                                console.log(`Updated user '${updatedUser.username}'`);
-                                models.Genre.updateMany({ "_id": { $in: req.body.story.genres } },
-                                    { $push: { stories: newStory } }, (err, updatedGenres) =>
-                                    {
-                                        console.log(`Genres Updated "${updatedGenres}"`);
-                                        res.json({ newStory: newStory });
-                                    });
+                                res.json({ newStory: newStory });
                             });
                         });
                     });

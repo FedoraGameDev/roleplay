@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
-import { Input, Form, Button, Grid, TextArea, Label, Dropdown } from "semantic-ui-react";
+import { Input, Form, Button, Grid, TextArea, Label, Dropdown, Container } from "semantic-ui-react";
 import cloudinary from "cloudinary/lib/cloudinary";
 import ReactCrop from "react-image-crop";
 import 'react-image-crop/lib/ReactCrop.scss';
@@ -163,180 +163,182 @@ class CreateCharacter extends Component
         );
 
         return (
-            <Form onSubmit={this.onSubmit}>
-                <Grid columns={2} centered stackable>
-                    <Grid.Row>
-                        <Grid.Column>
-                            <Grid columns={2}>
-                                <Grid.Row columns={1}><Grid.Column>
-                                    <Label size="big">General Info</Label>
-                                </Grid.Column></Grid.Row>
-                                <Grid.Row>
-                                    <Grid.Column>
-                                        <Input
-                                            error={isInvalid}
-                                            fluid
-                                            labelPosition='right corner'
-                                            label={{ icon: 'asterisk' }}
-                                            name="name"
-                                            value={character.name}
-                                            onChange={this.onChange}
-                                            placeholder="Name" />
-                                    </Grid.Column>
-                                    <Grid.Column>
-                                        <Input
-                                            fluid
-                                            type="number"
-                                            name="age"
-                                            value={character.basicinfo.age}
+            <Container>
+                <Form onSubmit={this.onSubmit}>
+                    <Grid columns={2} centered stackable>
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Grid columns={2}>
+                                    <Grid.Row columns={1}><Grid.Column>
+                                        <Label size="big">General Info</Label>
+                                    </Grid.Column></Grid.Row>
+                                    <Grid.Row>
+                                        <Grid.Column>
+                                            <Input
+                                                error={isInvalid}
+                                                fluid
+                                                labelPosition='right corner'
+                                                label={{ icon: 'asterisk' }}
+                                                name="name"
+                                                value={character.name}
+                                                onChange={this.onChange}
+                                                placeholder="Name" />
+                                        </Grid.Column>
+                                        <Grid.Column>
+                                            <Input
+                                                fluid
+                                                type="number"
+                                                name="age"
+                                                value={character.basicinfo.age}
+                                                onChange={this.onChangeBasic}
+                                                placeholder="Age" />
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    <Grid.Row columns={4}>
+                                        <Grid.Column width={8}>
+                                            <Input
+                                                fluid
+                                                name="gender"
+                                                value={character.basicinfo.gender}
+                                                onChange={this.onChangeBasic}
+                                                placeholder="Gender" />
+                                        </Grid.Column>
+                                        <Grid.Column>
+                                            <Dropdown
+                                                fluid
+                                                selection
+                                                options={Months}
+                                                placeholder="Month" />
+                                        </Grid.Column>
+                                        <Grid.Column>
+                                            <Input
+                                                fluid
+                                                type="number"
+                                                min="1"
+                                                max="31"
+                                                name="birthday"
+                                                value={character.basicinfo.birthday}
+                                                onChange={this.onChangeBasic}
+                                                placeholder="Birthday" />
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    <Grid.Row columns={1}><Grid.Column>
+                                        <TextArea
+                                            name="relationships"
+                                            value={character.basicinfo.relationships}
                                             onChange={this.onChangeBasic}
-                                            placeholder="Age" />
-                                    </Grid.Column>
-                                </Grid.Row>
-                                <Grid.Row columns={4}>
-                                    <Grid.Column width={8}>
+                                            placeholder="Relationships" />
+                                    </Grid.Column></Grid.Row>
+                                    <Grid.Row columns={1}><Grid.Column>
+                                        <TextArea
+                                            name="backstory"
+                                            value={character.basicinfo.backstory}
+                                            onChange={this.onChangeBasic}
+                                            placeholder="Backstory" />
+                                    </Grid.Column></Grid.Row>
+                                </Grid>
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Grid columns={1}>
+                                    <Grid.Row><Grid.Column>
+                                        <Label size="big">Image</Label>
+                                    </Grid.Column></Grid.Row>
+                                    <Grid.Row><Grid.Column>
                                         <Input
                                             fluid
-                                            name="gender"
-                                            value={character.basicinfo.gender}
-                                            onChange={this.onChangeBasic}
-                                            placeholder="Gender" />
-                                    </Grid.Column>
-                                    <Grid.Column>
-                                        <Dropdown
-                                            fluid
-                                            selection
-                                            options={Months}
-                                            placeholder="Month" />
-                                    </Grid.Column>
-                                    <Grid.Column>
-                                        <Input
-                                            fluid
-                                            type="number"
-                                            min="1"
-                                            max="31"
-                                            name="birthday"
-                                            value={character.basicinfo.birthday}
-                                            onChange={this.onChangeBasic}
-                                            placeholder="Birthday" />
-                                    </Grid.Column>
-                                </Grid.Row>
-                                <Grid.Row columns={1}><Grid.Column>
-                                    <TextArea
-                                        name="relationships"
-                                        value={character.basicinfo.relationships}
-                                        onChange={this.onChangeBasic}
-                                        placeholder="Relationships" />
-                                </Grid.Column></Grid.Row>
-                                <Grid.Row columns={1}><Grid.Column>
-                                    <TextArea
-                                        name="backstory"
-                                        value={character.basicinfo.backstory}
-                                        onChange={this.onChangeBasic}
-                                        placeholder="Backstory" />
-                                </Grid.Column></Grid.Row>
-                            </Grid>
-                        </Grid.Column>
-                        <Grid.Column>
-                            <Grid columns={1}>
-                                <Grid.Row><Grid.Column>
-                                    <Label size="big">Image</Label>
-                                </Grid.Column></Grid.Row>
-                                <Grid.Row><Grid.Column>
-                                    <Input
-                                        fluid
-                                        type="file"
-                                        onChange={this.onSelectFile} />
-                                    <ReactCrop
-                                        src={this.state.imageSrc}
-                                        crop={this.state.crop}
-                                        onChange={this.onChangeCrop}
-                                        onImageLoaded={this.onImageLoaded}
-                                        onComplete={this.onCropComplete} />
-                                </Grid.Column></Grid.Row>
-                            </Grid>
-                        </Grid.Column>
-                    </Grid.Row>
-                    <Grid.Row>
-                        <Grid.Column>
-                            <Grid columns={2}>
-                                <Grid.Row columns={1}><Grid.Column>
-                                    <Label size="big">Appearance Info</Label>
-                                </Grid.Column></Grid.Row>
-                                <Grid.Row>
-                                    <Grid.Column>
-                                        <center>
-                                            <p>Hair Color: {character.appearance.hair}</p>
-                                            <input
-                                                type="color"
-                                                name="hair"
-                                                value={character.appearance.hair}
-                                                onChange={this.onChangeAppearance}
-                                                placeholder="Hair" />
-                                        </center>
-                                    </Grid.Column>
-                                    <Grid.Column>
-                                        <center>
-                                            <p>Eye Color: {character.appearance.eyes}</p>
-                                            <input
-                                                type="color"
-                                                name="eyes"
-                                                value={character.appearance.eyes}
-                                                onChange={this.onChangeAppearance}
-                                                placeholder="Eyes" />
-                                        </center>
-                                    </Grid.Column>
-                                </Grid.Row>
-                                <Grid.Row columns={1}><Grid.Column>
-                                    <TextArea
-                                        name="description"
-                                        value={character.appearance.description}
-                                        onChange={this.onChangeAppearance}
-                                        placeholder="Description" />
-                                </Grid.Column></Grid.Row>
-                            </Grid>
-                        </Grid.Column>
-                        <Grid.Column>
-                            <Grid columns={1}>
-                                <Grid.Row columns={1}><Grid.Column>
-                                    <Label size="big">Personality Info</Label>
-                                </Grid.Column></Grid.Row>
-                                <Grid.Row><Grid.Column><TextArea
-                                    name="traits"
-                                    value={character.personality.traits}
-                                    onChange={this.onChangePersonality}
-                                    placeholder="Traits" />
-                                </Grid.Column></Grid.Row>
-                                <Grid.Row><Grid.Column><TextArea
-                                    name="likes"
-                                    value={character.personality.likes}
-                                    onChange={this.onChangePersonality}
-                                    placeholder="Likes" />
-                                </Grid.Column></Grid.Row>
-                                <Grid.Row><Grid.Column><TextArea
-                                    name="dislikes"
-                                    value={character.personality.dislikes}
-                                    onChange={this.onChangePersonality}
-                                    placeholder="Dislikes" />
-                                </Grid.Column></Grid.Row>
-                                <Grid.Row><Grid.Column><TextArea
-                                    name="habits"
-                                    value={character.personality.habits}
-                                    onChange={this.onChangePersonality}
-                                    placeholder="Habits" />
-                                </Grid.Column></Grid.Row>
-                                <Grid.Row><Grid.Column><TextArea
-                                    name="quirks"
-                                    value={character.personality.quirks}
-                                    onChange={this.onChangePersonality}
-                                    placeholder="Quirks" />
-                                </Grid.Column></Grid.Row>
-                            </Grid>
-                        </Grid.Column>
-                    </Grid.Row>
-                    <Button disabled={isInvalid} type="submit">Create Character</Button>
-                </Grid>
-            </Form>
+                                            type="file"
+                                            onChange={this.onSelectFile} />
+                                        <ReactCrop
+                                            src={this.state.imageSrc}
+                                            crop={this.state.crop}
+                                            onChange={this.onChangeCrop}
+                                            onImageLoaded={this.onImageLoaded}
+                                            onComplete={this.onCropComplete} />
+                                    </Grid.Column></Grid.Row>
+                                </Grid>
+                            </Grid.Column>
+                        </Grid.Row>
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Grid columns={2}>
+                                    <Grid.Row columns={1}><Grid.Column>
+                                        <Label size="big">Appearance Info</Label>
+                                    </Grid.Column></Grid.Row>
+                                    <Grid.Row>
+                                        <Grid.Column>
+                                            <center>
+                                                <p>Hair Color: {character.appearance.hair}</p>
+                                                <input
+                                                    type="color"
+                                                    name="hair"
+                                                    value={character.appearance.hair}
+                                                    onChange={this.onChangeAppearance}
+                                                    placeholder="Hair" />
+                                            </center>
+                                        </Grid.Column>
+                                        <Grid.Column>
+                                            <center>
+                                                <p>Eye Color: {character.appearance.eyes}</p>
+                                                <input
+                                                    type="color"
+                                                    name="eyes"
+                                                    value={character.appearance.eyes}
+                                                    onChange={this.onChangeAppearance}
+                                                    placeholder="Eyes" />
+                                            </center>
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    <Grid.Row columns={1}><Grid.Column>
+                                        <TextArea
+                                            name="description"
+                                            value={character.appearance.description}
+                                            onChange={this.onChangeAppearance}
+                                            placeholder="Description" />
+                                    </Grid.Column></Grid.Row>
+                                </Grid>
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Grid columns={1}>
+                                    <Grid.Row columns={1}><Grid.Column>
+                                        <Label size="big">Personality Info</Label>
+                                    </Grid.Column></Grid.Row>
+                                    <Grid.Row><Grid.Column><TextArea
+                                        name="traits"
+                                        value={character.personality.traits}
+                                        onChange={this.onChangePersonality}
+                                        placeholder="Traits" />
+                                    </Grid.Column></Grid.Row>
+                                    <Grid.Row><Grid.Column><TextArea
+                                        name="likes"
+                                        value={character.personality.likes}
+                                        onChange={this.onChangePersonality}
+                                        placeholder="Likes" />
+                                    </Grid.Column></Grid.Row>
+                                    <Grid.Row><Grid.Column><TextArea
+                                        name="dislikes"
+                                        value={character.personality.dislikes}
+                                        onChange={this.onChangePersonality}
+                                        placeholder="Dislikes" />
+                                    </Grid.Column></Grid.Row>
+                                    <Grid.Row><Grid.Column><TextArea
+                                        name="habits"
+                                        value={character.personality.habits}
+                                        onChange={this.onChangePersonality}
+                                        placeholder="Habits" />
+                                    </Grid.Column></Grid.Row>
+                                    <Grid.Row><Grid.Column><TextArea
+                                        name="quirks"
+                                        value={character.personality.quirks}
+                                        onChange={this.onChangePersonality}
+                                        placeholder="Quirks" />
+                                    </Grid.Column></Grid.Row>
+                                </Grid>
+                            </Grid.Column>
+                        </Grid.Row>
+                        <Button disabled={isInvalid} type="submit">Create Character</Button>
+                    </Grid>
+                </Form>
+            </Container>
         );
     }
 }

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Grid } from "semantic-ui-react";
+import { Grid, Container } from "semantic-ui-react";
 import { withAuthorization } from "../firebase/Session";
 import { SIGN_IN, BACKEND, LIST_CHARACTERS } from "../../constants/routes";
 import { CreateCharacterButton, CharacterGrid } from "./";
@@ -35,16 +35,11 @@ class ListCharacters extends Component
         return (
             <div>
                 {!!this.state.characters ?
-                    <div>
-                        <Grid>
-                            <Grid.Row><Grid.Column>
-                                <CreateCharacterButton />
-                            </Grid.Column></Grid.Row>
-                            <Grid.Row><Grid.Column>
-                                <CharacterGrid characters={this.state.characters} />
-                            </Grid.Column></Grid.Row>
-                        </Grid>
-                    </div> :
+                    <Container>
+                        <CreateCharacterButton />
+                        <center><CharacterGrid characters={this.state.characters} /></center>
+                    </Container> :
+
                     <div>
                         <CreateCharacterButton />
                     </div>}

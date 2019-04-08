@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import { Container } from "semantic-ui-react";
 import axios from "axios";
 import { withAuthStatic } from "../firebase/Session";
 import { BACKEND, GENRE, STORY_VIEW, CREATE_CHAPTER } from "../../constants/routes";
@@ -61,14 +62,17 @@ class ViewStory extends Component
         const { story } = this.state;
 
         return (
-            <div>
+            <Container>
                 <div>{story.author.username}</div>
                 <div><this.listGenres genres={story.genres} /></div>
                 <div>{story.title}</div>
                 <div>{story.description}</div>
                 <div><this.listChapters chapters={story.chapters} /></div>
-                {!!this.props.userInfo && this.props.userInfo.user.username === story.author.username ? <Link to={`${CREATE_CHAPTER.replace(":story_id", this.props.match.params.story_id)}`}>Create Chapter</Link> : null}
-            </div>
+                {!!this.props.userInfo && this.props.userInfo.user.username === story.author.username ?
+                    <Link to={`${CREATE_CHAPTER.replace(":story_id", this.props.match.params.story_id)}`}>Create Chapter</Link> :
+                    null
+                }
+            </Container>
         );
     }
 }

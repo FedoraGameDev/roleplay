@@ -39,7 +39,19 @@ class StoryTable extends Component
             ));
 
         return (
-            <Table><Table.Body>{rows}</Table.Body></Table>
+            <Table padded striped inverted>
+                <Table.Header>
+                    <Table.Row>
+                        <Table.HeaderCell>Title</Table.HeaderCell>
+                        <Table.HeaderCell>Other</Table.HeaderCell>
+                        <Table.HeaderCell>Other</Table.HeaderCell>
+                        <Table.HeaderCell>Other</Table.HeaderCell>
+                    </Table.Row>
+                </Table.Header>
+                <Table.Body>
+                    {rows}
+                </Table.Body>
+            </Table>
         );
     }
 

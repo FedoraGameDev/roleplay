@@ -30,7 +30,9 @@ class Story extends Component
                 {
                     genreChecks[element.name] = false;
                 });
-                this.setState({ genres: res.data.genres, genreChecks: genreChecks });
+                this.setState({
+                    genres: res.data.genres
+                });
             })
             .catch(error =>
             {
@@ -40,7 +42,7 @@ class Story extends Component
         axios.get(`${BACKEND}${LIST_STORY}`)
             .then(res =>
             {
-                this.setState({ stories: res.data.stories });//, filteredStories: res.data.stories });
+                this.setState({ stories: res.data.stories, filteredStories: [...res.data.stories] });
                 this.filterStories();
             })
             .catch(error =>
@@ -51,25 +53,26 @@ class Story extends Component
 
     filterStories = () =>
     {
-        //TODO: this is incredibly slow (1N~N^2). There should be a faster way to do this.
-        const { filteredStories, stories, genres } = this.state;
-        this.setState({ filteredStories: stories });
+        //TODO: this is slow (1N * genres)
+        const { stories, genres } = this.state;
+        const newFilter = [...stories];
 
         if (this.checkFilters())
         {
             genres.forEach(element =>
             {
                 var iter = 0;
-                while (iter < filteredStories.length)
+                while (iter < newFilter.length)
                 {
-                    if (filteredStories[iter].genres.indexOf(element._id) !== -1)
+                    if (newFilter[iter].genres.indexOf(element._id) !== -1)
                         iter++;
                     else
-                        filteredStories.splice(iter, 1);
+                        newFilter.splice(iter, 1);
                 }
             });
-            this.setState({ filteredStories: filteredStories });
         }
+
+        this.setState({ filteredStories: newFilter });
     }
 
     onGenreChange = genre =>
@@ -107,7 +110,7 @@ class Story extends Component
 
     render()
     {
-        const { genres, stories, filteredStories, genreChecks } = this.state;
+        const { genres, stories, genreChecks, filteredStories } = this.state;
         return (
             <Container>
                 {(!!genres && !!stories) ? [
