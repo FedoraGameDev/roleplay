@@ -10,7 +10,8 @@ import PasswordForget from "../firebase/PasswordForget";
 import Home from "../Home";
 import Account from "../Account";
 import Admin from "../Admin";
-import { Story, Genre, CreateStory, ViewStory, CreateChapter } from "../Story";
+import { CreateStory, ViewStory, CreateChapter, ListStory } from "../Story";
+import { ListCharacters, ViewCharacter, CreateCharacter } from "../Character";
 
 class App extends React.Component
 {
@@ -21,8 +22,6 @@ class App extends React.Component
                 <div>
                     <Navigation />
 
-                    <hr />
-
                     <Route exact path={ROUTES.LANDING} component={Landing} />
                     <Route path={ROUTES.SIGN_UP} component={SignUp} />
                     <Route path={ROUTES.SIGN_IN} component={SignIn} />
@@ -30,11 +29,16 @@ class App extends React.Component
                     <Route path={ROUTES.HOME} component={Home} />
                     <Route path={ROUTES.ACCOUNT} component={Account} />
                     <Route path={ROUTES.ADMIN} component={Admin} />
-                    <Route exact path={ROUTES.STORY} component={Story} />
-                    <Route path={ROUTES.CREATE_STORY} component={CreateStory} />
-                    <Route path={ROUTES.GENRE} component={Genre} />
+
+                    <Route path={ROUTES.LIST_STORY} component={ListStory} />
                     <Route path={ROUTES.STORY_VIEW} component={ViewStory} />
+
+                    <Route path={ROUTES.CREATE_STORY} component={CreateStory} />
                     <Route path={ROUTES.CREATE_CHAPTER} component={CreateChapter} />
+
+                    <Route path={ROUTES.LIST_CHARACTERS} component={ListCharacters} />
+                    <Route path={ROUTES.VIEW_CHARACTER} component={ViewCharacter} />
+                    <Route path={ROUTES.CREATE_CHARACTER} component={CreateCharacter} />
                 </div>
             </Router>
         );

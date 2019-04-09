@@ -3,7 +3,23 @@ const mongoose = require("mongoose");
 const firebaseAdmin = require("firebase-admin");
 
 module.exports = {
-    index: (req, res) =>
+    listStory: (req, res) =>
+    {
+        console.log("Retrieving Stories...");
+        models.Story.find({})
+            .then(stories =>
+            {
+                console.log(`Returning ${stories.length} Stories.`);
+                res.json({ stories: stories });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+                res.status(500).json({ "ERROR": error });
+            });
+    },
+
+    listGenre: (req, res) =>
     {
         console.log("Retrieving Genres...");
         models.Genre.find({})
@@ -15,8 +31,13 @@ module.exports = {
             .catch(error =>
             {
                 console.log(error);
+                res.status(500).json({ "ERROR": error });
             });
     },
+
+
+
+
     genre: (req, res) =>
     {
         console.log(`Retrieving Genre ${req.params.genre}...`);
@@ -59,14 +80,7 @@ module.exports = {
                             {
                                 if (err) { res.status(500).json({ "ERROR": err }); };
 
-                                console.log(req.body.story.genres);
-                                console.log(`Updated user '${updatedUser.username}'`);
-                                models.Genre.updateMany({ "_id": { $in: req.body.story.genres } },
-                                    { $push: { stories: newStory } }, (err, updatedGenres) =>
-                                    {
-                                        console.log(`Genres Updated "${updatedGenres}"`);
-                                        res.json({ newStory: newStory });
-                                    });
+                                res.json({ newStory: newStory });
                             });
                         });
                     });

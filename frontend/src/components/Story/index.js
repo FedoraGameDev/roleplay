@@ -1,7 +1,8 @@
-import Story from "./story";
-import Genre from "./Genre";
-import CreateStory from "./CreateStory";
+import ListStory from "./ListStories";
+import StoryCard from "./StoryCard";
 import ViewStory from "./ViewStory";
-import CreateChapter from "./CreateChapter";
 
-export { Story, Genre, CreateStory, ViewStory, CreateChapter };
+import CreateChapter from "./CreateChapter";
+import CreateStory from "./CreateStory";
+
+export { ListStory, StoryCard, ViewStory, CreateStory, CreateChapter };

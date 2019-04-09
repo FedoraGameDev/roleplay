@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
 import axios from "axios";
+import { Button } from "semantic-ui-react";
 import { compose } from "recompose";
 import { BACKEND, CREATE_STORY, STORY_VIEW, SIGN_IN } from "../../constants/routes";
 import { withAuthorization } from "../firebase/Session";
@@ -110,10 +111,22 @@ class CreateStory extends Component
     }
 }
 
-const CreateStoryLink = () =>
-    (
-        <p><Link to={CREATE_STORY}>New Story</Link></p>
-    )
+class CreateStoryLinkBase extends Component
+{
+    Click = to =>
+    {
+        this.props.history.push(to);
+    }
+
+    render()
+    {
+        return (
+            <Button primary onClick={event => this.Click(CREATE_STORY)}>New Story</Button>
+        );
+    }
+}
+
+const CreateStoryLink = withRouter(CreateStoryLinkBase);
 
 export default compose(withRouter, withAuthorization(userInfo => !!userInfo, history => history.push(`${SIGN_IN}?forward=story/create`)))(CreateStory);
 export { CreateStoryLink };

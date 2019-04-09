@@ -1,5 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
+import { Menu } from "semantic-ui-react";
+import { compose } from "recompose";
 import SignOutButton from "../firebase/SignOut";
 import { withAuthStatic } from "../firebase/Session";
 import * as ROUTES from "../../constants/routes";
@@ -11,13 +13,13 @@ class Navigation extends React.Component
         if (!!myself.myself.props.userInfo)
         {
             return (
-                <ul>
-                    <li><Link to={ROUTES.LANDING}>Landing</Link></li>
-                    <li><Link to={ROUTES.HOME}>Home</Link></li>
-                    <li><Link to={ROUTES.ACCOUNT}>Account</Link></li>
-                    <li><Link to={ROUTES.STORY}>Stories</Link></li>
-                    <li><SignOutButton /></li>
-                </ul>
+                <Menu inverted>
+                    <Link to={ROUTES.HOME}><Menu.Item >Home</Menu.Item></Link>
+                    <Link to={ROUTES.ACCOUNT}><Menu.Item >Account</Menu.Item></Link>
+                    <Link to={ROUTES.LIST_STORY}><Menu.Item >Stories</Menu.Item></Link>
+                    <Link to={ROUTES.LIST_CHARACTERS}><Menu.Item >Characters</Menu.Item></Link>
+                    <Menu.Item><SignOutButton /></Menu.Item>
+                </Menu>
             );
         }
         else
@@ -39,4 +41,4 @@ class Navigation extends React.Component
     }
 }
 
-export default withAuthStatic(Navigation);
+export default compose(withAuthStatic, withRouter)(Navigation);

@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import { Loader } from "semantic-ui-react";
 import AuthUserContext from "./context";
 import { withFirebase } from "../Firebase";
 import { BACKEND } from "../../../constants/routes";
@@ -67,7 +68,7 @@ const withAuthentication = Component =>
         {
             return (
                 <AuthUserContext.Provider value={this.state.userInfo}>
-                    {(this.state.checkedAuth) ? <Component {...this.props} /> : <h1>Loading...</h1>}
+                    {(this.state.checkedAuth) ? <Component {...this.props} /> : <Loader active />}
                 </AuthUserContext.Provider>
             );
         }

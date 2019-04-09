@@ -57,7 +57,7 @@ async function GenerateUser()
     {
         await user.save();
         await fedora.save();
-        return user;
+        return fedora;
     }
     catch (err)
     {
@@ -70,7 +70,10 @@ async function GenerateCharacter(user)
 {
     const character = new models.Character({
         name: "New Character",
-        user: user
+        user: user,
+        appearance: {
+            image: "https://res.cloudinary.com/dbfb8rwim/image/upload/v1554371198/w9ga5ite92psxuguw4im.png"
+        }
     });
 
     try
@@ -116,7 +119,7 @@ async function GenerateStory(genre, user, character)
         genres: [genre],
         author: user,
         chapters: [{
-            title: "Ch 1",
+            title: "Chapter 1",
             description: "Some setup stuff and character introductions.",
             posts: [{
                 author: user,
@@ -129,9 +132,6 @@ async function GenerateStory(genre, user, character)
     try
     {
         await story.save();
-
-        genre.stories = [story];
-        await genre.save();
 
         user.subscriptions = [story];
         user.notifications = [{
