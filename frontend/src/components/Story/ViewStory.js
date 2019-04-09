@@ -1,17 +1,19 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
-import { Container, Table, Header, Button } from "semantic-ui-react";
+import { Container, Table, Header, Button, Modal, ModalDescription, Dropdown } from "semantic-ui-react";
 import { compose } from "recompose";
 import axios from "axios";
 import { withAuthStatic } from "../firebase/Session";
-import { BACKEND, STORY_VIEW, CREATE_CHAPTER } from "../../constants/routes";
+import { BACKEND, STORY_VIEW, CREATE_CHAPTER, LIST_CHARACTERS } from "../../constants/routes";
 
 const INITIAL_STATE = {
     story: {
         author: {},
         genres: [],
         chapters: []
-    }
+    },
+    characterList: null,
+    selectedCharacter: 0
 }
 
 class ViewStory extends Component
@@ -34,17 +36,39 @@ class ViewStory extends Component
             {
                 console.log(error);
             });
+
+        axios.post(`${BACKEND}${LIST_CHARACTERS}`, { token: localStorage.getItem("token") })
+            .then(res =>
+            {
+                console.log(res.data.characters);
+                this.setState({ characterList: res.data.characters });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+            });
     }
 
     listGenres(genres)
     {
         const genreList = genres.genres.map((genre, index) => (
-            <Table.Cell key={index}><center>{genre.name}</center></Table.Cell>
+            <Table.Cell key={index} value={index}><center>{genre.name}</center></Table.Cell>
         ));
 
         return (
             <Table.Row>{genreList}</Table.Row>
         )
+    }
+
+    listCharacterOptions = info =>
+    {
+        const { characters, state } = info.info;
+        const options = characters.map((character, index) =>
+            (
+                <Dropdown.Item key={index}>{character.name}</Dropdown.Item>
+            ));
+
+        return (<Dropdown placeholder="Characters" scrolling value={state.selectedCharacter}><Dropdown.Menu>{options}</Dropdown.Menu></Dropdown>);
     }
 
     onLinkClick = to =>
@@ -54,7 +78,9 @@ class ViewStory extends Component
 
     listChapters(info)
     {
-        const { props, story, onLinkClick } = info.info;
+        const { myself, onLinkClick } = info.info;
+        const { props, state } = myself;
+        const { story, characterList } = state;
         const { chapters } = story;
         const { userInfo } = props;
         const { story_id } = props.match.params;
@@ -69,10 +95,20 @@ class ViewStory extends Component
         return (
             <Table.Body>
                 <Table.Row><Table.Cell>
-                    {isCreator ? 
-                        <Button primary onClick={event => {onLinkClick(CREATE_CHAPTER.replace(":story_id", story_id))}}>Create Chapter</Button> :
+                    {isCreator ?
+                        <Button primary onClick={event => { onLinkClick(CREATE_CHAPTER.replace(":story_id", story_id)) }}>Create Chapter</Button> :
                         null
                     }
+                    <Modal trigger={<Button secondary>Add Character</Button>}>
+                        <Modal.Header>Choose your character</Modal.Header>
+                        <Modal.Content>
+                            <ModalDescription>
+                                {!!characterList ?
+                                    <myself.listCharacterOptions info={{ characters: characterList, state: state }} /> :
+                                    <div>Loading...</div>}
+                            </ModalDescription>
+                        </Modal.Content>
+                    </Modal>
                 </Table.Cell></Table.Row>
                 {chapterList}
             </Table.Body>
@@ -81,34 +117,32 @@ class ViewStory extends Component
 
     render()
     {
-        const { story } = this.state;
-
         return (
             <Container>
                 <Table inverted attached="top">
                     <Table.Body>
                         <Table.Row>
                             <Table.HeaderCell>
-                                <center><Header as="h1" inverted>{story.title}</Header></center>
+                                <center><Header as="h1" inverted>{this.state.story.title}</Header></center>
                             </Table.HeaderCell>
                         </Table.Row>
                         <Table.Row>
                             <Table.HeaderCell>
-                                <center><Header as="h4" inverted>by {story.author.username}</Header></center>
+                                <center><Header as="h4" inverted>by {this.state.story.author.username}</Header></center>
                             </Table.HeaderCell>
                         </Table.Row>
                     </Table.Body>
                 </Table>
                 <Table attached>
                     <Table.Body>
-                        <this.listGenres genres={story.genres} />
+                        <this.listGenres genres={this.state.story.genres} />
                         <Table.Row>
-                            <Table.Cell><center>{story.description}</center></Table.Cell>
+                            <Table.Cell><center>{this.state.story.description}</center></Table.Cell>
                         </Table.Row>
                     </Table.Body>
                 </Table>
                 <Table attached>
-                    <this.listChapters info={{ props: this.props, story: story, onLinkClick: this.onLinkClick }} />
+                    <this.listChapters info={{ myself: this, props: this.props, state: this.state, onLinkClick: this.onLinkClick }} />
                 </Table>
             </Container>
         );

@@ -118,14 +118,40 @@ async function GenerateStory(genre, user, character)
         characters: [character],
         genres: [genre],
         author: user,
-        chapters: [{
-            title: "Chapter 1",
-            description: "Some setup stuff and character introductions.",
-            posts: [{
-                author: user,
-                description: "This character has xyz hair color, with some height and weight. He wears fassionable clothes, according to me."
-            }]
-        }],
+        chapters: [
+            {
+                title: "Chapter 1",
+                description: "Some setup stuff and character introductions.",
+                posts: [{
+                    author: user,
+                    description: "This character has xyz hair color, with some height and weight. He wears fassionable clothes, according to me."
+                }]
+            },
+            {
+                title: "Chapter 2",
+                description: "The baddy introduces themselves as a familiar figure to the characters leading many to believe they are good.",
+                posts: [{
+                    author: user,
+                    description: "This character has xyz hair color, with some height and weight. He wears fassionable clothes, according to me."
+                }]
+            },
+            {
+                title: "Chapter 3",
+                description: "Characters are pushed to fix some world problems that are caused by som mysterious force.",
+                posts: [{
+                    author: user,
+                    description: "This character has xyz hair color, with some height and weight. He wears fassionable clothes, according to me."
+                }]
+            },
+            {
+                title: "Chapter 4",
+                description: "Evil reveals itself as the familiar character from the past.",
+                posts: [{
+                    author: user,
+                    description: "This character has xyz hair color, with some height and weight. He wears fassionable clothes, according to me."
+                }]
+            }
+        ],
         subscribers: [user]
     });
 
