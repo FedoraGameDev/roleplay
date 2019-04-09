@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Table } from "semantic-ui-react";
 import { Link } from "react-router-dom";
-import { STORY } from "../../constants/routes";
+import { STORY_VIEW } from "../../constants/routes";
 
 class StoryCard extends Component
 {
@@ -11,7 +11,7 @@ class StoryCard extends Component
         return (
             <Table.Row>
                 <Table.Cell>
-                    <Link to={STORY.replace(":story_id", story._id)}>
+                    <Link to={STORY_VIEW.replace(":story_id", story._id)}>
                         {story.title}
                     </Link>
                 </Table.Cell>

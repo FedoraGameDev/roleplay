@@ -119,7 +119,7 @@ async function GenerateStory(genre, user, character)
         genres: [genre],
         author: user,
         chapters: [{
-            title: "Ch 1",
+            title: "Chapter 1",
             description: "Some setup stuff and character introductions.",
             posts: [{
                 author: user,

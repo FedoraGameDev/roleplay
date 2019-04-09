@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { Card, Label, Image, Container } from "semantic-ui-react";
+import { Card, Container } from "semantic-ui-react";
 import { VIEW_CHARACTER } from "../../constants/routes";
 
 /*<Card

@@ -8,10 +8,8 @@ export const PASSWORD_FORGET = "/pw-forget";
 
 export const LIST_STORY = "/story/list";
 export const LIST_GENRE = "/story/genre/list"
-export const STORY = "/story/view/:story_id";
-
 export const STORY_VIEW = "/story/view/:story_id";
-export const GENRE = "/genre/:genre";
+
 export const CREATE_STORY = "/story/create";
 export const CREATE_CHAPTER = "/story/chapter/create/:story_id";
 

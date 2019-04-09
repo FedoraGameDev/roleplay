@@ -111,10 +111,22 @@ class CreateStory extends Component
     }
 }
 
-const CreateStoryLink = () =>
-    (
-        <Link to={CREATE_STORY}><Button>New Story</Button></Link>
-    )
+class CreateStoryLinkBase extends Component
+{
+    Click = to =>
+    {
+        this.props.history.push(to);
+    }
+
+    render()
+    {
+        return (
+            <Button primary onClick={event => this.Click(CREATE_STORY)}>New Story</Button>
+        );
+    }
+}
+
+const CreateStoryLink = withRouter(CreateStoryLinkBase);
 
 export default compose(withRouter, withAuthorization(userInfo => !!userInfo, history => history.push(`${SIGN_IN}?forward=story/create`)))(CreateStory);
 export { CreateStoryLink };

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import axios from "axios";
-import { Grid, Container } from "semantic-ui-react";
+import { Container } from "semantic-ui-react";
 import { withAuthorization } from "../firebase/Session";
 import { SIGN_IN, BACKEND, LIST_CHARACTERS } from "../../constants/routes";
 import { CreateCharacterButton, CharacterGrid } from "./";
