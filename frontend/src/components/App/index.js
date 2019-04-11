@@ -10,7 +10,7 @@ import PasswordForget from "../firebase/PasswordForget";
 import Home from "../Home";
 import Account from "../Account";
 import Admin from "../Admin";
-import { CreateStory, ViewStory, CreateChapter, ListStory } from "../Story";
+import { CreateStory, ViewStory, CreateChapter, ListStory, ViewChapter } from "../Story";
 import { ListCharacters, ViewCharacter, CreateCharacter } from "../Character";
 
 class App extends React.Component
@@ -32,6 +32,7 @@ class App extends React.Component
 
                     <Route path={ROUTES.LIST_STORY} component={ListStory} />
                     <Route path={ROUTES.STORY_VIEW} component={ViewStory} />
+                    <Route path={ROUTES.CHAPTER_VIEW} component={ViewChapter} />
 
                     <Route path={ROUTES.CREATE_STORY} component={CreateStory} />
                     <Route path={ROUTES.CREATE_CHAPTER} component={CreateChapter} />

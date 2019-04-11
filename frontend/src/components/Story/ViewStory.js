@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 import { Container, Table, Header, Button, Modal, ModalDescription, Dropdown } from "semantic-ui-react";
 import { compose } from "recompose";
 import axios from "axios";
 import { withAuthStatic } from "../firebase/Session";
-import { BACKEND, STORY_VIEW, CREATE_CHAPTER, LIST_CHARACTERS } from "../../constants/routes";
+import { BACKEND, STORY_VIEW, CREATE_CHAPTER, LIST_CHARACTERS, CHAPTER_VIEW } from "../../constants/routes";
 
 const INITIAL_STATE = {
     story: {
@@ -40,7 +40,6 @@ class ViewStory extends Component
         axios.post(`${BACKEND}${LIST_CHARACTERS}`, { token: localStorage.getItem("token") })
             .then(res =>
             {
-                console.log(res.data.characters);
                 this.setState({ characterList: res.data.characters });
             })
             .catch(error =>
@@ -87,7 +86,7 @@ class ViewStory extends Component
         const isCreator = (!!userInfo && userInfo.user.username === story.author.username);
         const chapterList = chapters.map((chapter, index) => (
             <Table.Row key={index}>
-                <Table.Cell>{chapter.title}</Table.Cell>
+                <Table.Cell><Link to={CHAPTER_VIEW.replace(":story_id", story_id).replace(":chapter_name", index)}>{chapter.title}</Link></Table.Cell>
                 <Table.Cell>{chapter.description}</Table.Cell>
             </Table.Row>
         ));

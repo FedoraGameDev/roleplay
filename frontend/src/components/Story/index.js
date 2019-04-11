@@ -4,5 +4,6 @@ import ViewStory from "./ViewStory";
 
 import CreateChapter from "./CreateChapter";
 import CreateStory from "./CreateStory";
+import ViewChapter from "./ViewChapter";
 
-export { ListStory, StoryCard, ViewStory, CreateStory, CreateChapter };
+export { ListStory, StoryCard, ViewStory, CreateStory, CreateChapter, ViewChapter };

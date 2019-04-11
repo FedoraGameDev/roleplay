@@ -35,6 +35,37 @@ module.exports = {
             });
     },
 
+    story: (req, res) =>
+    {
+        console.log(`Retrieving story ${req.params.story_id}...`);
+        models.Story.findOne({ _id: req.params.story_id }).populate("genres").populate("subscribers").populate("author")
+            .then(story =>
+            {
+                console.log(`Returning story "${story.title}".`);
+                res.json({ story: story });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+                res.status(500).json({ "ERROR": error });
+            });
+    },
+
+    chapter: (req, res) =>
+    {
+        console.log(`Retrieving chapter ${req.params.story_id}/${req.params.chapter_name}`);
+        models.Story.findOne({ _id: req.params.story_id }).populate("chapters.posts.author")
+            .then(story =>
+            {
+                console.log(`Returning chapter ${story.chapters[req.params.chapter_name]}`);
+                res.json({ chapter: story.chapters[req.params.chapter_name] });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+                res.status(500).json({ "ERROR": error });
+            })
+    },
 
 
 
@@ -90,20 +121,6 @@ module.exports = {
             {
                 console.log(error);
                 res.status(500).json({ "ERROR": error });
-            });
-    },
-    story: (req, res) =>
-    {
-        console.log(`Retrieving story ${req.params.story_id}...`);
-        models.Story.findOne({ _id: req.params.story_id }).populate("genres").populate("stories").populate("subscribers").populate("author")
-            .then(story =>
-            {
-                console.log(`Returning story "${story.title}".`);
-                res.json({ story: story });
-            })
-            .catch(error =>
-            {
-                console.log(error);
             });
     },
     create_chapter: (req, res) =>
