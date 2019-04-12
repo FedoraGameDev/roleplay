@@ -1,5 +1,4 @@
 const models = require("../models");
-const mongoose = require("mongoose");
 const firebaseAdmin = require("firebase-admin");
 
 module.exports = {
@@ -15,7 +14,6 @@ module.exports = {
                     {
                         console.log(`${user.username} authenticated.`);
                         console.log(`Found ${user.characters.length} characters.`);
-                        console.log(user.characters);
 
                         res.json({ characters: user.characters });
                     })

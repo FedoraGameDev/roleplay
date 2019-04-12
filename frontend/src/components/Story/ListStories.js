@@ -20,7 +20,7 @@ class Story extends Component
         this.state = { ...INITIAL_STATE };
     }
 
-    componentWillMount()
+    componentDidMount()
     {
         axios.get(`${BACKEND}${LIST_GENRE}`)
             .then(res =>

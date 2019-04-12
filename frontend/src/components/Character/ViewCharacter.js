@@ -40,7 +40,7 @@ class ViewCharacter extends Component
         this.state = { ...INITIAL_STATE };
     }
 
-    componentWillMount()
+    componentDidMount()
     {
         Axios.post(`${BACKEND}${VIEW_CHARACTER.replace(":character_id", this.props.match.params.character_id)}`,
             { token: localStorage.token })

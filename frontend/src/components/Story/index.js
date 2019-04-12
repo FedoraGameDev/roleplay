@@ -6,4 +6,6 @@ import CreateChapter from "./CreateChapter";
 import CreateStory from "./CreateStory";
 import ViewChapter from "./ViewChapter";
 
-export { ListStory, StoryCard, ViewStory, CreateStory, CreateChapter, ViewChapter };
+import CreatePost, { CreatePostButton } from "./CreatePost";
+
+export { ListStory, StoryCard, ViewStory, CreateStory, CreateChapter, ViewChapter, CreatePost, CreatePostButton };

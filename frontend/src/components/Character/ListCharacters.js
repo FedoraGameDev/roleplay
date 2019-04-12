@@ -17,7 +17,7 @@ class ListCharacters extends Component
         this.state = { ...INITIAL_STATE };
     }
 
-    componentWillMount()
+    componentDidMount()
     {
         axios.post(`${BACKEND}${LIST_CHARACTERS}`, { token: localStorage.getItem("token") })
             .then(res =>

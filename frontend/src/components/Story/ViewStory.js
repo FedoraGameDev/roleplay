@@ -25,7 +25,7 @@ class ViewStory extends Component
         this.state = { ...INITIAL_STATE };
     }
 
-    componentWillMount()
+    componentDidMount()
     {
         axios.get(`${BACKEND}${STORY_VIEW.replace(":story_id", this.props.match.params.story_id)}`)
             .then(res =>

@@ -57,7 +57,7 @@ module.exports = {
         models.Story.findOne({ _id: req.params.story_id }).populate("chapters.posts.author")
             .then(story =>
             {
-                console.log(`Returning chapter ${story.chapters[req.params.chapter_name]}`);
+                console.log(`Returning chapter "${story.chapters[req.params.chapter_name].description}"`);
                 res.json({ chapter: story.chapters[req.params.chapter_name] });
             })
             .catch(error =>
