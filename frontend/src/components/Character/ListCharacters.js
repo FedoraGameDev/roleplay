@@ -37,7 +37,7 @@ class ListCharacters extends Component
                 {!!this.state.characters ?
                     <Container>
                         <CreateCharacterButton />
-                        <center><CharacterGrid characters={this.state.characters} /></center>
+                        <CharacterGrid characters={this.state.characters} />
                     </Container> :
 
                     <div>

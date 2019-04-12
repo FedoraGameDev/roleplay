@@ -14,6 +14,8 @@ const INITIAL_STATE = {
 
 class Story extends Component
 {
+    timeout = null;
+
     constructor(props)
     {
         super(props);
@@ -54,22 +56,27 @@ class Story extends Component
     filterStories = () =>
     {
         //TODO: this is slow (1N * genres)
-        const { stories, genres } = this.state;
+        const { stories, genres, genreChecks } = this.state;
         const newFilter = [...stories];
 
         if (this.checkFilters())
         {
-            genres.forEach(element =>
+            for (let i = 0; i < genres.length; i++)
             {
-                var iter = 0;
-                while (iter < newFilter.length)
+                const element = genreChecks[genres[i].name];
+
+                if (element === true)
                 {
-                    if (newFilter[iter].genres.indexOf(element._id) !== -1)
-                        iter++;
-                    else
-                        newFilter.splice(iter, 1);
+                    var iter = 0;
+                    while (iter < newFilter.length)
+                    {
+                        if (newFilter[iter].genres.indexOf(genres[i]._id) !== -1)
+                            iter++;
+                        else
+                            newFilter.splice(iter, 1);
+                    }
                 }
-            });
+            }
         }
 
         this.setState({ filteredStories: newFilter });
@@ -77,17 +84,23 @@ class Story extends Component
 
     onGenreChange = genre =>
     {
-        const genreChecks = this.state.genreChecks;
+        if (!!this.timeout)
+            clearTimeout(this.timeout);
+        const genreChecks = { ...this.state.genreChecks };
         genreChecks[genre] = !genreChecks[genre];
         this.setState({ genreChecks: genreChecks });
-        this.filterStories();
+        this.timeout = setTimeout(this.filterStories, 500);
     }
 
     checkFilters = () =>
     {
         for (let i = 0; i < this.state.genres.length; i++)
-            if (this.state.genreChecks[this.state.genres[i].name] === true)
+        {
+            const check = this.state.genreChecks[this.state.genres[i].name];
+            if (check == undefined) continue;
+            if (check === true)
                 return true;
+        }
 
         return false;
     }
@@ -96,13 +109,13 @@ class Story extends Component
     {
         const { genres, genreChecks, onGenreChange } = info.info;
         const listItems = genres.map((genre, index) =>
-            <li key={index}>
+            <div className="genre-item" key={index}>
                 <Checkbox
                     name={genre.name}
                     label={genre.name}
                     defaultChecked={genreChecks[genre.name]}
                     onChange={event => { onGenreChange(genre.name) }} />
-            </li>
+            </div>
         );
 
         return <ul>{listItems}</ul>;

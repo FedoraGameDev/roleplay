@@ -10,7 +10,9 @@ class Navigation extends React.Component
 {
     RenderNavigation(myself)
     {
-        if (!!myself.myself.props.userInfo)
+        const { props } = myself.myself;
+        const { userInfo } = props;
+        if (!!userInfo)
         {
             return (
                 <Menu inverted>
@@ -25,10 +27,10 @@ class Navigation extends React.Component
         else
         {
             return (
-                <ul>
-                    <li><Link to={ROUTES.LANDING}>Landing</Link></li>
-                    <li><Link to={ROUTES.SIGN_IN}>Sign In</Link></li>
-                </ul>
+                <Menu inverted>
+                    <Link to={ROUTES.LANDING}><Menu.Item>Landing</Menu.Item></Link>
+                    <Link to={ROUTES.SIGN_IN}><Menu.Item>Sign In</Menu.Item></Link>
+                </Menu>
             );
         }
     }

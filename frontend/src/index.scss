@@ -46,4 +46,27 @@ code {
 		width: 250px;
 		height: 250px;
 	}
+
+	.content {
+		text-align: center;
+	}
+
+	&:last-child {
+		margin-bottom: 20px !important;
+	}
+}
+
+.ui.basic-table {
+	border: none;
+}
+
+.genre-item {
+	float: left;
+	padding: 5px;
+}
+
+.color-background { 
+	padding: 10px;
+	text-align: center;
+	border-radius: 20px;
 }

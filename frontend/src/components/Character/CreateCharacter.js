@@ -348,7 +348,7 @@ class CreateCharacterButton extends Component
     render()
     {
         return (
-            <center><Link to={CREATE_CHARACTER}><Button>Create Character</Button></Link></center>
+            <center><Link to={CREATE_CHARACTER}><Button primary>Create Character</Button></Link></center>
         )
     }
 }

@@ -32,16 +32,22 @@ class ViewChapter extends Component
             });
     }
 
+    createParagraphClick = event =>
+    {
+        this.setState({ showReplyForm: !this.state.showReplyForm });
+    }
+
     listReplies(info)
     {
-        const { state } = info.info;
+        const { myself } = info.info;
+        const { state } = myself;
         const { chapter, showReplyForm } = state;
         const TableBody = (post) => (
             <Table.Body>
                 <Table.Row>
                     <Table.Cell>
                         <Image floated='left' src={post.author.appearance.image} />
-                        {post.description}
+                        <pre>{post.description}</pre>
                     </Table.Cell>
                 </Table.Row>
             </Table.Body>
@@ -70,13 +76,13 @@ class ViewChapter extends Component
             <Table.Body>
                 {replies}
                 <Table.Row><Table.Cell>
-                    <Button primary>{showReplyForm ? "Cancel" : "Create Paragraph"}</Button>
+                    <Button primary={!showReplyForm} secondary={showReplyForm} onClick={myself.createParagraphClick}>{showReplyForm ? "Cancel" : "Create Paragraph"}</Button>
+                    {
+                        showReplyForm ?
+                            <CreatePost /> :
+                            null
+                    }
                 </Table.Cell></Table.Row>
-                {
-                    showReplyForm ?
-                        <CreatePost /> :
-                        null
-                }
             </Table.Body>
         );
     }
@@ -85,7 +91,7 @@ class ViewChapter extends Component
     {
         return (
             <Container>
-                {!!this.state.chapter ? <Table><this.listReplies info={{ props: this.props, state: this.state }} /></Table> : <Loader active />}
+                {!!this.state.chapter ? <Table className="basic-table"><this.listReplies info={{ myself: this }} /></Table> : <Loader active />}
             </Container>
         );
     }

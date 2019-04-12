@@ -50,7 +50,7 @@ class StoryTable extends Component
                         </Table.Row>
                     </Table.Header>
                 </Table>
-                <Table attached striped>
+                <Table attached="bottom" striped>
                     <Table.Body>
                         {rows}
                     </Table.Body>
