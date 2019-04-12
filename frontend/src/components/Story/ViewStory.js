@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { withRouter, Link } from "react-router-dom";
-import { Container, Table, Header, Button, Modal, ModalDescription, Dropdown } from "semantic-ui-react";
+import { Container, Table, Header, Button, Modal, ModalDescription, Dropdown, Card } from "semantic-ui-react";
 import { compose } from "recompose";
 import axios from "axios";
 import { withAuthStatic } from "../firebase/Session";
@@ -10,7 +10,8 @@ const INITIAL_STATE = {
     story: {
         author: {},
         genres: [],
-        chapters: []
+        chapters: [],
+        characters: []
     },
     characterList: null,
     selectedCharacter: 0
@@ -90,6 +91,20 @@ class ViewStory extends Component
                 <Table.Cell>{chapter.description}</Table.Cell>
             </Table.Row>
         ));
+        const CharacterCards = story.characters.map((character, index) => (
+            <Card key={index}
+                image={character.appearance.image}
+                header={character.name}
+            />
+        ));
+
+        /*<Card
+            image='/images/avatar/large/elliot.jpg'
+            header='Elliot Baker'
+            meta='Friend'
+            description='Elliot is a sound engineer living in Nashville who enjoys playing guitar and hanging with his cat.'
+            extra={extra}
+        />*/
 
         return (
             <Table.Body>
@@ -104,6 +119,16 @@ class ViewStory extends Component
                             <ModalDescription>
                                 {!!characterList ?
                                     <myself.listCharacterOptions info={{ characters: characterList, state: state }} /> :
+                                    <div>Loading...</div>}
+                            </ModalDescription>
+                        </Modal.Content>
+                    </Modal>
+                    <Modal trigger={<Button secondary>Roster</Button>}>
+                        <Modal.Header>Character Roster</Modal.Header>
+                        <Modal.Content>
+                            <ModalDescription>
+                                {!!characterList ?
+                                    <div>{CharacterCards}</div> :
                                     <div>Loading...</div>}
                             </ModalDescription>
                         </Modal.Content>

@@ -22,7 +22,7 @@ const storySchema = new Schema({
         posts: [{
             author: {
                 type: Schema.Types.ObjectId,
-                ref: "User"
+                ref: "Character"
             },
             description: String
         }]

@@ -1,18 +1,37 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
-import { Container, Button, Form, TextArea } from "semantic-ui-react";
+import { Button, Form, TextArea } from "semantic-ui-react";
 import { CREATE_POST } from "../../constants/routes";
+
+const INITIAL_STATE = {
+    postData: ""
+}
 
 class CreatePost extends Component
 {
+    constructor(props)
+    {
+        super(props);
+        this.state = { ...INITIAL_STATE };
+    }
+
+    onSubmit = (event) =>
+    {
+        //
+    }
+
+    onChange = (event) =>
+    {
+        this.setState({ postData: event.target.value });
+    }
+
     render()
     {
         return (
-            <Container>
-                <Form>
-                    <TextArea placeholder="paragraph" />
-                </Form>
-            </Container>
+            <Form onSubmit={this.onSubmit}>
+                <TextArea placeholder="paragraph" name="postData" onChange={this.onChange} />
+                <Button primary type="submit">Submit</Button>
+            </Form>
         )
     }
 }

@@ -30,19 +30,20 @@ code {
 
 	a {
 		.card {
-			width: 250px;
-			float: left;
-			margin: 5px;
-
-			img {
-				width: 250px;
-				height: 250px;
-			}
-
 			&:hover {
 				background-color: rgb(219, 219, 219) !important;
 			}
 		}
 	}
+}
 
+.card {
+	width: 250px !important;
+	float: left;
+	margin: 5px;
+	
+	img {
+		width: 250px;
+		height: 250px;
+	}
 }

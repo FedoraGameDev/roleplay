@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
+import { Container, Input, Table, Button, Loader, Header } from "semantic-ui-react";
 import { compose } from "recompose";
 import { withAuthStatic } from "../firebase/Session";
 import { STORY_VIEW, BACKEND } from "../../constants/routes";
@@ -71,17 +72,31 @@ class CreateChapter extends Component
     render()
     {
         return (
-            <div>
-                <div>
-                    <label name="name">{this.state.chapter.title}</label>
-                    {(!!this.state.story.author) ?
-                        <form onSubmit={this.onSubmit}>
-                            <textarea onChange={this.onChange} name="description" value={this.state.chapter.description} placeholder="description" />
-                            <button type="submit">Create Chapter</button>
-                        </form> :
-                        <div>Loading...</div>}
-                </div>
-            </div>
+            <Container>
+                <Table attached="top" inverted>
+                    <Table.Body>
+                        <Table.Row>
+                            <Table.Cell>
+                                <center><Header as="h1" inverted>{this.state.chapter.title}</Header></center>
+                            </Table.Cell>
+                        </Table.Row>
+                    </Table.Body>
+                </Table>
+                <Table attached>
+                    <Table.Body>
+                        <Table.Row>
+                            <Table.Cell>
+                                {(!!this.state.story.author) ?
+                                    <form onSubmit={this.onSubmit}>
+                                        <Input fluid onChange={this.onChange} name="description" value={this.state.chapter.description} placeholder="description" />
+                                        <center><Button type="submit" primary>Create Chapter</Button></center>
+                                    </form> :
+                                    <Loader active />}
+                            </Table.Cell>
+                        </Table.Row>
+                    </Table.Body>
+                </Table>
+            </Container>
         );
     }
 }

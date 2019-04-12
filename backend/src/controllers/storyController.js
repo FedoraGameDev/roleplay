@@ -38,7 +38,7 @@ module.exports = {
     story: (req, res) =>
     {
         console.log(`Retrieving story ${req.params.story_id}...`);
-        models.Story.findOne({ _id: req.params.story_id }).populate("genres").populate("subscribers").populate("author")
+        models.Story.findOne({ _id: req.params.story_id }).populate("genres").populate("subscribers").populate("author").populate("characters")
             .then(story =>
             {
                 console.log(`Returning story "${story.title}".`);

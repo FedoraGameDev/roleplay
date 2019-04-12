@@ -1,11 +1,12 @@
 import React, { Component } from "react";
-import { Container, Loader, Table } from "semantic-ui-react";
+import { Container, Loader, Table, Image, Header, Button } from "semantic-ui-react";
 import axios from "axios";
 import { BACKEND, CHAPTER_VIEW } from "../../constants/routes";
-import { CreatePostButton } from "./CreatePost";
+import CreatePost from "./CreatePost";
 
 const INITIAL_STATE = {
-    chapter: null
+    chapter: null,
+    showReplyForm: false
 }
 
 class ViewChapter extends Component
@@ -33,41 +34,58 @@ class ViewChapter extends Component
 
     listReplies(info)
     {
-        const { chapter, props } = info.info;
-        const { story_id } = props.match.params;
+        const { state } = info.info;
+        const { chapter, showReplyForm } = state;
+        const TableBody = (post) => (
+            <Table.Body>
+                <Table.Row>
+                    <Table.Cell>
+                        <Image floated='left' src={post.author.appearance.image} />
+                        {post.description}
+                    </Table.Cell>
+                </Table.Row>
+            </Table.Body>
+        );
 
         const replies = chapter.posts.map((post, index) =>
             (
                 <Table.Row key={index}><Table.Cell>
-                    <Table>
+                    <Table attached="top" inverted>
                         <Table.Body>
                             <Table.Row>
                                 <Table.Cell>
-                                    {post.description}
+                                    <center><Header as="h2" inverted>{post.author.name}</Header></center>
                                 </Table.Cell>
                             </Table.Row>
                         </Table.Body>
                     </Table>
+                    {(index === chapter.posts.length - 1) ?
+                        <Table attached="bottom">{TableBody(post)}</Table> :
+                        <Table attached>{TableBody(post)}</Table>
+                    }
                 </Table.Cell></Table.Row>
             ));
 
         return (
             <Table.Body>
-                <Table.Row><Table.Cell>
-                    <CreatePostButton info={{ story_id: story_id }} />
-                </Table.Cell></Table.Row>
                 {replies}
+                <Table.Row><Table.Cell>
+                    <Button primary>{showReplyForm ? "Cancel" : "Create Paragraph"}</Button>
+                </Table.Cell></Table.Row>
+                {
+                    showReplyForm ?
+                        <CreatePost /> :
+                        null
+                }
             </Table.Body>
         );
     }
 
     render()
     {
-        const { chapter } = this.state;
-
         return (
             <Container>
-                {!!chapter ? <Table><this.listReplies info={{ chapter: chapter, props: this.props }} /></Table> : <Loader active />}
+                {!!this.state.chapter ? <Table><this.listReplies info={{ props: this.props, state: this.state }} /></Table> : <Loader active />}
             </Container>
         );
     }
