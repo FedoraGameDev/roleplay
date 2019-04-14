@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Container, Loader, Table, Image, Header, Button } from "semantic-ui-react";
+import { Container, Loader, Table, Image, Header, Button, Rail, Segment, Grid } from "semantic-ui-react";
 import axios from "axios";
 import { withAuthStatic } from "../firebase/Session";
 import { BACKEND, CHAPTER_VIEW } from "../../constants/routes";
@@ -76,10 +76,11 @@ class ViewChapter extends Component
 
         return (
             <Table.Body>
-                {replies}
                 <Table.Row><Table.Cell>
                     {!!userInfo ?
-                        <Button primary={!showReplyForm} secondary={showReplyForm} onClick={myself.createParagraphClick}>{showReplyForm ? "Cancel" : "Create Paragraph"}</Button> :
+                        <Button primary={!showReplyForm} secondary={showReplyForm} onClick={myself.createParagraphClick}>
+                            {showReplyForm ? "Cancel" : "Create Paragraph"}
+                        </Button> :
                         null
                     }
                     {
@@ -88,15 +89,18 @@ class ViewChapter extends Component
                             null
                     }
                 </Table.Cell></Table.Row>
+                {replies}
             </Table.Body>
         );
     }
 
     render()
     {
+        const { state } = this;
+
         return (
             <Container>
-                {!!this.state.chapter ? <Table className="basic-table"><this.listReplies info={{ myself: this }} /></Table> : <Loader active />}
+                {!!state.chapter ? <Table className="basic-table"><this.listReplies info={{ myself: this }} /></Table> : <Loader active />}
             </Container>
         );
     }
