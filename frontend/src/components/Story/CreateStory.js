@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
 import axios from "axios";
-import { Button } from "semantic-ui-react";
+import { Button, TextArea, Input, Container, Checkbox, Label, Form, Table, Header } from "semantic-ui-react";
 import { compose } from "recompose";
-import { BACKEND, CREATE_STORY, STORY_VIEW, SIGN_IN } from "../../constants/routes";
+import { BACKEND, CREATE_STORY, STORY_VIEW, SIGN_IN, LIST_GENRE } from "../../constants/routes";
 import { withAuthorization } from "../firebase/Session";
 
 const INITIAL_STATE = {
@@ -25,10 +25,12 @@ class CreateStory extends Component
 
     componentDidMount()
     {
-        axios.get(`${BACKEND}/story`)
+        axios.get(`${BACKEND}${LIST_GENRE}`)
             .then(res =>
             {
-                this.setState({ genres: res.data.genres });
+                this.setState({
+                    genres: res.data.genres
+                });
             })
             .catch(error =>
             {
@@ -41,23 +43,20 @@ class CreateStory extends Component
         this.setState({ [event.target.name]: event.target.value });
     }
 
-    onGenreChecked = event =>
-    {
-        const newSel = this.state.genresSelection;
-        newSel[`${event.target.name}`] = event.target.checked;
-        this.setState({ genresSelection: newSel });
-    }
-
     onSubmit = event =>
     {
         event.preventDefault();
-        const { title, description, closed_group, genresSelection } = this.state;
-        const genres = [];
+        const { title, description, closed_group, genresSelection, genres } = this.state;
+        const selectedGenres = [];
 
-        for (var key in genresSelection)
+        for (let i = 0; i < genres.length; i++)
         {
-            if (genresSelection[key])
-                genres.splice(genres.length - 1, 0, key);
+            const element = genresSelection[genres[i].name];
+
+            if (element === true)
+            {
+                selectedGenres.splice(genres.length - 1, 0, genres[i]._id);
+            }
         }
 
         axios.post(`${BACKEND}/story/create`, {
@@ -67,7 +66,7 @@ class CreateStory extends Component
                 title: title,
                 description: description,
                 closed_group: closed_group,
-                genres: genres
+                genres: selectedGenres
             }
         }).then(res =>
         {
@@ -78,35 +77,78 @@ class CreateStory extends Component
         });
     }
 
-    renderGenres(myself)
+    genreList(info)
     {
-        const allGenres = myself.this.state.genres.map((genre, index) => (
-            <li key={index}>
-                <input type="checkbox" onChange={myself.this.onGenreChecked} name={genre.name} />
-                <label>{genre.name}</label>
-            </li>
-        ));
-        return (
-            <ul>{allGenres}</ul>
+        const { genres, onGenreChange } = info.info;
+        const listItems = genres.map((genre, index) =>
+            <div className="genre-item" key={index}>
+                <Checkbox
+                    name={genre.name}
+                    label={genre.name}
+                    onChange={event => { onGenreChange(genre.name) }} />
+            </div>
         );
+
+        return <ul>{listItems}</ul>;
+    }
+
+    onGenreChange = genre =>
+    {
+        const genresSelection = { ...this.state.genresSelection };
+        genresSelection[genre] = !genresSelection[genre];
+        this.setState({ genresSelection: genresSelection });
     }
 
     render()
     {
-        const { title, description, closed_group, error } = this.state;
+        const { title, description, closed_group, error, genres } = this.state;
 
         const isInvalid = (title === "" || description === "");
 
         return (
-            <form onSubmit={this.onSubmit}>
-                <input type="text" onChange={this.onChange} name="title" value={title} placeholder="title" />
-                <textarea onChange={this.onChange} name="description" value={description} placeholder="description" />
-                <input type="checkbox" onChange={this.onChange} name="closed_group" value={closed_group} />
-                <this.renderGenres this={this} />
-                <button disabled={isInvalid} type="submit">Create</button>
+            <Container>
+                <Table inverted attached="top">
+                    <Table.Header>
+                        <Table.Row>
+                            <Table.HeaderCell textAlign="center"><Header as="h2" inverted>New Story</Header></Table.HeaderCell>
+                        </Table.Row>
+                    </Table.Header>
+                </Table>
+                <Form onSubmit={this.onSubmit}>
+                    <Table attached="bottom">
+                        <Table.Body>
+                            <Table.Row>
+                                <Table.Cell>
+                                    <Input fluid type="text" onChange={this.onChange} name="title" value={title} placeholder="title" />
+                                </Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell>
+                                    <TextArea onChange={this.onChange} name="description" value={description} placeholder="description" />
+                                </Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell textAlign="center">
+                                    <Label>Genres</Label>
+                                    <this.genreList info={{ genres: genres, onGenreChange: this.onGenreChange }} />
+                                </Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell textAlign="right">
+                                    <Checkbox onChange={this.onChange} name="closed_group" toggle label="Require Character Approval" />
+                                </Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell textAlign="right">
+                                    <Button disabled={isInvalid} primary type="submit">Create</Button>
+                                </Table.Cell>
+                            </Table.Row>
+                        </Table.Body>
+                    </Table>
 
-                {error && <p>{error.message}</p>}
-            </form>
+                    {error && <p>{error.message}</p>}
+                </Form>
+            </Container>
         );
     }
 }

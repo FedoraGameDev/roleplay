@@ -197,6 +197,7 @@ Mauris augue neque gravida in. Habitasse platea dictumst vestibulum rhoncus est 
                 }]
             }
         ],
+        date_created: Date.now(),
         subscribers: [user]
     });
 

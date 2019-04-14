@@ -144,6 +144,42 @@ module.exports = {
             });
     },
 
+    create: (req, res) =>
+    {
+        console.log("New story data...");
+        firebaseAdmin.auth().verifyIdToken(req.body.token)
+            .then(decodedToken =>
+            {
+                console.log("User authenticated from firebase.");
+                models.User.findOne({ uuid: decodedToken.uid }, (err, user) =>
+                {
+                    if (err) { res.status(500).json({ "ERROR": err }); };
+
+                    console.log(`${user.username} authenticated.`);
+                    req.body.story.author = user;
+                    req.body.story.date_created = Date.now();
+
+                    models.Story.create(req.body.story, (err, newStory) =>
+                    {
+                        if (err) { res.status(500).json({ "ERROR": err }); };
+
+                        console.log(`New story "${newStory.title}" created with id ${newStory._id}.`);
+
+                        models.User.updateOne({ uuid: decodedToken.uid }, { $push: { stories: newStory } }, (err, updatedUser) =>
+                        {
+                            if (err) { res.status(500).json({ "ERROR": err }); };
+
+                            res.json({ newStory: newStory });
+                        });
+                    });
+                });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+                res.status(500).json({ "ERROR": error });
+            });
+    },
 
 
 
@@ -161,46 +197,6 @@ module.exports = {
             .catch(error =>
             {
                 console.log(error);
-            });
-    },
-    create: (req, res) =>
-    {
-        console.log("New story data...");
-        firebaseAdmin.auth().verifyIdToken(req.body.token)
-            .then(decodedToken =>
-            {
-                console.log("User authenticated from firebase.");
-                models.User.findOne({ uuid: decodedToken.uid }, (err, user) =>
-                {
-                    if (err) { res.status(500).json({ "ERROR": err }); };
-
-                    console.log(`${user.username} authenticated.`);
-                    req.body.story.author = user;
-
-                    models.Genre.find({ "name": { $in: req.body.story.genres } }, (err, genres) =>
-                    {
-                        if (err) { res.status(500).json({ "ERROR": err }); };
-                        req.body.story.genres = genres.map(genre => mongoose.Types.ObjectId(genre._id));
-                        models.Story.create(req.body.story, (err, newStory) =>
-                        {
-                            if (err) { res.status(500).json({ "ERROR": err }); };
-
-                            console.log(`New story "${newStory.title}" created with id ${newStory._id}.`);
-
-                            models.User.updateOne({ uuid: decodedToken.uid }, { $push: { stories: newStory } }, (err, updatedUser) =>
-                            {
-                                if (err) { res.status(500).json({ "ERROR": err }); };
-
-                                res.json({ newStory: newStory });
-                            });
-                        });
-                    });
-                });
-            })
-            .catch(error =>
-            {
-                console.log(error);
-                res.status(500).json({ "ERROR": error });
             });
     },
     create_chapter: (req, res) =>

@@ -39,6 +39,7 @@ const storySchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "User"
     }],
+    date_created: Date,
     closed_group: Boolean
 });
 
