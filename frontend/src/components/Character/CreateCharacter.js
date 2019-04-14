@@ -183,7 +183,7 @@ class CreateCharacter extends Component
                     <Grid columns={2} centered stackable>
                         <Grid.Row>
                             <Grid.Column>
-                                <Grid columns={2}>
+                                <Grid columns={2} stackable>
                                     <Grid.Row columns={1}><Grid.Column>
                                         <Label size="big">General Info</Label>
                                     </Grid.Column></Grid.Row>
