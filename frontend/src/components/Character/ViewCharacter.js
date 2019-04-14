@@ -80,7 +80,7 @@ class ViewCharacter extends Component
     render()
     {
         const { character, ready, eyeColor, hairColor } = this.state;
-        const { basicinfo, appearance } = character;
+        const { basicinfo } = character;
 
         return (
             <Container>
@@ -169,10 +169,5 @@ class ViewCharacter extends Component
         )
     }
 }
-
-{/* <Grid centered columns={1}>
-    
-    
-</Grid> */}
 
 export default ViewCharacter;

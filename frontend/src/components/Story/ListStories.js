@@ -97,7 +97,7 @@ class Story extends Component
         for (let i = 0; i < this.state.genres.length; i++)
         {
             const check = this.state.genreChecks[this.state.genres[i].name];
-            if (check == undefined) continue;
+            if (check === undefined) continue;
             if (check === true)
                 return true;
         }

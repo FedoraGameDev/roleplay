@@ -3,16 +3,17 @@ import { withFirebase } from "../Firebase";
 
 class SignOutButton extends Component
 {
+    SignOut()
+    {
+        this.props.firebase.doSignOut();
+    }
+
     render()
     {
         return (
-            <a href="#" onClick={event => { event.preventDefault(); this.props.firebase.doSignOut(); }}>Sign Out</a>
+            <button className="as-anchor" onClick={event => { event.preventDefault(); this.props.firebase.doSignOut(); }}>Sign Out</button>
         );
     }
 }
-
-// const SignOutButton = ({ firebase }) => (
-//     <button type="button" onClick={firebase.doSignOut}>Sign Out</button>
-// );
 
 export default withFirebase(SignOutButton);

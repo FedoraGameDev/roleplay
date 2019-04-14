@@ -101,7 +101,7 @@ class CreateStory extends Component
 
     render()
     {
-        const { title, description, closed_group, error, genres } = this.state;
+        const { title, description, error, genres } = this.state;
 
         const isInvalid = (title === "" || description === "");
 

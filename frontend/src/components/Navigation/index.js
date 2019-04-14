@@ -2,25 +2,31 @@ import React from "react";
 import { Link, withRouter } from "react-router-dom";
 import { Menu } from "semantic-ui-react";
 import { compose } from "recompose";
-import SignOutButton from "../firebase/SignOut";
+import { withFirebase } from "../firebase/Firebase";
 import { withAuthStatic } from "../firebase/Session";
 import * as ROUTES from "../../constants/routes";
 
 class Navigation extends React.Component
 {
+    clickLink = to =>
+    {
+        this.props.history.push(to);
+    }
+
     RenderNavigation(myself)
     {
-        const { props } = myself.myself;
+        const { props, clickLink } = myself.myself;
         const { userInfo } = props;
         if (!!userInfo)
         {
             return (
                 <Menu inverted>
-                    <Link to={ROUTES.HOME}><Menu.Item >Home</Menu.Item></Link>
-                    <Link to={ROUTES.ACCOUNT}><Menu.Item >Account</Menu.Item></Link>
-                    <Link to={ROUTES.LIST_STORY}><Menu.Item >Stories</Menu.Item></Link>
-                    <Link to={ROUTES.LIST_CHARACTERS}><Menu.Item >Characters</Menu.Item></Link>
-                    <Menu.Item><SignOutButton /></Menu.Item>
+                    <Menu.Item onClick={event => { clickLink(ROUTES.HOME) }} >Home</Menu.Item>
+                    <Menu.Item onClick={event => { clickLink(ROUTES.ACCOUNT) }} >Account</Menu.Item>
+                    <Menu.Item onClick={event => { clickLink(ROUTES.LIST_STORY) }} >Stories</Menu.Item>
+                    <Menu.Item onClick={event => { clickLink(ROUTES.LIST_CHARACTERS) }} >Characters</Menu.Item>
+                    <Menu.Item onClick={event => { props.firebase.doSignOut(); }} >Log Out</Menu.Item>
+                    {/* <Menu.Item><SignOutButton /></Menu.Item> */}
                 </Menu>
             );
         }
@@ -43,4 +49,4 @@ class Navigation extends React.Component
     }
 }
 
-export default compose(withAuthStatic, withRouter)(Navigation);
+export default compose(withAuthStatic, withRouter, withFirebase)(Navigation);
