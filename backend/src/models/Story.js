@@ -8,6 +8,14 @@ const storySchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "Character"
     }],
+    applicantusers: [{
+        type: Schema.Types.ObjectId,
+        ref: "User"
+    }],
+    applicantcharacters: [{
+        type: Schema.Types.ObjectId,
+        ref: "Character"
+    }],
     genres: [{
         type: Schema.Types.ObjectId,
         ref: "Genre"

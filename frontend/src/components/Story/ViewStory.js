@@ -1,10 +1,11 @@
 import React, { Component } from "react";
 import { withRouter, Link } from "react-router-dom";
-import { Container, Table, Header, Button, Modal, ModalDescription, Dropdown, Card } from "semantic-ui-react";
+import { Container, Table, Header, Button, Modal, ModalDescription, Form } from "semantic-ui-react";
 import { compose } from "recompose";
 import axios from "axios";
 import { withAuthStatic } from "../firebase/Session";
-import { BACKEND, STORY_VIEW, CREATE_CHAPTER, LIST_CHARACTERS, CHAPTER_VIEW } from "../../constants/routes";
+import { CharacterGrid } from "../Character";
+import { BACKEND, STORY_VIEW, CREATE_CHAPTER, LIST_CHARACTERS, CHAPTER_VIEW, APPLY_CHARACTER } from "../../constants/routes";
 
 const INITIAL_STATE = {
     story: {
@@ -28,20 +29,29 @@ class ViewStory extends Component
 
     componentDidMount()
     {
-        axios.get(`${BACKEND}${STORY_VIEW.replace(":story_id", this.props.match.params.story_id)}`)
+        this.getStory();
+
+        axios.post(`${BACKEND}${LIST_CHARACTERS}`, { token: localStorage.getItem("token") })
             .then(res =>
             {
-                this.setState({ story: res.data.story });
+                const chars = res.data.characters;
+                if (chars.length === 0)
+                    this.setState({ characterList: null });
+                else
+                    this.setState({ characterList: res.data.characters, selectedCharacter: res.data.characters[0]._id });
             })
             .catch(error =>
             {
                 console.log(error);
             });
+    }
 
-        axios.post(`${BACKEND}${LIST_CHARACTERS}`, { token: localStorage.getItem("token") })
+    getStory = () =>
+    {
+        axios.get(`${BACKEND}${STORY_VIEW.replace(":story_id", this.props.match.params.story_id)}`)
             .then(res =>
             {
-                this.setState({ characterList: res.data.characters });
+                this.setState({ story: res.data.story });
             })
             .catch(error =>
             {
@@ -62,13 +72,15 @@ class ViewStory extends Component
 
     listCharacterOptions = info =>
     {
-        const { characters, state } = info.info;
-        const options = characters.map((character, index) =>
+        const { myself } = info.info;
+        const { state } = myself;
+        const { characterList } = state;
+        const options = characterList.map((character, index) =>
             (
-                <Dropdown.Item key={index}>{character.name}</Dropdown.Item>
+                <option key={index} value={character._id}>{character.name}</option>
             ));
 
-        return (<Dropdown placeholder="Characters" scrolling value={state.selectedCharacter}><Dropdown.Menu>{options}</Dropdown.Menu></Dropdown>);
+        return (<select placeholder="Characters" value={state.selectedCharacter} onChange={myself.onChooseCharacterChange}>{options}</select>);
     }
 
     onLinkClick = to =>
@@ -76,12 +88,40 @@ class ViewStory extends Component
         this.props.history.push(to);
     }
 
+    onChooseCharacterChange = event =>
+    {
+        this.setState({ selectedCharacter: event.target.value });
+    }
+
+    onApplyCharacter = event =>
+    {
+        event.preventDefault();
+        axios.post(`${BACKEND}${APPLY_CHARACTER}`,
+            { token: localStorage.getItem("token"), character_id: this.state.selectedCharacter, story_id: this.state.story._id })
+            .then(res =>
+            {
+                const { message, status } = res.data;
+
+                alert(message);
+
+                if (status === "added")
+                {
+                    this.setState({ story: INITIAL_STATE.story });
+                    this.getStory();
+                }
+            })
+            .catch(error =>
+            {
+                console.log(error);
+            });
+    }
+
     listChapters(info)
     {
         const { myself, onLinkClick } = info.info;
         const { props, state } = myself;
         const { story, characterList } = state;
-        const { chapters } = story;
+        const { chapters, characters } = story;
         const { userInfo } = props;
         const { story_id } = props.match.params;
         const isCreator = (!!userInfo && userInfo.user.username === story.author.username);
@@ -91,20 +131,6 @@ class ViewStory extends Component
                 <Table.Cell>{chapter.description}</Table.Cell>
             </Table.Row>
         ));
-        const CharacterCards = story.characters.map((character, index) => (
-            <Card key={index}
-                image={character.appearance.image}
-                header={character.name}
-            />
-        ));
-
-        /*<Card
-            image='/images/avatar/large/elliot.jpg'
-            header='Elliot Baker'
-            meta='Friend'
-            description='Elliot is a sound engineer living in Nashville who enjoys playing guitar and hanging with his cat.'
-            extra={extra}
-        />*/
 
         return (
             <Table.Body>
@@ -118,7 +144,10 @@ class ViewStory extends Component
                         <Modal.Content>
                             <ModalDescription>
                                 {!!characterList ?
-                                    <myself.listCharacterOptions info={{ characters: characterList, state: state }} /> :
+                                    <Form onSubmit={myself.onApplyCharacter}>
+                                        <myself.listCharacterOptions info={{ myself: myself }} />
+                                        <Button primary type="submit">Apply</Button>
+                                    </Form> :
                                     <div>Loading...</div>}
                             </ModalDescription>
                         </Modal.Content>
@@ -128,7 +157,7 @@ class ViewStory extends Component
                         <Modal.Content>
                             <ModalDescription>
                                 {!!characterList ?
-                                    <div>{CharacterCards}</div> :
+                                    <CharacterGrid characters={characters} /> :
                                     <div>Loading...</div>}
                             </ModalDescription>
                         </Modal.Content>

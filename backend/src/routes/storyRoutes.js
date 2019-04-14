@@ -8,6 +8,7 @@ module.exports = router
     .get("/list", controllers.story.listStory)
     .get("/genre/list", controllers.story.listGenre)
     .get("/chapter/view/:story_id/:chapter_name", controllers.story.chapter)
+    .post("/apply", controllers.story.apply)
 
     .get("/:genre", controllers.story.genre)
     //.get("/", controllers.story.index)

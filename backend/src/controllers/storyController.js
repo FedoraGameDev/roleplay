@@ -67,6 +67,86 @@ module.exports = {
             })
     },
 
+    apply: (req, res) =>
+    {
+        console.log(`Character requesting addition to story.`);
+        const { token, character_id, story_id } = req.body;
+        firebaseAdmin.auth().verifyIdToken(token)
+            .then(decodedToken =>
+            {
+                console.log("User authenticated from firebase.");
+                models.User.findOne({ uuid: decodedToken.uid })
+                    .then(user =>
+                    {
+                        console.log(`${user.username} authenticated.`);
+                        models.Character.findOne({ _id: character_id })
+                            .then(character =>
+                            {
+                                console.log(`Character '${character.name}' found.`);
+                                models.Story.findOne({ _id: story_id })
+                                    .then(story =>
+                                    {
+                                        console.log(`'${story.title}' found.`);
+                                        if (story.applicantcharacters.indexOf(character_id) === -1)
+                                        {
+                                            if (story.characters.indexOf(character_id) === -1)
+                                            {
+                                                console.log("Updating story...");
+                                                if (story.closed_group)
+                                                {
+                                                    models.Story.updateOne({ _id: story_id },
+                                                        { $push: { applicantusers: user._id, applicantcharacters: character_id } }, (err, action) =>
+                                                        {
+                                                            if (err) { console.log(err); res.status(500).json({ "ERROR": err }); };
+
+                                                            console.log(action);
+                                                            res.json({ status: "applied", message: `${character.name} has sent an application for the owner to review.` });
+                                                        });
+                                                }
+                                                else
+                                                {
+                                                    models.Story.updateOne({ _id: story_id }, { $push: { characters: character_id } }, (err, action) =>
+                                                    {
+                                                        if (err) { console.log(err); res.status(500).json({ "ERROR": err }); };
+
+                                                        console.log(action);
+                                                        res.json({ status: "added", message: `Character added to story. You may now post as ${character.name}.` });
+                                                    });
+                                                }
+                                            }
+                                            else
+                                            {
+                                                res.json({ status: "error", message: "Character is already in this story." });
+                                            }
+                                        }
+                                        else
+                                        {
+                                            res.json({ status: "error", message: "Character has already applied to this story." });
+                                        }
+                                    })
+                                    .catch(error =>
+                                    {
+                                        console.log(error);
+                                        res.status(500).json({ "ERROR": error });
+                                    });
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                                res.status(500).json({ "ERROR": error });
+                            });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                        res.status(500).json({ "ERROR": error });
+                    });
+            });
+    },
+
+
+
+
 
 
     genre: (req, res) =>
