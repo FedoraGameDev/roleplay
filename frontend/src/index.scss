@@ -39,8 +39,6 @@ code {
 
 .card {
 	width: 250px !important;
-	float: left;
-	margin: 5px;
 	
 	img {
 		width: 250px;
@@ -49,10 +47,6 @@ code {
 
 	.content {
 		text-align: center;
-	}
-
-	&:last-child {
-		margin-bottom: 20px !important;
 	}
 }
 
