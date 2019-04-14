@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, withRouter } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import { Menu } from "semantic-ui-react";
 import { compose } from "recompose";
 import { withFirebase } from "../firebase/Firebase";
@@ -25,8 +25,7 @@ class Navigation extends React.Component
                     <Menu.Item onClick={event => { clickLink(ROUTES.ACCOUNT) }} >Account</Menu.Item>
                     <Menu.Item onClick={event => { clickLink(ROUTES.LIST_STORY) }} >Stories</Menu.Item>
                     <Menu.Item onClick={event => { clickLink(ROUTES.LIST_CHARACTERS) }} >Characters</Menu.Item>
-                    <Menu.Item onClick={event => { props.firebase.doSignOut(); }} >Log Out</Menu.Item>
-                    {/* <Menu.Item><SignOutButton /></Menu.Item> */}
+                    <Menu.Item onClick={event => { props.firebase.doSignOut(); props.history.push("/"); }} >Log Out</Menu.Item>
                 </Menu>
             );
         }
@@ -34,8 +33,9 @@ class Navigation extends React.Component
         {
             return (
                 <Menu inverted>
-                    <Link to={ROUTES.LANDING}><Menu.Item>Landing</Menu.Item></Link>
-                    <Link to={ROUTES.SIGN_IN}><Menu.Item>Sign In</Menu.Item></Link>
+                    <Menu.Item onClick={event => { clickLink(ROUTES.LANDING) }} >Home</Menu.Item>
+                    <Menu.Item onClick={event => { clickLink(ROUTES.LIST_STORY) }} >Stories</Menu.Item>
+                    <Menu.Item onClick={event => { clickLink(ROUTES.SIGN_IN) }} >Sign In</Menu.Item>
                 </Menu>
             );
         }

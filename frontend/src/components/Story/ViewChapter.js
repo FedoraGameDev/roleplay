@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Container, Loader, Table, Image, Header, Button } from "semantic-ui-react";
 import axios from "axios";
+import { withAuthStatic } from "../firebase/Session";
 import { BACKEND, CHAPTER_VIEW } from "../../constants/routes";
 import CreatePost from "./CreatePost";
 
@@ -40,8 +41,9 @@ class ViewChapter extends Component
     listReplies(info)
     {
         const { myself } = info.info;
-        const { state } = myself;
+        const { state, props } = myself;
         const { chapter, showReplyForm } = state;
+        const { userInfo } = props;
         const TableBody = (post) => (
             <Table.Body>
                 <Table.Row>
@@ -76,7 +78,10 @@ class ViewChapter extends Component
             <Table.Body>
                 {replies}
                 <Table.Row><Table.Cell>
-                    <Button primary={!showReplyForm} secondary={showReplyForm} onClick={myself.createParagraphClick}>{showReplyForm ? "Cancel" : "Create Paragraph"}</Button>
+                    {!!userInfo ?
+                        <Button primary={!showReplyForm} secondary={showReplyForm} onClick={myself.createParagraphClick}>{showReplyForm ? "Cancel" : "Create Paragraph"}</Button> :
+                        null
+                    }
                     {
                         showReplyForm ?
                             <CreatePost /> :
@@ -97,4 +102,4 @@ class ViewChapter extends Component
     }
 }
 
-export default ViewChapter;
+export default withAuthStatic(ViewChapter);

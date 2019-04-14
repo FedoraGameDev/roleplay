@@ -31,19 +31,22 @@ class ViewStory extends Component
     {
         this.getStory();
 
-        axios.post(`${BACKEND}${LIST_CHARACTERS}`, { token: localStorage.getItem("token") })
-            .then(res =>
-            {
-                const chars = res.data.characters;
-                if (chars.length === 0)
-                    this.setState({ characterList: null });
-                else
-                    this.setState({ characterList: res.data.characters, selectedCharacter: res.data.characters[0]._id });
-            })
-            .catch(error =>
-            {
-                console.log(error);
-            });
+        if (!!this.props.userInfo)
+        {
+            axios.post(`${BACKEND}${LIST_CHARACTERS}`, { token: localStorage.getItem("token") })
+                .then(res =>
+                {
+                    const chars = res.data.characters;
+                    if (chars.length === 0)
+                        this.setState({ characterList: null });
+                    else
+                        this.setState({ characterList: res.data.characters, selectedCharacter: res.data.characters[0]._id });
+                })
+                .catch(error =>
+                {
+                    console.log(error);
+                });
+        }
     }
 
     getStory = () =>
@@ -139,24 +142,27 @@ class ViewStory extends Component
                         <Button primary onClick={event => { onLinkClick(CREATE_CHAPTER.replace(":story_id", story_id)) }}>Create Chapter</Button> :
                         null
                     }
-                    <Modal trigger={<Button secondary>Add Character</Button>}>
-                        <Modal.Header>Choose your character</Modal.Header>
-                        <Modal.Content>
-                            <ModalDescription>
-                                {!!characterList ?
-                                    <Form onSubmit={myself.onApplyCharacter}>
-                                        <myself.listCharacterOptions info={{ myself: myself }} />
-                                        <Button primary type="submit">Apply</Button>
-                                    </Form> :
-                                    <div>Loading...</div>}
-                            </ModalDescription>
-                        </Modal.Content>
-                    </Modal>
+                    {!!userInfo ?
+                        <Modal trigger={<Button secondary>Add Character</Button>}>
+                            <Modal.Header>Choose your character</Modal.Header>
+                            <Modal.Content>
+                                <ModalDescription>
+                                    {!!characterList ?
+                                        <Form onSubmit={myself.onApplyCharacter}>
+                                            <myself.listCharacterOptions info={{ myself: myself }} />
+                                            <Button primary type="submit">Apply</Button>
+                                        </Form> :
+                                        <div>Loading...</div>}
+                                </ModalDescription>
+                            </Modal.Content>
+                        </Modal> :
+                        null
+                    }
                     <Modal trigger={<Button secondary>Roster</Button>}>
                         <Modal.Header>Character Roster</Modal.Header>
                         <Modal.Content>
                             <ModalDescription>
-                                {!!characterList ?
+                                {!!characters ?
                                     <CharacterGrid characters={characters} /> :
                                     <div>Loading...</div>}
                             </ModalDescription>
