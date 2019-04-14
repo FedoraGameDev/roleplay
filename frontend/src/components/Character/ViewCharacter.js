@@ -54,13 +54,11 @@ class ViewCharacter extends Component
                 Axios.get(`https://www.thecolorapi.com/id?format=json&hex=${this.state.character.appearance.eyes.replace("#", "")}`)
                     .then(res =>
                     {
-                        console.log(res.data);
                         this.setState({ eyeColor: res.data });
 
                         Axios.get(`https://www.thecolorapi.com/id?format=json&hex=${this.state.character.appearance.hair.replace("#", "")}`)
                             .then(res =>
                             {
-                                console.log(res.data);
                                 this.setState({ hairColor: res.data, ready: true });
                             })
                             .catch(error =>
