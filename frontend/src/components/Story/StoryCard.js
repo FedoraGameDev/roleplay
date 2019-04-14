@@ -8,6 +8,7 @@ class StoryCard extends Component
     render()
     {
         const { story } = this.props;
+        const date = new Date(story.date_created);
         return (
             <Table.Row>
                 <Table.Cell width={10}>
@@ -16,10 +17,10 @@ class StoryCard extends Component
                     </Link>
                 </Table.Cell>
                 <Table.Cell width={1}><center>
-                    4/8/19
+                    {`${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`}
                 </center></Table.Cell>
                 <Table.Cell width={1}><center>
-                    4
+                    {story.replies}
                 </center></Table.Cell>
                 <Table.Cell width={2}><center>
                     {story.author.username}

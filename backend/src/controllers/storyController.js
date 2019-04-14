@@ -6,7 +6,7 @@ module.exports = {
     listStory: (req, res) =>
     {
         console.log("Retrieving Stories...");
-        models.Story.find({}).populate("author")
+        models.Story.find({}, "title date_created replies genres author").populate("author")
             .then(stories =>
             {
                 console.log(`Returning ${stories.length} Stories.`);
@@ -38,7 +38,7 @@ module.exports = {
     story: (req, res) =>
     {
         console.log(`Retrieving story ${req.params.story_id}...`);
-        models.Story.findOne({ _id: req.params.story_id }).populate("genres").populate("subscribers").populate("author").populate("characters")
+        models.Story.findOne({ _id: req.params.story_id }, "title author genres description chapters characters").populate("genres").populate("subscribers").populate("author").populate("characters")
             .then(story =>
             {
                 console.log(`Returning story "${story.title}".`);
@@ -54,7 +54,7 @@ module.exports = {
     chapter: (req, res) =>
     {
         console.log(`Retrieving chapter ${req.params.story_id}/${req.params.chapter_name}`);
-        models.Story.findOne({ _id: req.params.story_id }).populate("chapters.posts.author")
+        models.Story.findOne({ _id: req.params.story_id }, "chapters").populate("chapters.posts.author")
             .then(story =>
             {
                 console.log(`Returning chapter "${story.chapters[req.params.chapter_name].description}"`);

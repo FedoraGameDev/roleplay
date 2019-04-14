@@ -40,6 +40,7 @@ const storySchema = new Schema({
         ref: "User"
     }],
     date_created: Date,
+    replies: Number,
     closed_group: Boolean
 });
 
