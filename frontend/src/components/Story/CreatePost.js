@@ -4,7 +4,8 @@ import { Button, Form, TextArea } from "semantic-ui-react";
 import { CREATE_POST } from "../../constants/routes";
 
 const INITIAL_STATE = {
-    postData: ""
+    postData: "",
+    character: 0
 }
 
 class CreatePost extends Component
@@ -29,6 +30,14 @@ class CreatePost extends Component
     {
         return (
             <Form onSubmit={this.onSubmit}>
+                <select placeholder="Characters" value={this.state.character}>
+                    {
+                        this.props.characters.map((character, index) =>
+                            (
+                                <option key={index} value={character._id}>{character.name}</option>
+                            ))
+                    }
+                </select>
                 <TextArea placeholder="paragraph" name="postData" onChange={this.onChange} />
                 <Button primary type="submit">Submit</Button>
             </Form>
