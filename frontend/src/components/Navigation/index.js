@@ -1,22 +1,52 @@
 import React from "react";
+import { withRouter } from "react-router-dom";
 import { Menu } from "semantic-ui-react";
 import { compose } from "recompose";
 import { withFirebase } from "../firebase/Firebase";
 import { withAuthStatic } from "../firebase/Session";
 import * as ROUTES from "../../constants/routes";
-import withNavLink from "./withNavLink";
 
 class Navigation extends React.Component
 {
+    constructor(props)
+    {
+        super(props);
+
+        this.state = {
+            menuTarget: "home"
+        };
+    }
+
     componentDidMount()
     {
-        this.props.navlink.setTarget(this.props.location.pathname);
+        this.setTarget(this.props.location.pathname);
+
+        this.backListener = this.props.history.listen(location =>
+        {
+            this.setTarget(location.pathname);
+        });
+    }
+
+    componentWillUnmount()
+    {
+        this.backListener();
+    }
+
+    setTarget = (to) =>
+    {
+        if (to.includes("home")) this.setState({ menuTarget: "home" });
+        if (to.includes("account")) this.setState({ menuTarget: "account" });
+        if (to.includes("story")) this.setState({ menuTarget: "story" });
+        if (to.includes("character")) this.setState({ menuTarget: "character" });
+        if (to === "/") this.setState({ menuTarget: "landing" });
+        if (to.includes("signin")) this.setState({ menuTarget: "signin" });
     }
 
     render()
     {
-        const { props } = this;
-        const { userInfo, navlink, history, firebase } = props;
+        const { props, state } = this;
+        const { userInfo, history, firebase } = props;
+        const { menuTarget } = state;
 
         const loggedInItems = [
             { activeLink: "home", route: ROUTES.HOME, title: "Home" },
@@ -40,20 +70,20 @@ class Navigation extends React.Component
                                 (
                                     <Menu.Item
                                         key={index}
-                                        active={navlink.menuTarget === item.activeLink}
-                                        onClick={() => { navlink.goToLink(item.route, history) }}>
+                                        active={menuTarget === item.activeLink}
+                                        onClick={() => { history.push(item.route) }}>
                                         {item.title}
                                     </Menu.Item>
                                 )),
-                            <Menu.Item key={loggedInItems.length} onClick={event => { firebase.doSignOut(); navlink.goToLink("/", history); }} >Log Out</Menu.Item>
+                            <Menu.Item key={loggedInItems.length} onClick={event => { firebase.doSignOut(); history.push("/"); }} >Log Out</Menu.Item>
                         ]
                         :
                         loggedOutItems.map((item, index) =>
                             (
                                 <Menu.Item
                                     key={index}
-                                    active={navlink.menuTarget === item.activeLink}
-                                    onClick={() => { navlink.goToLink(item.route, history) }}>
+                                    active={menuTarget === item.activeLink}
+                                    onClick={() => { history.push(item.route) }}>
                                     {item.title}
                                 </Menu.Item>
                             ))
@@ -63,4 +93,4 @@ class Navigation extends React.Component
     }
 }
 
-export default compose(withAuthStatic, withNavLink(), withFirebase)(Navigation);
+export default compose(withAuthStatic, withRouter, withFirebase)(Navigation);

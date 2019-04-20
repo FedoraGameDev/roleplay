@@ -4,7 +4,6 @@ import { compose } from "recompose";
 import { SignUpLink } from "../SignUp";
 import { PasswordForgetLink } from "../PasswordForget";
 import { withFirebase } from "../Firebase";
-import withNavLink from "../../Navigation/withNavLink";
 import * as ROUTES from "../../../constants/routes";
 
 const SignInPage = () => (
@@ -54,9 +53,9 @@ class SignInFormBase extends Component
                             });
                         }
                         if (!!query && !!query["forward"])
-                            this.props.navlink.goToLink(query["forward"], this.props.history);
+                            this.props.history.push(query["forward"]);
                         else
-                            this.props.navlink.goToLink(ROUTES.HOME, this.props.history);
+                            this.props.history.push(ROUTES.HOME);
                     })
                     .catch(error =>
                     {
@@ -94,7 +93,7 @@ class SignInFormBase extends Component
     }
 }
 
-const SignInForm = compose(withRouter, withFirebase, withNavLink())(SignInFormBase);
+const SignInForm = compose(withRouter, withFirebase)(SignInFormBase);
 
 export default SignInPage;
 
