@@ -4,7 +4,7 @@ import { withAuthStatic } from "../firebase/Session";
 import { compose } from "recompose";
 import axios from "axios";
 import { Table, Loader, Header } from "semantic-ui-react";
-import { BACKEND, STORY_VIEW, LIST_CHARACTERS } from "../../constants/routes";
+import { BACKEND, STORY_VIEW, LIST_CHARACTERS, CHAPTER_VIEW } from "../../constants/routes";
 
 const INITIAL_STATE = {
     story: {
@@ -21,6 +21,9 @@ const INITIAL_STATE = {
     loaded: false
 }
 
+/* StoryView
+ * Displays all info from a single story listing its chapters.
+*/
 class StoryView extends Component
 {
     constructor(props)
@@ -108,7 +111,7 @@ class StoryView extends Component
                                 {
                                     story.chapters.map((chapter, index) =>
                                         (
-                                            <Table.Row key={index}>
+                                            <Table.Row key={index} onClick={() => { this.goToLink(CHAPTER_VIEW.replace(":story_id", story._id).replace(":chapter_name", index)) }}>
                                                 <Table.Cell>{chapter.title}</Table.Cell>
                                                 <Table.Cell>{chapter.description}</Table.Cell>
                                             </Table.Row>
