@@ -115,18 +115,18 @@ class StoryContainer extends Component
         const { stories, genres, filteredStories } = this.state;
 
         return (
-            <Router>
+            <div>
                 {
                     (stories && genres) ?
                         [
                             <Route key={0} path={LIST_STORY} component={() => { return (<StoryList stories={filteredStories} />); }} />,
                             <Route key={1} path={STORY_VIEW} component={() => { return (<StoryView />); }} />,
-                            <Router key={2} path={CHAPTER_VIEW} component={() => { return (<ChapterView />); }} />
+                            <Route key={2} path={CHAPTER_VIEW} component={() => { return (<ChapterView />); }} />
                         ]
                         :
                         <Loader active />
                 }
-            </Router>
+            </div>
         );
     }
 }

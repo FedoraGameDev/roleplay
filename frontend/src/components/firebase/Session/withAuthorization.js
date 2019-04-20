@@ -41,7 +41,7 @@ const withAuthorization = (condition, badCheck, renderAnyways = false) => Compon
                             });
                     }
                     else
-                        if (!renderAnyways) badCheck(this.props.history);//this.props.history.push(ROUTES.SIGN_IN);
+                        if (!renderAnyways) badCheck(this.props.history);
                 }
             );
         }

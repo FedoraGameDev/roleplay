@@ -1,8 +1,10 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
+import { withAuthStatic } from "../firebase/Session";
+import { compose } from "recompose";
 import axios from "axios";
 import { Table, Loader, Header } from "semantic-ui-react";
-import { BACKEND, STORY_VIEW } from "../../constants/routes";
+import { BACKEND, STORY_VIEW, LIST_CHARACTERS } from "../../constants/routes";
 
 const INITIAL_STATE = {
     story: {
@@ -38,6 +40,28 @@ class StoryView extends Component
             {
                 console.log(error);
             });
+
+        if (!!this.props.userInfo)
+        {
+            axios.post(`${BACKEND}${LIST_CHARACTERS}`, { token: localStorage.getItem("token") })
+                .then(res =>
+                {
+                    const chars = res.data.characters;
+                    if (chars.length === 0)
+                        this.setState({ characterList: null });
+                    else
+                        this.setState({ characterList: res.data.characters, selectedCharacter: res.data.characters[0]._id });
+                })
+                .catch(error =>
+                {
+                    console.log(error);
+                });
+        }
+    }
+
+    goToLink = to =>
+    {
+        this.props.history.push(to);
     }
 
     render()
@@ -63,9 +87,8 @@ class StoryView extends Component
                                     </Table.Row>
                                 </Table.Body>
                             </Table>
-                            <Table attached>
+                            <Table attached fixed>
                                 <Table.Body>
-                                    {/* <this.listGenres genres={story.genres} /> */}
                                     <Table.Row textAlign="center">
                                         {
                                             story.genres.map((genre, index) =>
@@ -74,13 +97,14 @@ class StoryView extends Component
                                                 ))
                                         }
                                     </Table.Row>
-                                    <Table.Row>
-                                        <Table.Cell><center>{story.description}</center></Table.Cell>
-                                    </Table.Row>
                                 </Table.Body>
                             </Table>
-                            <Table attached className="linkable"><Table.Body>
-                                {/* <this.listChapters info={{ myself: this, props: this.props, state: this.state, onLinkClick: this.onLinkClick }} /> */}
+                            <Table attached><Table.Body>
+                                <Table.Row>
+                                    <Table.Cell><center>{story.description}</center></Table.Cell>
+                                </Table.Row>
+                            </Table.Body></Table>
+                            <Table attached="bottom" className="linkable"><Table.Body>
                                 {
                                     story.chapters.map((chapter, index) =>
                                         (
@@ -100,4 +124,4 @@ class StoryView extends Component
     }
 }
 
-export default withRouter(StoryView);
+export default compose(withRouter, withAuthStatic)(StoryView);
