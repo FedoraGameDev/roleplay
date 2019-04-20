@@ -78,3 +78,13 @@ code {
 	cursor: pointer;
 	display: inline-block;
 }
+
+table.linkable {
+	tr {
+		cursor: pointer;
+
+		&:hover {
+			background-color: #c5c5c5 !important;
+		}
+	}
+}

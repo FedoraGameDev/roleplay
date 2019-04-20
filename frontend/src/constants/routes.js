@@ -6,6 +6,7 @@ export const ACCOUNT = "/account";
 export const ADMIN = "/admin";
 export const PASSWORD_FORGET = "/pw-forget";
 
+export const STORY_CONTAINER = "/story";
 export const LIST_STORY = "/story/list";
 export const LIST_GENRE = "/story/genre/list"
 export const STORY_VIEW = "/story/view/:story_id";
