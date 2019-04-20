@@ -7,7 +7,7 @@ class ChapterView extends Component
     render()
     {
         return (
-            <div></div>
+            <Table><Table.Body></Table.Body></Table>
         );
     }
 }

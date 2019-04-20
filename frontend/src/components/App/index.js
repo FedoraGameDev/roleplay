@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Route, withRouter } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import * as ROUTES from "../../constants/routes";
 import { withAuthentication } from "../firebase/Session";
 import { compose } from "recompose";

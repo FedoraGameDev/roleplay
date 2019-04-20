@@ -1,7 +1,7 @@
 import React, { Component } from "react"
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { Route } from "react-router-dom";
 import axios from "axios";
-import { Container, Loader } from "semantic-ui-react";
+import { Loader } from "semantic-ui-react";
 import { BACKEND, LIST_GENRE, LIST_STORY, STORY_VIEW, CHAPTER_VIEW } from "../../constants/routes";
 import StoryList from "./StoryList";
 import StoryView from "./StoryView";

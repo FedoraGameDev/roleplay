@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Container, Loader, Table, Image, Header, Button } from "semantic-ui-react";
-import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import { withAuthStatic } from "../firebase/Session";
 import { BACKEND, CHAPTER_VIEW } from "../../constants/routes";
