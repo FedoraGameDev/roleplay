@@ -73,9 +73,9 @@ class ChapterView extends Component
                                         <Table.Body>
                                             <Table.Row>
                                                 <Table.Cell>
-                                                    <div className="characterPlacard" style={{ width: "250px", float: "left", marginRight: "15px" }}>
+                                                    <div className="characterPlacard" style={{ width: "150px", float: "left", marginRight: "15px" }}>
                                                         <center><Header>{post.author.name}</Header></center>
-                                                        <Image floated='left' src={post.author.appearance.image} />
+                                                        <Image floated='left' src={post.author.appearance.image} style={{ width: "150px" }} />
                                                     </div>
                                                     <pre style={{ margin: "0" }}>{post.description}</pre>
                                                 </Table.Cell>
