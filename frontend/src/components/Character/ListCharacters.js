@@ -4,6 +4,7 @@ import { Container } from "semantic-ui-react";
 import { withAuthorization } from "../firebase/Session";
 import { SIGN_IN, BACKEND, LIST_CHARACTERS } from "../../constants/routes";
 import { CreateCharacterButton, CharacterGrid } from "./";
+import { makeCancelable } from "../../constants/extensions";
 
 const INITIAL_STATE = {
     characters: []
@@ -11,6 +12,8 @@ const INITIAL_STATE = {
 
 class ListCharacters extends Component
 {
+    promises = [];
+
     constructor(props)
     {
         super(props);
@@ -19,7 +22,7 @@ class ListCharacters extends Component
 
     componentDidMount()
     {
-        axios.post(`${BACKEND}${LIST_CHARACTERS}`, { token: localStorage.getItem("token") })
+        this.promises.splice(this.promises.length - 1, 0, makeCancelable(axios.post(`${BACKEND}${LIST_CHARACTERS}`, { token: localStorage.getItem("token") })
             .then(res =>
             {
                 this.setState({ characters: res.data.characters });
@@ -27,7 +30,12 @@ class ListCharacters extends Component
             .catch(error =>
             {
                 console.log(error);
-            });
+            })));
+    }
+
+    componentWillUnmount()
+    {
+        this.promises.forEach(promise => promise.cancel());
     }
 
     render()

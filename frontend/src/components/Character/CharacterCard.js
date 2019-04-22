@@ -22,6 +22,7 @@ class CharacterCard extends Component
     {
         return (
             <Card
+                className="character-card"
                 image={this.props.character.appearance.image}
                 header={this.props.character.name}
                 link

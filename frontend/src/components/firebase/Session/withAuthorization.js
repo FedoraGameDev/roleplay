@@ -5,14 +5,17 @@ import AuthUserContext from "./context";
 import { withFirebase } from "../Firebase";
 import * as ROUTES from "../../../constants/routes";
 import Axios from "axios";
+import { makeCancelable } from "../../../constants/extensions";
 
 const withAuthorization = (condition, badCheck, renderAnyways = false) => Component =>
 {
     class WithAuthorization extends React.Component
     {
+        promises = [];
+
         componentDidMount()
         {
-            this.listener = this.props.firebase.auth.onAuthStateChanged(
+            this.props.firebase.auth.onAuthStateChanged(
                 authUser =>
                 {
                     if (authUser)
@@ -20,7 +23,7 @@ const withAuthorization = (condition, badCheck, renderAnyways = false) => Compon
                         this.props.firebase.auth.currentUser.getIdToken(true)
                             .then(token =>
                             {
-                                Axios.post(`${ROUTES.BACKEND}/user`, { token: token })
+                                this.promises.splice(this.promises.length - 1, 0, makeCancelable(Axios.post(`${ROUTES.BACKEND}/user`, { token: token })
                                     .then(user =>
                                     {
                                         const userInfo = {
@@ -33,7 +36,7 @@ const withAuthorization = (condition, badCheck, renderAnyways = false) => Compon
                                     .catch(error =>
                                     {
                                         console.log(error);
-                                    });
+                                    })));
                             })
                             .catch(error =>
                             {
@@ -48,7 +51,7 @@ const withAuthorization = (condition, badCheck, renderAnyways = false) => Compon
 
         componentWillUnmount()
         {
-            this.listener();
+            this.promises.forEach(promise => promise.cancel());
         }
 
         render()

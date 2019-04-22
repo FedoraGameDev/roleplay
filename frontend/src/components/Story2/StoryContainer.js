@@ -6,6 +6,7 @@ import { BACKEND, LIST_GENRE, LIST_STORY, STORY_VIEW, CHAPTER_VIEW } from "../..
 import StoryList from "./StoryList";
 import StoryView from "./StoryView";
 import ChapterView from "./ChapterView";
+import { makeCancelable } from "../../constants/extensions";
 
 const INITIAL_STATE = {
     genres: null,
@@ -19,6 +20,8 @@ const INITIAL_STATE = {
 */
 class StoryContainer extends Component
 {
+    promises = [];
+
     constructor(props)
     {
         super(props)
@@ -31,7 +34,7 @@ class StoryContainer extends Component
     */
     componentDidMount()
     {
-        axios.get(`${BACKEND}${LIST_GENRE}`)
+        this.promises.splice(this.promises.length - 1, 0, makeCancelable(axios.get(`${BACKEND}${LIST_GENRE}`)
             .then(res =>
             {
                 const genreChecks = {};
@@ -46,9 +49,9 @@ class StoryContainer extends Component
             .catch(error =>
             {
                 console.log(error);
-            });
+            })));
 
-        axios.get(`${BACKEND}${LIST_STORY}`)
+        this.promises.splice(this.promises.length - 1, 0, makeCancelable(axios.get(`${BACKEND}${LIST_STORY}`)
             .then(res =>
             {
                 this.setState({ stories: res.data.stories, filteredStories: [...res.data.stories] });
@@ -57,7 +60,12 @@ class StoryContainer extends Component
             .catch(error =>
             {
                 console.log(error);
-            });
+            })));
+    }
+
+    componentWillUnmount()
+    {
+        this.promises.forEach(promise => promise.cancel());
     }
 
     /* filterStories

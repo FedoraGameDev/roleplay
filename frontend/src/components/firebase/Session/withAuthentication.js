@@ -4,11 +4,14 @@ import { Loader } from "semantic-ui-react";
 import AuthUserContext from "./context";
 import { withFirebase } from "../Firebase";
 import { BACKEND } from "../../../constants/routes";
+import { makeCancelable } from "../../../constants/extensions";
 
 const withAuthentication = Component =>
 {
     class WithAuthentication extends React.Component
     {
+        promises = [];
+
         constructor(props)
         {
             super(props);
@@ -20,7 +23,7 @@ const withAuthentication = Component =>
 
         componentDidMount()
         {
-            this.listener = this.props.firebase.auth.onAuthStateChanged(
+            this.props.firebase.auth.onAuthStateChanged(
                 authUser =>
                 {
                     if (authUser)
@@ -28,7 +31,7 @@ const withAuthentication = Component =>
                         this.props.firebase.auth.currentUser.getIdToken(true)
                             .then(idToken =>
                             {
-                                axios.post(`${BACKEND}/user`, { token: idToken })
+                                this.promises.splice(this.promises.length - 1, 0, makeCancelable(axios.post(`${BACKEND}/user`, { token: idToken })
                                     .then(user =>
                                     {
                                         this.setState({
@@ -43,7 +46,7 @@ const withAuthentication = Component =>
                                     .catch(error =>
                                     {
                                         console.log(error);
-                                    });
+                                    })));
                             })
                             .catch(error =>
                             {
@@ -61,7 +64,7 @@ const withAuthentication = Component =>
 
         componentWillUnmount()
         {
-            this.listener();
+            this.promises.forEach(promise => promise.cancel());
         }
 
         render()

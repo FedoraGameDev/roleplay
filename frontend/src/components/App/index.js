@@ -23,7 +23,9 @@ class App extends React.Component
         return (
             <Router>
                 <Container>
-                    <Navigation />
+                    <Segment inverted attached="top" style={{ padding: "2px" }}>
+                        <Navigation />
+                    </Segment>
                     <Segment attached="bottom">
                         <Route exact path={ROUTES.LANDING} component={Landing} />
                         <Route path={ROUTES.SIGN_UP} component={SignUp} />

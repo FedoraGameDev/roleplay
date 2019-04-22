@@ -1,8 +1,11 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
+import { compose } from "recompose";
 import axios from "axios";
+import withAuthStatic from "../firebase/Session/withAuthStatic";
 import { Table, Placeholder, Button, Header, Image } from "semantic-ui-react";
 import { BACKEND, CHAPTER_VIEW } from "../../constants/routes";
+import { makeCancelable } from "../../constants/extensions";
 
 const INITIAL_STATE = {
     chapter: null,
@@ -11,6 +14,8 @@ const INITIAL_STATE = {
 
 class ChapterView extends Component
 {
+    promises = [];
+
     constructor(props)
     {
         super(props);
@@ -21,7 +26,7 @@ class ChapterView extends Component
     componentDidMount()
     {
         const { story_id, chapter_name } = this.props.match.params;
-        axios.get(`${BACKEND}${CHAPTER_VIEW.replace(":story_id", story_id).replace(":chapter_name", chapter_name)}`)
+        this.promises.splice(this.promises.length - 1, 0, makeCancelable(axios.get(`${BACKEND}${CHAPTER_VIEW.replace(":story_id", story_id).replace(":chapter_name", chapter_name)}`)
             .then(res =>
             {
                 this.setState({ chapter: res.data.chapter });
@@ -29,7 +34,12 @@ class ChapterView extends Component
             .catch(error =>
             {
                 console.log(error);
-            });
+            })));
+    }
+
+    componentWillUnmount()
+    {
+        this.promises.forEach(promise => promise.cancel());
     }
 
     render()
@@ -75,15 +85,6 @@ class ChapterView extends Component
 
                                     return (
                                         <Table.Row key={index}><Table.Cell>
-                                            {/* <Table attached="top" inverted>
-                                                <Table.Body>
-                                                    <Table.Row>
-                                                        <Table.Cell>
-                                                            <center><Header as="h2" inverted>{post.author.name}</Header></center>
-                                                        </Table.Cell>
-                                                    </Table.Row>
-                                                </Table.Body>
-                                            </Table> */}
                                             {(index === chapter.posts.length - 1) ?
                                                 <Table attached="bottom">{TableBody(post)}</Table> :
                                                 <Table attached>{TableBody(post)}</Table>
@@ -114,4 +115,4 @@ class ChapterView extends Component
     }
 }
 
-export default withRouter(ChapterView);
+export default compose(withRouter, withAuthStatic)(ChapterView);

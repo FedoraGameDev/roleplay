@@ -37,7 +37,7 @@ code {
 	}
 }
 
-.card {
+.character-card.card {
 	width: 250px !important;
 	
 	img {
@@ -84,7 +84,30 @@ table.linkable {
 		cursor: pointer;
 
 		&:hover {
-			background-color: #c5c5c5 !important;
+			background-color: #e2e2e2 !important;
+			border: none;
+		}
+
+		td {
+			border-top: none !important;
 		}
 	}
+}
+
+.ui.inverted.menu .blue.active.item {
+	background-color: transparent;
+	color: #2185d0 !important;
+
+	&:hover {
+		color: #65b4f0 !important;
+	}
+}
+
+.book-card {
+	.content {
+		text-align: center;
+		color: black;
+	}
+	
+	&.blue .content { background-color: #2185d055 !important; }
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
-import { Menu } from "semantic-ui-react";
+import { Menu, Icon } from "semantic-ui-react";
 import { compose } from "recompose";
 import { withFirebase } from "../firebase/Firebase";
 import { withAuthStatic } from "../firebase/Session";
@@ -49,42 +49,49 @@ class Navigation extends React.Component
         const { menuTarget } = state;
 
         const loggedInItems = [
-            { activeLink: "home", route: ROUTES.HOME, title: "Home" },
-            { activeLink: "account", route: ROUTES.ACCOUNT, title: "Account" },
-            { activeLink: "story", route: ROUTES.LIST_STORY, title: "Stories" },
-            { activeLink: "character", route: ROUTES.LIST_CHARACTERS, title: "Characters" }
+            { activeLink: "home", route: ROUTES.HOME, title: "Home", icon: "home" },
+            { activeLink: "account", route: ROUTES.ACCOUNT, title: "Account", icon: "user" },
+            { activeLink: "story", route: ROUTES.LIST_STORY, title: "Stories", icon: "book" },
+            { activeLink: "character", route: ROUTES.LIST_CHARACTERS, title: "Characters", icon: "user secret" }
         ];
 
         const loggedOutItems = [
-            { activeLink: "landing", route: ROUTES.LANDING, title: "Landing" },
-            { activeLink: "story", route: ROUTES.LIST_STORY, title: "Stories" },
-            { activeLink: "signin", route: ROUTES.SIGN_IN, title: "Sign In" }
+            { activeLink: "landing", route: ROUTES.LANDING, title: "Home", icon: "home" },
+            { activeLink: "story", route: ROUTES.LIST_STORY, title: "Stories", icon: "book" },
+            { activeLink: "signin", route: ROUTES.SIGN_IN, title: "Sign In", icon: "sign in alternate" }
         ];
 
         return (
-            <Menu inverted tabular attached="top">
+            <Menu inverted pointing secondary>
                 {
                     !!userInfo ?
                         [
                             loggedInItems.map((item, index) =>
                                 (
                                     <Menu.Item
+                                        color="blue"
                                         key={index}
                                         active={menuTarget === item.activeLink}
                                         onClick={() => { history.push(item.route) }}>
-                                        {item.title}
+                                        <Icon name={item.icon} size="large" color={menuTarget === item.activeLink ? "blue" : null} />
+                                        <div>{item.title}</div>
                                     </Menu.Item>
                                 )),
-                            <Menu.Item key={loggedInItems.length} onClick={event => { firebase.doSignOut(); history.push("/"); }} >Log Out</Menu.Item>
+                            <Menu.Item key={loggedInItems.length} onClick={event => { firebase.doSignOut(); history.push("/"); }} >
+                                <Icon name="sign out alternate" size="large" />
+                                Log Out
+                            </Menu.Item>
                         ]
                         :
                         loggedOutItems.map((item, index) =>
                             (
                                 <Menu.Item
+                                    color="blue"
                                     key={index}
                                     active={menuTarget === item.activeLink}
                                     onClick={() => { history.push(item.route) }}>
-                                    {item.title}
+                                    <Icon name={item.icon} size="large" color={menuTarget === item.activeLink ? "blue" : null} />
+                                    <div>{item.title}</div>
                                 </Menu.Item>
                             ))
                 }

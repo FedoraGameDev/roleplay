@@ -5,6 +5,7 @@ import { compose } from "recompose";
 import axios from "axios";
 import { Table, Loader, Header } from "semantic-ui-react";
 import { BACKEND, STORY_VIEW, LIST_CHARACTERS, CHAPTER_VIEW } from "../../constants/routes";
+import { makeCancelable } from "../../constants/extensions";
 
 const INITIAL_STATE = {
     story: {
@@ -26,6 +27,8 @@ const INITIAL_STATE = {
 */
 class StoryView extends Component
 {
+    promises = [];
+
     constructor(props)
     {
         super(props);
@@ -34,7 +37,7 @@ class StoryView extends Component
 
     componentDidMount()
     {
-        axios.get(`${BACKEND}${STORY_VIEW.replace(":story_id", this.props.match.params.story_id)}`)
+        this.promises.splice(this.promises.length - 1, 0, makeCancelable(axios.get(`${BACKEND}${STORY_VIEW.replace(":story_id", this.props.match.params.story_id)}`)
             .then(res =>
             {
                 this.setState({ story: res.data.story, loaded: true });
@@ -42,11 +45,11 @@ class StoryView extends Component
             .catch(error =>
             {
                 console.log(error);
-            });
+            })));
 
         if (!!this.props.userInfo)
         {
-            axios.post(`${BACKEND}${LIST_CHARACTERS}`, { token: localStorage.getItem("token") })
+            this.promises.splice(this.promises.length - 1, 0, makeCancelable(axios.post(`${BACKEND}${LIST_CHARACTERS}`, { token: localStorage.getItem("token") })
                 .then(res =>
                 {
                     const chars = res.data.characters;
@@ -58,8 +61,13 @@ class StoryView extends Component
                 .catch(error =>
                 {
                     console.log(error);
-                });
+                })));
         }
+    }
+
+    componentWillUnmount()
+    {
+        this.promises.forEach(promise => { promise.cancel(); });
     }
 
     goToLink = to =>
