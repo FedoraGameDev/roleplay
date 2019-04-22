@@ -133,16 +133,13 @@ async function saveGenre(genre)
 
 async function GenerateGenre()
 {
-    const genres = [
-        new models.Genre({ name: "Fantasy" }),
-        new models.Genre({ name: "Science Fiction" }),
-        new models.Genre({ name: "Western" }),
-        new models.Genre({ name: "Romance" }),
-        new models.Genre({ name: "Thriller" }),
-        new models.Genre({ name: "Mystery" }),
-        new models.Genre({ name: "Detective" }),
-        new models.Genre({ name: "Dystopia" })
-    ];
+    const genreTitles = [
+        "Fantasy", "Science Fiction", "Western",
+        "Romance", "Thriller", "Mystery",
+        "Detective", "Dystopia"];
+    const genres = genreTitles.map(genreName => (
+        new models.Genre({ name: genreName })
+    ));
 
     try
     {
