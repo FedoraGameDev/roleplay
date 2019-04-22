@@ -1,5 +1,4 @@
 const models = require("../models");
-const mongoose = require("mongoose");
 const firebaseAdmin = require("firebase-admin");
 
 module.exports = {
@@ -15,7 +14,6 @@ module.exports = {
                     {
                         console.log(`${user.username} authenticated.`);
                         console.log(`Found ${user.characters.length} characters.`);
-                        console.log(user.characters);
 
                         res.json({ characters: user.characters });
                     })
@@ -67,22 +65,13 @@ module.exports = {
     view: (req, res) =>
     {
         console.log("Retrieving character...");
-        firebaseAdmin.auth().verifyIdToken(req.body.token)
-            .then(decodedToken =>
-            {
-                console.log("User authenticated through firebase...");
 
-                models.Character.findOne({ _id: req.params.character_id }, (err, character) =>
-                {
-                    if (err) { res.status(500).json({ "ERROR": err }) };
+        models.Character.findOne({ _id: req.params.character_id }, (err, character) =>
+        {
+            if (err) { res.status(500).json({ "ERROR": err }) };
 
-                    console.log(`Character "${character.name}" found.`);
-                    res.json({ "character": character });
-                });
-            })
-            .catch(error =>
-            {
-                res.status(500).json({ "ERROR": error });
-            });
+            console.log(`Character "${character.name}" found.`);
+            res.json({ "character": character });
+        });
     }
 }

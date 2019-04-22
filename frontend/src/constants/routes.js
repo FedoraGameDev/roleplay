@@ -6,9 +6,13 @@ export const ACCOUNT = "/account";
 export const ADMIN = "/admin";
 export const PASSWORD_FORGET = "/pw-forget";
 
+export const STORY_CONTAINER = "/story";
 export const LIST_STORY = "/story/list";
 export const LIST_GENRE = "/story/genre/list"
 export const STORY_VIEW = "/story/view/:story_id";
+export const CHAPTER_VIEW = "/story/chapter/view/:story_id/:chapter_name";
+export const CREATE_POST = "/story/post/:story_id";
+export const APPLY_CHARACTER = "/story/apply";
 
 export const CREATE_STORY = "/story/create";
 export const CREATE_CHAPTER = "/story/chapter/create/:story_id";

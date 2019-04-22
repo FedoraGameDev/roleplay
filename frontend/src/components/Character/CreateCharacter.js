@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { compose } from "recompose";
-import { Input, Form, Button, Grid, TextArea, Label, Dropdown, Container } from "semantic-ui-react";
+import { Input, Form, Button, Grid, TextArea, Label, Container } from "semantic-ui-react";
 import cloudinary from "cloudinary/lib/cloudinary";
 import ReactCrop from "react-image-crop";
 import 'react-image-crop/lib/ReactCrop.scss';
@@ -155,6 +155,21 @@ class CreateCharacter extends Component
         this.imageRef = image;
     };
 
+    MonthsDropdown = info =>
+    {
+        const { myself } = info.info;
+        const { character } = myself.state;
+
+        const monthElements = Months.map((month, index) =>
+            (
+                <option value={month.key} key={index}>{month.text}</option>
+            ));
+
+        return (
+            <select name="birthmonth" placeholder="Month" value={character.basicinfo.birthmonth} onChange={myself.onChangeBasic}>{monthElements}</select>
+        )
+    }
+
     render()
     {
         const { character } = this.state;
@@ -168,7 +183,7 @@ class CreateCharacter extends Component
                     <Grid columns={2} centered stackable>
                         <Grid.Row>
                             <Grid.Column>
-                                <Grid columns={2}>
+                                <Grid columns={2} stackable>
                                     <Grid.Row columns={1}><Grid.Column>
                                         <Label size="big">General Info</Label>
                                     </Grid.Column></Grid.Row>
@@ -204,11 +219,7 @@ class CreateCharacter extends Component
                                                 placeholder="Gender" />
                                         </Grid.Column>
                                         <Grid.Column>
-                                            <Dropdown
-                                                fluid
-                                                selection
-                                                options={Months}
-                                                placeholder="Month" />
+                                            <this.MonthsDropdown info={{ myself: this }} />
                                         </Grid.Column>
                                         <Grid.Column>
                                             <Input
@@ -348,7 +359,7 @@ class CreateCharacterButton extends Component
     render()
     {
         return (
-            <center><Link to={CREATE_CHARACTER}><Button>Create Character</Button></Link></center>
+            <center><Link to={CREATE_CHARACTER}><Button primary>Create Character</Button></Link></center>
         )
     }
 }

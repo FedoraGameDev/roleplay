@@ -1,30 +1,40 @@
-import React, { Component } from "react";
-import { Container, Checkbox, Loader } from "semantic-ui-react";
+import React, { Component } from "react"
+import { Route } from "react-router-dom";
 import axios from "axios";
-import { CreateStoryLink } from "./CreateStory";
-import { StoryTable } from "./StoryCard";
-import { BACKEND, LIST_GENRE, LIST_STORY } from "../../constants/routes";
+import { Loader } from "semantic-ui-react";
+import { BACKEND, LIST_GENRE, LIST_STORY, STORY_VIEW, CHAPTER_VIEW } from "../../constants/routes";
+import StoryList from "./StoryList";
+import StoryView from "./StoryView";
+import ChapterView from "./ChapterView";
+import { makeCancelable } from "../../constants/extensions";
 
 const INITIAL_STATE = {
-    genres: [],
-    genreChecks: [],
-    stories: [],
+    genres: null,
+    stories: null,
+    genreChecks: {},
     filteredStories: []
 }
 
-class Story extends Component
+/* StoryContainer
+ * Container for all story pages
+*/
+class StoryContainer extends Component
 {
-    timeout = null;
+    promises = [];
 
     constructor(props)
     {
-        super(props);
+        super(props)
+
         this.state = { ...INITIAL_STATE };
     }
 
+    /* componentDidMount
+     * Sends requests to backend and receives story list and genre list.
+    */
     componentDidMount()
     {
-        axios.get(`${BACKEND}${LIST_GENRE}`)
+        this.promises.splice(this.promises.length - 1, 0, makeCancelable(axios.get(`${BACKEND}${LIST_GENRE}`)
             .then(res =>
             {
                 const genreChecks = {};
@@ -39,9 +49,9 @@ class Story extends Component
             .catch(error =>
             {
                 console.log(error);
-            });
+            })));
 
-        axios.get(`${BACKEND}${LIST_STORY}`)
+        this.promises.splice(this.promises.length - 1, 0, makeCancelable(axios.get(`${BACKEND}${LIST_STORY}`)
             .then(res =>
             {
                 this.setState({ stories: res.data.stories, filteredStories: [...res.data.stories] });
@@ -50,12 +60,19 @@ class Story extends Component
             .catch(error =>
             {
                 console.log(error);
-            })
+            })));
     }
 
+    componentWillUnmount()
+    {
+        this.promises.forEach(promise => promise.cancel());
+    }
+
+    /* filterStories
+     * Sets state.filteredStories to all stories that have all genreChecks assigned to them.
+    */
     filterStories = () =>
     {
-        //TODO: this is slow (1N * genres)
         const { stories, genres, genreChecks } = this.state;
         const newFilter = [...stories];
 
@@ -82,16 +99,9 @@ class Story extends Component
         this.setState({ filteredStories: newFilter });
     }
 
-    onGenreChange = genre =>
-    {
-        if (!!this.timeout)
-            clearTimeout(this.timeout);
-        const genreChecks = { ...this.state.genreChecks };
-        genreChecks[genre] = !genreChecks[genre];
-        this.setState({ genreChecks: genreChecks });
-        this.timeout = setTimeout(this.filterStories, 500);
-    }
-
+    /* checkFilters
+     * Returns true if any filters are active, else returns false.
+    */
     checkFilters = () =>
     {
         for (let i = 0; i < this.state.genres.length; i++)
@@ -105,37 +115,28 @@ class Story extends Component
         return false;
     }
 
-    genreList(info)
-    {
-        const { genres, genreChecks, onGenreChange } = info.info;
-        const listItems = genres.map((genre, index) =>
-            <div className="genre-item" key={index}>
-                <Checkbox
-                    name={genre.name}
-                    label={genre.name}
-                    defaultChecked={genreChecks[genre.name]}
-                    onChange={event => { onGenreChange(genre.name) }} />
-            </div>
-        );
-
-        return <ul>{listItems}</ul>;
-    }
-
+    /* render
+     * Displays Story List, Story, and Chapter depending on path
+    */
     render()
     {
-        const { genres, stories, genreChecks, filteredStories } = this.state;
+        const { stories, genres, filteredStories } = this.state;
+
         return (
-            <Container>
-                {(!!genres && !!stories) ? [
-                    <CreateStoryLink key={0} />,
-                    <Container key={1}><this.genreList info={{ genres, genreChecks, onGenreChange: this.onGenreChange }} /></Container>,
-                    <Container key={2}><StoryTable stories={filteredStories} /></Container>
-                ] :
-                    <Loader active />
+            <div>
+                {
+                    (stories && genres) ?
+                        [
+                            <Route key={0} path={LIST_STORY} component={() => { return (<StoryList stories={filteredStories} />); }} />,
+                            <Route key={1} path={STORY_VIEW} component={() => { return (<StoryView />); }} />,
+                            <Route key={2} path={CHAPTER_VIEW} component={() => { return (<ChapterView />); }} />
+                        ]
+                        :
+                        <Loader active />
                 }
-            </Container>
+            </div>
         );
     }
 }
 
-export default Story;
+export default StoryContainer;

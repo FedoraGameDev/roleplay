@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import Axios from "axios";
-import { Grid, Label, Loader, Image } from "semantic-ui-react";
+import { Header, Label, Loader, Image, Container, Table } from "semantic-ui-react";
 import { BACKEND, VIEW_CHARACTER } from "../../constants/routes";
 import Months from "../../constants/months";
 
@@ -28,7 +28,10 @@ const INITIAL_STATE = {
             habits: "",
             quirks: ""
         }
-    }
+    },
+    hairColor: {},
+    eyeColor: {},
+    ready: false
 }
 
 class ViewCharacter extends Component
@@ -40,13 +43,33 @@ class ViewCharacter extends Component
         this.state = { ...INITIAL_STATE };
     }
 
-    componentWillMount()
+    componentDidMount()
     {
         Axios.post(`${BACKEND}${VIEW_CHARACTER.replace(":character_id", this.props.match.params.character_id)}`,
             { token: localStorage.token })
             .then(res =>
             {
                 this.setState({ character: res.data.character });
+
+                Axios.get(`https://www.thecolorapi.com/id?format=json&hex=${this.state.character.appearance.eyes.replace("#", "")}`)
+                    .then(res =>
+                    {
+                        this.setState({ eyeColor: res.data });
+
+                        Axios.get(`https://www.thecolorapi.com/id?format=json&hex=${this.state.character.appearance.hair.replace("#", "")}`)
+                            .then(res =>
+                            {
+                                this.setState({ hairColor: res.data, ready: true });
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                            });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                    });
             })
             .catch(error =>
             {
@@ -56,72 +79,93 @@ class ViewCharacter extends Component
 
     render()
     {
-        const { character } = this.state;
-
-        console.log(character);
-        console.log(!character.appearance);
+        const { character, ready, eyeColor, hairColor } = this.state;
+        const { basicinfo } = character;
 
         return (
-            <div>
-                {!!character.name ?
-                    <Grid centered columns={8}>
-                        <Grid.Row>
-                            <Grid.Column width={2}>
-                                <center><Label size="huge">{character.name}</Label></center>
-                            </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Grid.Column>
-                                <center><Image src={character.appearance.image} /></center>
-                            </Grid.Column>
-                            <Grid.Column>
-                                <center>
-                                    <Label>{character.basicinfo.age} - {character.basicinfo.gender}{` - `}
-                                        {Months[character.basicinfo.birthmonth].text} {character.basicinfo.birthday}</Label><br />
-                                    <span style={{ backgroundColor: character.appearance.hair }}>Hair</span> - <span style={{ backgroundColor: character.appearance.eyes }}>Eyes</span>
-                                    <br />{character.appearance.description}
-                                </center>
-                            </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Grid.Column width={8}>
-                                <center><Label>Traits</Label></center>
-                                <pre>{character.personality.traits}</pre>
-                            </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Grid.Column width={8}>
-                                <center><Label>Likes</Label></center>
-                                <pre>{character.personality.likes}</pre>
-                            </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Grid.Column width={8}>
-                                <center><Label>Dislikes</Label></center>
-                                <pre>{character.personality.dislikes}</pre>
-                            </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Grid.Column width={8}>
-                                <center><Label>Habits</Label></center>
-                                <pre>{character.personality.habits}</pre>
-                            </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Grid.Column width={8}>
-                                <center><Label>Quirks</Label></center>
-                                <pre>{character.personality.quirks}</pre>
-                            </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Grid.Column width={8}>
-                                <center><Label>Backstory</Label></center>
-                                <pre>{character.basicinfo.backstory}</pre>
-                            </Grid.Column>
-                        </Grid.Row>
-                    </Grid> :
+            <Container>
+                {ready ?
+                    [
+                        <Table key={1} inverted attached="top"><Table.Body>
+                            <Table.Row>
+                                <Table.Cell>
+                                    <center><Header as="h1" inverted size="huge">{character.name}</Header></center>
+                                </Table.Cell>
+                            </Table.Row>
+                        </Table.Body></Table>,
+                        <Table key={2} attached="bottom"><Table.Body>
+                            <Table.Row>
+                                <Table.Cell>
+                                    <Table fixed basic="very">
+                                        <Table.Header>
+                                            <Table.Row>
+                                                <Table.HeaderCell textAlign="center">Age</Table.HeaderCell>
+                                                <Table.HeaderCell textAlign="center">Gender</Table.HeaderCell>
+                                                <Table.HeaderCell textAlign="center">Birthday</Table.HeaderCell>
+                                                <Table.HeaderCell textAlign="center">Eyes</Table.HeaderCell>
+                                                <Table.HeaderCell textAlign="center">Hair</Table.HeaderCell>
+                                            </Table.Row>
+                                        </Table.Header>
+                                        <Table.Body><Table.Row>
+                                            <Table.Cell textAlign="center">{basicinfo.age}</Table.Cell>
+                                            <Table.Cell textAlign="center">{basicinfo.gender}</Table.Cell>
+                                            <Table.Cell textAlign="center">{Months[basicinfo.birthmonth].text} {basicinfo.birthday}</Table.Cell>
+                                            <Table.Cell textAlign="center">
+                                                <div className="color-background" style={{ backgroundColor: eyeColor.name.closest_named_hex, color: eyeColor.contrast.value }}>
+                                                    {eyeColor.name.value}
+                                                </div>
+                                            </Table.Cell>
+                                            <Table.Cell textAlign="center">
+                                                <div className="color-background" style={{ backgroundColor: hairColor.name.closest_named_hex, color: hairColor.contrast.value }}>
+                                                    {hairColor.name.value}
+                                                </div>
+                                            </Table.Cell>
+                                        </Table.Row></Table.Body>
+                                    </Table>
+                                    <center><Label><Header as="h2">Description</Header></Label></center>
+                                    <Image src={character.appearance.image} floated="left" />
+                                    <pre>{character.appearance.description}</pre>
+                                </Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell>
+                                    <center><Label><Header as="h2">Traits</Header></Label></center>
+                                    <pre>{character.personality.traits}</pre>
+                                </Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell>
+                                    <center><Label><Header as="h2">Likes</Header></Label></center>
+                                    <pre>{character.personality.likes}</pre>
+                                </Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell>
+                                    <center><Label><Header as="h2">Dislikes</Header></Label></center>
+                                    <pre>{character.personality.dislikes}</pre>
+                                </Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell>
+                                    <center><Label><Header as="h2">Habits</Header></Label></center>
+                                    <pre>{character.personality.habits}</pre>
+                                </Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell>
+                                    <center><Label><Header as="h2">Quirks</Header></Label></center>
+                                    <pre>{character.personality.quirks}</pre>
+                                </Table.Cell>
+                            </Table.Row>
+                            <Table.Row>
+                                <Table.Cell>
+                                    <center><Label><Header as="h2">Backstory</Header></Label></center>
+                                    <pre>{character.basicinfo.backstory}</pre>
+                                </Table.Cell>
+                            </Table.Row>
+                        </Table.Body></Table>] :
                     <Loader active />}
-            </div>
+            </Container>
         )
     }
 }

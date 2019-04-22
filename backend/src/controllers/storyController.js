@@ -6,7 +6,7 @@ module.exports = {
     listStory: (req, res) =>
     {
         console.log("Retrieving Stories...");
-        models.Story.find({})
+        models.Story.find({}, "title date_created replies genres author").populate("author")
             .then(stories =>
             {
                 console.log(`Returning ${stories.length} Stories.`);
@@ -35,23 +35,115 @@ module.exports = {
             });
     },
 
-
-
-
-    genre: (req, res) =>
+    story: (req, res) =>
     {
-        console.log(`Retrieving Genre ${req.params.genre}...`);
-        models.Genre.findOne({ name: req.params.genre }).populate("stories")
-            .then(genre =>
+        console.log(`Retrieving story ${req.params.story_id}...`);
+        models.Story.findOne({ _id: req.params.story_id }, "title author genres description chapters characters").populate("genres").populate("subscribers").populate("author").populate("characters")
+            .then(story =>
             {
-                console.log(`Returning Genre ${req.params.genre}. Found ${genre.stories.length} stories.`);
-                res.json({ stories: genre.stories });
+                console.log(`Returning story "${story.title}".`);
+                res.json({ story: story });
             })
             .catch(error =>
             {
                 console.log(error);
+                res.status(500).json({ "ERROR": error });
             });
     },
+
+    chapter: (req, res) =>
+    {
+        console.log(`Retrieving chapter ${req.params.story_id}/${req.params.chapter_name}`);
+        models.Story.findOne({ _id: req.params.story_id }, "chapters").populate("chapters.posts.author")
+            .then(story =>
+            {
+                console.log(`Returning chapter "${story.chapters[req.params.chapter_name].description}"`);
+                res.json({ chapter: story.chapters[req.params.chapter_name] });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+                res.status(500).json({ "ERROR": error });
+            })
+    },
+
+    apply: (req, res) =>
+    {
+        console.log(`Character requesting addition to story.`);
+        const { token, character_id, story_id } = req.body;
+        firebaseAdmin.auth().verifyIdToken(token)
+            .then(decodedToken =>
+            {
+                console.log("User authenticated from firebase.");
+                models.User.findOne({ uuid: decodedToken.uid })
+                    .then(user =>
+                    {
+                        console.log(`${user.username} authenticated.`);
+                        models.Character.findOne({ _id: character_id })
+                            .then(character =>
+                            {
+                                console.log(`Character '${character.name}' found.`);
+                                models.Story.findOne({ _id: story_id })
+                                    .then(story =>
+                                    {
+                                        console.log(`'${story.title}' found.`);
+                                        if (story.applicantcharacters.indexOf(character_id) === -1)
+                                        {
+                                            if (story.characters.indexOf(character_id) === -1)
+                                            {
+                                                console.log("Updating story...");
+                                                if (story.closed_group)
+                                                {
+                                                    models.Story.updateOne({ _id: story_id },
+                                                        { $push: { applicantusers: user._id, applicantcharacters: character_id } }, (err, action) =>
+                                                        {
+                                                            if (err) { console.log(err); res.status(500).json({ "ERROR": err }); };
+
+                                                            console.log(action);
+                                                            res.json({ status: "applied", message: `${character.name} has sent an application for the owner to review.` });
+                                                        });
+                                                }
+                                                else
+                                                {
+                                                    models.Story.updateOne({ _id: story_id }, { $push: { characters: character_id } }, (err, action) =>
+                                                    {
+                                                        if (err) { console.log(err); res.status(500).json({ "ERROR": err }); };
+
+                                                        console.log(action);
+                                                        res.json({ status: "added", message: `Character added to story. You may now post as ${character.name}.` });
+                                                    });
+                                                }
+                                            }
+                                            else
+                                            {
+                                                res.json({ status: "error", message: "Character is already in this story." });
+                                            }
+                                        }
+                                        else
+                                        {
+                                            res.json({ status: "error", message: "Character has already applied to this story." });
+                                        }
+                                    })
+                                    .catch(error =>
+                                    {
+                                        console.log(error);
+                                        res.status(500).json({ "ERROR": error });
+                                    });
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                                res.status(500).json({ "ERROR": error });
+                            });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                        res.status(500).json({ "ERROR": error });
+                    });
+            });
+    },
+
     create: (req, res) =>
     {
         console.log("New story data...");
@@ -65,23 +157,19 @@ module.exports = {
 
                     console.log(`${user.username} authenticated.`);
                     req.body.story.author = user;
+                    req.body.story.date_created = Date.now();
 
-                    models.Genre.find({ "name": { $in: req.body.story.genres } }, (err, genres) =>
+                    models.Story.create(req.body.story, (err, newStory) =>
                     {
                         if (err) { res.status(500).json({ "ERROR": err }); };
-                        req.body.story.genres = genres.map(genre => mongoose.Types.ObjectId(genre._id));
-                        models.Story.create(req.body.story, (err, newStory) =>
+
+                        console.log(`New story "${newStory.title}" created with id ${newStory._id}.`);
+
+                        models.User.updateOne({ uuid: decodedToken.uid }, { $push: { stories: newStory } }, (err, updatedUser) =>
                         {
                             if (err) { res.status(500).json({ "ERROR": err }); };
 
-                            console.log(`New story "${newStory.title}" created with id ${newStory._id}.`);
-
-                            models.User.updateOne({ uuid: decodedToken.uid }, { $push: { stories: newStory } }, (err, updatedUser) =>
-                            {
-                                if (err) { res.status(500).json({ "ERROR": err }); };
-
-                                res.json({ newStory: newStory });
-                            });
+                            res.json({ newStory: newStory });
                         });
                     });
                 });
@@ -92,14 +180,19 @@ module.exports = {
                 res.status(500).json({ "ERROR": error });
             });
     },
-    story: (req, res) =>
+
+
+
+
+
+    genre: (req, res) =>
     {
-        console.log(`Retrieving story ${req.params.story_id}...`);
-        models.Story.findOne({ _id: req.params.story_id }).populate("genres").populate("stories").populate("subscribers").populate("author")
-            .then(story =>
+        console.log(`Retrieving Genre ${req.params.genre}...`);
+        models.Genre.findOne({ name: req.params.genre }).populate("stories")
+            .then(genre =>
             {
-                console.log(`Returning story "${story.title}".`);
-                res.json({ story: story });
+                console.log(`Returning Genre ${req.params.genre}. Found ${genre.stories.length} stories.`);
+                res.json({ stories: genre.stories });
             })
             .catch(error =>
             {

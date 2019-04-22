@@ -30,19 +30,84 @@ code {
 
 	a {
 		.card {
-			width: 250px;
-			float: left;
-			margin: 5px;
-
-			img {
-				width: 250px;
-				height: 250px;
-			}
-
 			&:hover {
 				background-color: rgb(219, 219, 219) !important;
 			}
 		}
 	}
+}
 
+.character-card.card {
+	width: 250px !important;
+	
+	img {
+		width: 250px;
+		height: 250px;
+	}
+
+	.content {
+		text-align: center;
+	}
+}
+
+.ui.basic-table {
+	border: none;
+}
+
+.genre-item {
+	float: left;
+	padding: 5px;
+}
+
+.color-background { 
+	padding: 10px;
+	text-align: center;
+	border-radius: 20px;
+}
+
+.ui.menu {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+}
+
+.as-anchor {
+	border: none;
+	background-color: inherit;
+	color: white;
+	font-size: 1rem;
+	cursor: pointer;
+	display: inline-block;
+}
+
+table.linkable {
+	tr {
+		cursor: pointer;
+
+		&:hover {
+			background-color: #e2e2e2 !important;
+			border: none;
+		}
+
+		td {
+			border-top: none !important;
+		}
+	}
+}
+
+.ui.inverted.menu .blue.active.item {
+	background-color: transparent;
+	color: #2185d0 !important;
+
+	&:hover {
+		color: #65b4f0 !important;
+	}
+}
+
+.book-card {
+	.content {
+		text-align: center;
+		color: black;
+	}
+	
+	&.blue .content { background-color: #2185d055 !important; }
 }

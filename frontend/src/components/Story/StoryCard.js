@@ -8,22 +8,23 @@ class StoryCard extends Component
     render()
     {
         const { story } = this.props;
+        const date = new Date(story.date_created);
         return (
             <Table.Row>
-                <Table.Cell>
+                <Table.Cell width={10}>
                     <Link to={STORY_VIEW.replace(":story_id", story._id)}>
                         {story.title}
                     </Link>
                 </Table.Cell>
-                <Table.Cell>
-                    Hello
-                </Table.Cell>
-                <Table.Cell>
-                    Hello
-                </Table.Cell>
-                <Table.Cell>
-                    Hello
-                </Table.Cell>
+                <Table.Cell width={1}><center>
+                    {`${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`}
+                </center></Table.Cell>
+                <Table.Cell width={1}><center>
+                    {story.replies}
+                </center></Table.Cell>
+                <Table.Cell width={2}><center>
+                    {story.author.username}
+                </center></Table.Cell>
             </Table.Row>
         );
     }
@@ -39,19 +40,23 @@ class StoryTable extends Component
             ));
 
         return (
-            <Table padded striped inverted>
-                <Table.Header>
-                    <Table.Row>
-                        <Table.HeaderCell>Title</Table.HeaderCell>
-                        <Table.HeaderCell>Other</Table.HeaderCell>
-                        <Table.HeaderCell>Other</Table.HeaderCell>
-                        <Table.HeaderCell>Other</Table.HeaderCell>
-                    </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                    {rows}
-                </Table.Body>
-            </Table>
+            <div>
+                <Table inverted attached="top">
+                    <Table.Header>
+                        <Table.Row>
+                            <Table.HeaderCell width={10}>Title</Table.HeaderCell>
+                            <Table.HeaderCell width={1}><center>Date Created</center></Table.HeaderCell>
+                            <Table.HeaderCell width={1}><center>Post Count</center></Table.HeaderCell>
+                            <Table.HeaderCell width={2}><center>Author</center></Table.HeaderCell>
+                        </Table.Row>
+                    </Table.Header>
+                </Table>
+                <Table attached="bottom" striped>
+                    <Table.Body>
+                        {rows}
+                    </Table.Body>
+                </Table>
+            </div>
         );
     }
 
