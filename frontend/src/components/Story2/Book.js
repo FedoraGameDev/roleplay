@@ -71,7 +71,7 @@ class Book extends Component
                 onClick={() => { this.goToPage(STORY_VIEW.replace(":story_id", story._id)); }}>
                 {
                     <div className="content" style={{ backgroundColor, color: fontColor, display: "flex", alignItems: "center" }}>
-                        <div>
+                        <div style={{ width: "100%" }}>
                             <Header style={{ color: fontColor }}>{story.title}</Header>
                             <i>{story.author.username}</i><br />
                             {dateCreated}
