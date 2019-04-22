@@ -26,7 +26,7 @@ class Book extends Component
     componentDidMount()
     {
         this.promises.splice(this.promises.length - 1, 0,
-            makeCancelable(axios.get(`https://www.thecolorapi.com/id?format=json&hex=${this.props.color.replace("#", "")}`)
+            makeCancelable(axios.get(`https://www.thecolorapi.com/id?format=json&hex=${this.props.story.color.replace("#", "")}`)
                 .then(res =>
                 {
                     this.setState({ backgroundColor: `${res.data.name.closest_named_hex}55`, fontColor: res.data.contrast.value });
@@ -61,12 +61,18 @@ class Book extends Component
             <Card
                 link
                 className={`book-card`}
-                style={{ width: "150px", height: "175px", backgroundImage: `url(${BookCover})`, backgroundSize: "150px auto" }}
+                style={{
+                    width: "150px",
+                    height: "175px",
+                    backgroundImage: `url(${BookCover})`,
+                    color: fontColor,
+                    backgroundSize: "150px auto"
+                }}
                 onClick={() => { this.goToPage(STORY_VIEW.replace(":story_id", story._id)); }}>
                 {
-                    <div className="content" style={{ backgroundColor, fontColor, display: "flex", alignItems: "center" }}>
+                    <div className="content" style={{ backgroundColor, color: fontColor, display: "flex", alignItems: "center" }}>
                         <div>
-                            <Header><span style={{ fontColor }}>{story.title}</span></Header>
+                            <Header style={{ color: fontColor }}>{story.title}</Header>
                             <i>{story.author.username}</i><br />
                             {dateCreated}
                         </div>

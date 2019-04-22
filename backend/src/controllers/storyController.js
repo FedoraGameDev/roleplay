@@ -6,7 +6,7 @@ module.exports = {
     listStory: (req, res) =>
     {
         console.log("Retrieving Stories...");
-        models.Story.find({}, "title date_created replies genres author").populate("author")
+        models.Story.find({}, "title date_created replies genres author color").populate("author")
             .then(stories =>
             {
                 console.log(`Returning ${stories.length} Stories.`);
