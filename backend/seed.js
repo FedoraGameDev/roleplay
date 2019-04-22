@@ -37,9 +37,9 @@ async function seed()
         let startLongPos = Math.floor(Math.random() * (ipsumLongArray.length - 1));
         let shortInput = [];
         let longInput = ipsumLongArray[startLongPos];
-        for (let i = startPos; i < quantityShort; i++)
+        for (let i = startPos; i < startPos + quantityShort; i++)
         {
-            shortInput.splice(shortInput.length, 0, ipsumShortArray[i]);
+            shortInput.splice(shortInput.length - 1, 0, ipsumShortArray[i]);
         }
         let character = await GenerateCharacter(user, shortInput, longInput);
 
