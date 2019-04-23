@@ -5,6 +5,7 @@ const firebaseAdmin = require("firebase-admin");
 module.exports = {
     listStory: (req, res) =>
     {
+        //TODO: Take in start point and quantity and return that many.
         console.log("Retrieving Stories...");
         models.Story.find({}, "title date_created replies genres author color").populate("author")
             .then(stories =>

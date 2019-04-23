@@ -5,7 +5,7 @@ const controllers = require("../controllers");
 const router = express.Router();
 
 module.exports = router
-    .get("/list", controllers.story.listStory)
+    .get("/list/:start/:quantity", controllers.story.listStory)
     .get("/genre/list", controllers.story.listGenre)
     .get("/chapter/view/:story_id/:chapter_name", controllers.story.chapter)
     .post("/apply", controllers.story.apply)
