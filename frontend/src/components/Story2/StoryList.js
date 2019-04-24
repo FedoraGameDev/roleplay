@@ -1,21 +1,26 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
+import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import Book from "./Book";
-import { Card, Button, Modal, Loader } from "semantic-ui-react";
+import { Container, Button, Modal, Loader, Card } from "semantic-ui-react";
 import StoryForm from "./StoryForm";
 import { BACKEND, STORY_VIEW, LIST_STORY, LIST_STORY_PART } from "../../constants/routes";
 import { makeCancelable } from "../../constants/extensions";
+import BookCover from "../../images/bookCover.jpg";
 
 const INITIAL_STATE = {
     stories: null,
+    loadedQty: 0,
     genreChecks: {},
-    filteredStories: []
+    filteredStories: [],
+    hasMore: true
 }
 
 class StoryList extends Component
 {
-    promises = [];
+    fetchStoriesPromise = null;
+    keepLoadingDataRoutine = null;
 
     constructor(props)
     {
@@ -46,21 +51,13 @@ class StoryList extends Component
     componentDidMount()
     {
         //TODO: Retrieve stories in parts.
-        this.promises.splice(this.promises.length - 1, 0, makeCancelable(axios.get(`${BACKEND + LIST_STORY}/0/10`)
-            .then(res =>
-            {
-                this.setState({ stories: res.data.stories, filteredStories: [...res.data.stories] });
-                //this.filterStories();
-            })
-            .catch(error =>
-            {
-                console.log(error);
-            })));
+        this.PullDataPart(0, 30);
     }
 
     componentWillUnmount()
     {
-        this.promises.forEach(promise => promise.cancel());
+        if (this.fetchStoriesPromise)
+            this.fetchStoriesPromise.cancel();
     }
 
     /* filterStories
@@ -111,36 +108,83 @@ class StoryList extends Component
         return false;
     }
 
+    fetchData = () =>
+    {
+        if (this.fetchStoriesPromise)
+            return;
+        //this.fetchStoriesPromise.cancel();
+        console.log(`Fetching ${this.state.loadedQty} - ${this.state.loadedQty + 10}...`);
+        this.PullDataPart(this.state.loadedQty, 10);
+    }
+
+    PullDataPart = (start, quantity) =>
+    {
+        this.fetchStoriesPromise = makeCancelable(axios.get(`${BACKEND + LIST_STORY}/${start}/${quantity}`)
+            .then(res =>
+            {
+                let storyData = res.data.stories;
+                if (this.state.stories)
+                    storyData = [...this.state.stories, ...res.data.stories];
+                this.setState({
+                    stories: [...storyData],
+                    filteredStories: [...res.data.stories],
+                    loadedQty: storyData.length,
+                    hasMore: res.data.hasMore
+                });
+                this.fetchStoriesPromise = null;
+                //TODO: filter the stories
+                //this.filterStories();
+            })
+            .catch(error =>
+            {
+                console.log(error);
+            }));
+    }
+
     /* render
      * Display a list of stories based on property 'stories'
     */
     render()
     {
         const { genres } = this.props;
-        const { stories } = this.state;
+        const { stories, hasMore } = this.state;
 
         return (
-            <div>
-                <Modal trigger={< center > <Button primary>New Story</Button></center >} dimmer="blurring" >
+            <Container>
+                <Modal trigger={<center><Button primary>New Story</Button></center>} dimmer="blurring" >
                     <Modal.Header>New Story</Modal.Header>
                     <Modal.Content>
                         <StoryForm genres={genres} onStorySubmit={this.onStoryCreateSubmit} />
                     </Modal.Content>
                 </Modal>
                 {
-                    stories ?
-                        <Card.Group centered style={{ marginTop: "5px" }}>
+                    !!stories ?
+                        <InfiniteScroll
+                            className="ui centered cards"
+                            style={{ marginTop: "20px" }}
+                            dataLength={stories.length}
+                            next={this.fetchData}
+                            hasMore={hasMore}
+                            hasChildren={true}>
                             {
                                 stories.map((story, index) =>
                                     (
-                                        <Book key={index} story={story} genres={genres} />
+                                        <Book key={index} story={story} />
                                     ))
                             }
-                        </Card.Group>
+                            {
+                                hasMore ?
+                                    <Book loader />
+                                    :
+                                    null
+                            }
+                        </InfiniteScroll>
                         :
-                        <div><br /><br /><br /><br /><Loader active /></div>
+                        <Card.Group centered>
+                            <Book loader />
+                        </Card.Group>
                 }
-            </div >
+            </Container>
         );
     }
 }

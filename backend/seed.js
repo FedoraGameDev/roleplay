@@ -156,7 +156,7 @@ async function GenerateGenre()
 
 async function GenerateStory(genres, user, character, ipsumShortArray, ipsumLongArray)
 {
-    let storyCount = 12;
+    let storyCount = 50;
 
     try
     {
@@ -213,7 +213,7 @@ async function GenerateStory(genres, user, character, ipsumShortArray, ipsumLong
             console.log("Creating story document...");
             const shortWordedIpsum = shortIpsum[Math.floor(Math.random() * shortIpsum.length)].split(" ");
             const storyTitleArray = [];
-            for (let k = 0; k < Math.floor(Math.random() * 3) + 4; k++)
+            for (let k = 0; k < Math.floor(Math.random() * 3) + 2; k++)
             {
                 storyTitleArray.splice(storyTitleArray.length, 0, shortWordedIpsum[k]);
             }
@@ -228,6 +228,7 @@ async function GenerateStory(genres, user, character, ipsumShortArray, ipsumLong
                 date_created: Date.now(),
                 replies: 4,
                 subscribers: [user],
+                latest_reply_date: Date.now(),
                 color: color
             });
 

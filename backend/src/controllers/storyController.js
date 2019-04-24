@@ -7,11 +7,31 @@ module.exports = {
     {
         //TODO: Take in start point and quantity and return that many.
         console.log("Retrieving Stories...");
-        models.Story.find({}, "title date_created replies genres author color").populate("author")
+
+        const { start, quantity } = req.params;
+
+        models.Story.find({}, "title date_created replies genres author color latest_reply_date").sort({ latest_reply_date: 1 }).populate("author")
             .then(stories =>
             {
-                console.log(`Returning ${stories.length} Stories.`);
-                res.json({ stories: stories });
+                let end = "";
+                try { end = parseInt(start) + parseInt(quantity); }
+                catch (error)
+                {
+                    console.log(error);
+                    res.status(500).json({ "ERROR": error });
+                }
+
+                console.log(`Fetching ${start} - ${end}...`);
+                if (end >= stories.length)
+                {
+                    console.log(`Returning ${stories.length - start} Stories.`);
+                    res.json({ stories: stories.slice(start, stories.length), hasMore: false });
+                }
+                else
+                {
+                    console.log(`Returning ${quantity} Stories.`);
+                    res.json({ stories: stories.slice(start, end), hasMore: true });
+                }
             })
             .catch(error =>
             {

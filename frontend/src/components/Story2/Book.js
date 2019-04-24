@@ -25,16 +25,17 @@ class Book extends Component
 
     componentDidMount()
     {
-        this.promises.splice(this.promises.length - 1, 0,
-            makeCancelable(axios.get(`https://www.thecolorapi.com/id?format=json&hex=${this.props.story.color.replace("#", "")}`)
-                .then(res =>
-                {
-                    this.setState({ backgroundColor: `${res.data.name.closest_named_hex}55`, fontColor: res.data.contrast.value });
-                })
-                .catch(error =>
-                {
-                    console.log(error);
-                })));
+        if (this.props.story)
+            this.promises.splice(this.promises.length - 1, 0,
+                makeCancelable(axios.get(`https://www.thecolorapi.com/id?format=json&hex=${this.props.story.color.replace("#", "")}`)
+                    .then(res =>
+                    {
+                        this.setState({ backgroundColor: `${res.data.name.closest_named_hex}55`, fontColor: res.data.contrast.value });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                    })));
     }
 
     componentWillUnmount()
@@ -52,10 +53,10 @@ class Book extends Component
 
     render()
     {
-        const { story } = this.props;
-        const date = new Date(story.date_created);
+        const { story, loader } = this.props;
+        const date = story ? new Date(story.date_created) : null;
         const { backgroundColor, fontColor } = this.state;
-        const dateCreated = `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}`;
+        const dateCreated = date ? `${date.getMonth()}/${date.getDate()}/${date.getFullYear()}` : null;
 
         return (
             <Card
@@ -68,14 +69,19 @@ class Book extends Component
                     color: fontColor,
                     backgroundSize: "150px auto"
                 }}
-                onClick={() => { this.goToPage(STORY_VIEW.replace(":story_id", story._id)); }}>
+                onClick={() => { if (!loader) this.goToPage(STORY_VIEW.replace(":story_id", story._id)); }}>
                 {
                     <div className="content" style={{ backgroundColor, color: fontColor, display: "flex", alignItems: "center" }}>
-                        <div style={{ width: "100%" }}>
-                            <Header style={{ color: fontColor }}>{story.title}</Header>
-                            <i>{story.author.username}</i><br />
-                            {dateCreated}
-                        </div>
+                        {
+                            loader ?
+                                <Loader active />
+                                :
+                                <div style={{ width: "100%" }}>
+                                    <Header style={{ color: fontColor }}>{story.title}</Header>
+                                    <i>{story.author.username}</i> <br />
+                                    {dateCreated}
+                                </div>
+                        }
                     </div>
                 }
             </Card>

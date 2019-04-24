@@ -2,7 +2,5 @@
   "name": "roleplay",
   "author": "Fedora Dev",
   "version": "0.1.0",
-  "dependencies": {
-    "react-infinite-scroll-component": "^4.5.2"
-  }
+  "dependencies": {}
 }
