@@ -39,7 +39,12 @@ const storySchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: "User"
     }],
+    color: {
+        type: String,
+        default: "#000000"
+    },
     date_created: Date,
+    latest_reply_date: Date,
     replies: Number,
     closed_group: Boolean
 });

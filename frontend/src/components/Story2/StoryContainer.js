@@ -2,17 +2,14 @@ import React, { Component } from "react"
 import { Route } from "react-router-dom";
 import axios from "axios";
 import { Loader } from "semantic-ui-react";
-import { BACKEND, LIST_GENRE, LIST_STORY, STORY_VIEW, CHAPTER_VIEW } from "../../constants/routes";
+import { BACKEND, LIST_GENRE, LIST_STORY, LIST_STORY_PART, STORY_VIEW, CHAPTER_VIEW } from "../../constants/routes";
 import StoryList from "./StoryList";
 import StoryView from "./StoryView";
 import ChapterView from "./ChapterView";
 import { makeCancelable } from "../../constants/extensions";
 
 const INITIAL_STATE = {
-    genres: null,
-    stories: null,
-    genreChecks: {},
-    filteredStories: []
+    genres: null
 }
 
 /* StoryContainer
@@ -30,7 +27,7 @@ class StoryContainer extends Component
     }
 
     /* componentDidMount
-     * Sends requests to backend and receives story list and genre list.
+     * Sends requests to backend and receives genre list.
     */
     componentDidMount()
     {
@@ -50,69 +47,6 @@ class StoryContainer extends Component
             {
                 console.log(error);
             })));
-
-        this.promises.splice(this.promises.length - 1, 0, makeCancelable(axios.get(`${BACKEND}${LIST_STORY}`)
-            .then(res =>
-            {
-                this.setState({ stories: res.data.stories, filteredStories: [...res.data.stories] });
-                this.filterStories();
-            })
-            .catch(error =>
-            {
-                console.log(error);
-            })));
-    }
-
-    componentWillUnmount()
-    {
-        this.promises.forEach(promise => promise.cancel());
-    }
-
-    /* filterStories
-     * Sets state.filteredStories to all stories that have all genreChecks assigned to them.
-    */
-    filterStories = () =>
-    {
-        const { stories, genres, genreChecks } = this.state;
-        const newFilter = [...stories];
-
-        if (this.checkFilters())
-        {
-            for (let i = 0; i < genres.length; i++)
-            {
-                const element = genreChecks[genres[i].name];
-
-                if (element === true)
-                {
-                    var iter = 0;
-                    while (iter < newFilter.length)
-                    {
-                        if (newFilter[iter].genres.indexOf(genres[i]._id) !== -1)
-                            iter++;
-                        else
-                            newFilter.splice(iter, 1);
-                    }
-                }
-            }
-        }
-
-        this.setState({ filteredStories: newFilter });
-    }
-
-    /* checkFilters
-     * Returns true if any filters are active, else returns false.
-    */
-    checkFilters = () =>
-    {
-        for (let i = 0; i < this.state.genres.length; i++)
-        {
-            const check = this.state.genreChecks[this.state.genres[i].name];
-            if (check === undefined) continue;
-            if (check === true)
-                return true;
-        }
-
-        return false;
     }
 
     /* render
@@ -120,14 +54,14 @@ class StoryContainer extends Component
     */
     render()
     {
-        const { stories, genres, filteredStories } = this.state;
+        const { genres } = this.state;
 
         return (
             <div>
                 {
-                    (stories && genres) ?
+                    (genres) ?
                         [
-                            <Route key={0} path={LIST_STORY} component={() => { return (<StoryList stories={filteredStories} />); }} />,
+                            <Route key={0} path={LIST_STORY} component={() => { return (<StoryList genres={genres} />); }} />,
                             <Route key={1} path={STORY_VIEW} component={() => { return (<StoryView />); }} />,
                             <Route key={2} path={CHAPTER_VIEW} component={() => { return (<ChapterView />); }} />
                         ]

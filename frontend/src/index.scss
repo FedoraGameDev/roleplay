@@ -106,8 +106,15 @@ table.linkable {
 .book-card {
 	.content {
 		text-align: center;
-		color: black;
 	}
-	
-	&.blue .content { background-color: #2185d055 !important; }
+}
+
+.ui.input input[type=color] {
+	padding: 2px;
+	height: 35px;
+	cursor: pointer;
+
+	&:hover {
+		background-color: #e2e2e2;
+	}
 }
