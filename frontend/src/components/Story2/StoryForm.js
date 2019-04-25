@@ -4,11 +4,23 @@ import BookCover from "../../images/bookCover.jpg";
 import GenreList from "./GenreList";
 
 const INITIAL_STATE = {
-    title: "",
-    description: "",
+    story: {
+        _id: "",
+        author: {},
+        chapters: [],
+        characters: [],
+        description: "",
+        genres: [],
+        subscribers: [],
+        applicantcharacters: [],
+        color: "#000000",
+        title: ""
+    },
     genresSelection: {},
-    closed_group: false,
-    color: "#000000"
+    // title: "",
+    // description: "",
+    // closed_group: false,
+    // color: "#000000"
 }
 
 class StoryForm extends Component
@@ -20,20 +32,50 @@ class StoryForm extends Component
         this.state = { ...INITIAL_STATE };
     }
 
+    componentDidMount()
+    {
+        if (this.props.story)
+        {
+            let genresSelection = {};
+            const usedGenres = this.props.story.genres.map(genre => genre.name);
+            this.props.genres.forEach(genre =>
+            {
+                if (usedGenres.indexOf(genre.name) !== -1)
+                    genresSelection[genre.name] = true;
+                else
+                    genresSelection[genre.name] = false;
+            });
+            this.setState({ story: this.props.story, genresSelection: genresSelection });
+        }
+        else
+        {
+            let genresSelection = {};
+            this.props.genres.forEach(genre =>
+            {
+                genresSelection[genre.name] = false;
+            });
+            this.setState({ genresSelection: genresSelection });
+        }
+    }
+
     onChange = event =>
     {
-        this.setState({ [event.target.name]: event.target.value });
+        let story = { ...this.state.story };
+        console.log(story[event.target.name]);
+        story[event.target.name] = event.target.value;
+        this.setState({ story: story });
     }
 
     onCheckboxChange = (event, { checked }) =>
     {
-        console.log(checked);
-        this.setState({ closed_group: checked });
+        let story = { ...this.state.story };
+        story.closed_group = checked;
+        this.setState({ story: story });
     }
 
     onGenreChange = genre =>
     {
-        const genresSelection = { ...this.state.genresSelection };
+        let genresSelection = { ...this.state.genresSelection };
         genresSelection[genre] = !genresSelection[genre];
         this.setState({ genresSelection: genresSelection });
     }
@@ -41,34 +83,26 @@ class StoryForm extends Component
     onSubmit = event =>
     {
         event.preventDefault();
-        const { title, description, closed_group, genresSelection, color } = this.state;
+        const story = { ...this.state.story };
+        const genresSelection = { ...this.state.genresSelection };
         const { genres, onStorySubmit } = this.props;
-        const selectedGenres = [];
+        let selectedGenres = [];
 
         for (let i = 0; i < genres.length; i++)
         {
-            const element = genresSelection[genres[i].name];
-
-            if (element === true)
-            {
-                selectedGenres.splice(genres.length - 1, 0, genres[i]._id);
-            }
+            if (genresSelection[genres[i].name])
+                selectedGenres.splice(selectedGenres.length, 0, genres[i]._id);
         }
 
-        const story = {
-            title: title,
-            description: description,
-            closed_group: closed_group,
-            genres: selectedGenres,
-            color: color
-        }
+        story.genres = selectedGenres;
 
         onStorySubmit(story);
     }
 
     render()
     {
-        const { title, description, color, closed_group } = this.state;
+        const { story, genresSelection } = this.state;
+        const { title, description, color, closed_group } = story;
         const { genres } = this.props;
 
         return (
@@ -106,17 +140,17 @@ class StoryForm extends Component
                     <Table.Body>
                         <Table.Row>
                             <Table.Cell textAlign="center">
-                                <GenreList genres={genres} onChange={this.onGenreChange} />
+                                <GenreList genres={genres} selections={genresSelection} onChange={this.onGenreChange} />
                             </Table.Cell>
                         </Table.Row>
                         <Table.Row>
                             <Table.Cell textAlign="right">
-                                <Checkbox onChange={this.onCheckboxChange} name="closed_group" defaultChecked={closed_group} toggle label="Require Character Approval" />
+                                <Checkbox onChange={this.onCheckboxChange} name="closed_group" checked={closed_group} toggle label="Require Character Approval" />
                             </Table.Cell>
                         </Table.Row>
                         <Table.Row>
                             <Table.Cell textAlign="right">
-                                <Button primary type="submit">Create</Button>
+                                <Button primary type="submit">{this.props.actionText}</Button>
                             </Table.Cell>
                         </Table.Row>
                     </Table.Body>

@@ -59,7 +59,7 @@ module.exports = {
     story: (req, res) =>
     {
         console.log(`Retrieving story ${req.params.story_id}...`);
-        models.Story.findOne({ _id: req.params.story_id }, "title author genres description chapters characters closed_group applicantusers applicantcharacters").populate("genres").populate("subscribers").populate("author").populate("characters").populate("applicantusers").populate("applicantcharacters")
+        models.Story.findOne({ _id: req.params.story_id }, "title author genres description chapters characters closed_group applicantusers applicantcharacters color").populate("genres").populate("subscribers").populate("author").populate("characters").populate("applicantusers").populate("applicantcharacters")
             .then(story =>
             {
                 console.log(`Returning story "${story.title}".`);
@@ -466,6 +466,57 @@ module.exports = {
                         });
                     });
                 });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+                res.status(500).json({ "ERROR": error });
+            });
+    },
+
+    update: (req, res) =>
+    {
+        console.log("Updated story data...");
+        firebaseAdmin.auth().verifyIdToken(req.body.token)
+            .then(decodedToken =>
+            {
+                console.log("User authenticated from firebase.");
+                models.User.findOne({ uuid: decodedToken.uid })
+                    .then(user =>
+                    {
+                        console.log(`${user.username} authenticated.`);
+                        console.log(req.body.story);
+
+                        models.Story.findOne({ _id: req.body.story._id })
+                            .then(story =>
+                            {
+                                if (`${user._id}` === `${story.author._id}`)
+                                {
+                                    models.Story.updateOne({ _id: story._id }, { $set: req.body.story })
+                                        .then(update =>
+                                        {
+                                            console.log("Story Updated.");
+
+                                            res.json({ "Status": "OK" });
+                                        })
+                                        .catch(error =>
+                                        {
+                                            console.log(error);
+                                            res.status(500).json({ "ERROR": error });
+                                        })
+                                }
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                                res.status(500).json({ "ERROR": error });
+                            });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                        res.status(500).json({ "ERROR": error });
+                    });
             })
             .catch(error =>
             {

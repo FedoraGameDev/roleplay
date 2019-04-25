@@ -4,10 +4,11 @@ import { withAuthStatic } from "../firebase/Session";
 import { compose } from "recompose";
 import axios from "axios";
 import { Table, Loader, Header, Modal, Button, Icon, Card, Container } from "semantic-ui-react";
-import { BACKEND, STORY_VIEW, LIST_CHARACTERS, CHAPTER_VIEW, CREATE_CHAPTER, UPDATE_CHAPTER, APPLY_CHARACTER, DENY_CHARACTER, ACCEPT_CHARACTER } from "../../constants/routes";
+import { BACKEND, STORY_VIEW, UPDATE_STORY, LIST_CHARACTERS, CHAPTER_VIEW, CREATE_CHAPTER, UPDATE_CHAPTER, APPLY_CHARACTER, DENY_CHARACTER, ACCEPT_CHARACTER } from "../../constants/routes";
 import { makeCancelable } from "../../constants/extensions";
 import { CharacterGrid, CharacterCard } from "../Character";
 import ChapterForm from "./ChapterForm";
+import StoryForm from "./StoryForm";
 
 const INITIAL_STATE = {
     story: {
@@ -223,6 +224,31 @@ class StoryView extends Component
         this.goToLink(CHAPTER_VIEW.replace(":story_id", id).replace(":chapter_name", index));
     }
 
+    onUpdateStory = story =>
+    {
+        const updateStory = {
+            _id: story._id,
+            title: story.title,
+            description: story.description,
+            genres: story.genres,
+            closed_group: story.closed_group,
+            color: story.color
+        };
+
+        axios.post(`${BACKEND}${UPDATE_STORY}`, {
+            token: localStorage.getItem("token"),
+            story: updateStory
+        }).then(res =>
+        {
+            const place = this.props.history.location.pathname;
+            this.props.history.push("/");
+            this.props.history.push(place);
+        }).catch(error =>
+        {
+            this.setState({ error: error });
+        });
+    }
+
     render()
     {
         const { story, characterList, loadedStory, loadedCharacters } = this.state;
@@ -270,7 +296,13 @@ class StoryView extends Component
                                     {
                                         isCreator ?
                                             <span>
-                                                <Modal key={0} trigger={<Button primary><Icon name="bookmark" />Add Chapter</Button>} closeOnDimmerClick={false} closeIcon>
+                                                <Modal trigger={<Button primary>Edit Story</Button>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
+                                                    <Modal.Header>Edit Story</Modal.Header>
+                                                    <Modal.Content>
+                                                        <StoryForm genres={this.props.genres} story={this.state.story} actionText="Update" onStorySubmit={this.onUpdateStory} />
+                                                    </Modal.Content>
+                                                </Modal>
+                                                <Modal trigger={<Button primary><Icon name="bookmark" />Add Chapter</Button>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
                                                     <Modal.Header>New Chapter</Modal.Header>
                                                     <Modal.Content>
                                                         <ChapterForm onSubmit={this.submitChapter} chapter={{ title: `Chapter ${story.chapters.length + 1}` }} actionText="Create Chapter" />
@@ -278,7 +310,7 @@ class StoryView extends Component
                                                 </Modal>
                                                 {
                                                     story.closed_group ?
-                                                        <Modal key={1} trigger={<Button primary><Icon name="address book" />Applicants</Button>} closeOnDimmerClick={false} closeIcon>
+                                                        <Modal trigger={<Button primary><Icon name="address book" />Applicants</Button>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
                                                             <Modal.Header>Applicants</Modal.Header>
                                                             <Modal.Content>
                                                                 <Container className="character-grid">
@@ -319,7 +351,7 @@ class StoryView extends Component
                                             :
                                             null
                                     }
-                                    <Modal trigger={<Button secondary><Icon name="spy" />Roster</Button>} closeOnDimmerClick={false} closeIcon>
+                                    <Modal trigger={<Button secondary><Icon name="spy" />Roster</Button>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
                                         <Modal.Header>Character Roster</Modal.Header>
                                         <Modal.Content>
                                             <Modal.Description>
@@ -340,7 +372,7 @@ class StoryView extends Component
                                                             <span><Icon name="lock open" />Join</span>
                                                     }
                                                 </Button>
-                                            } closeOnDimmerClick={false} closeIcon>
+                                            } dimmer="blurring" closeOnDimmerClick={false} closeIcon>
                                                 <Modal.Header>{story.closed_group ? "Apply Character" : "Add Character to Roster"}</Modal.Header>
                                                 <Modal.Content>
                                                     <CharacterGrid characters={characterList} onClick={this.onCharacterApplyClick} />

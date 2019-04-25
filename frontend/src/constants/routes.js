@@ -18,6 +18,7 @@ export const ACCEPT_CHARACTER = "/story/accept";
 export const DENY_CHARACTER = "/story/deny";
 
 export const CREATE_STORY = "/story/create";
+export const UPDATE_STORY = "/story/update";
 export const CREATE_CHAPTER = "/story/chapter/create";
 export const UPDATE_CHAPTER = "/story/update/chapter";
 export const CREATE_REPLY = "/story/chapter/post";
