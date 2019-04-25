@@ -137,23 +137,19 @@ class StoryView extends Component
 
     addToRoster = characterId =>
     {
-        console.log("Adding to roster...");
         let story = { ...this.state.story };
-        let newRoster = story.characters ? story.characters : [];
         let newApplicants = story.applicantcharacters;
-        const applicantIndex = -1;
+        let newRoster = story.characters ? story.characters : [];
+        let applicantIndex = -1;
 
         for (let i = 0; i < newApplicants.length; i++)
         {
-            if (newApplicants._id === characterId)
+            if (newApplicants[i]._id === characterId)
             {
-                console.log("found at index " + i);
                 applicantIndex = i;
                 break;
             }
         }
-
-        console.log(newApplicants[applicantIndex]);
 
         newRoster.splice(newRoster.length, 0, newApplicants[applicantIndex]);
         story.characters = newRoster;
@@ -164,16 +160,14 @@ class StoryView extends Component
 
     removeFromApplicants = characterId =>
     {
-        console.log("Removing from applicants...");
         let story = { ...this.state.story };
         let newApplicants = story.applicantcharacters;
-        const applicantIndex = -1;
+        let applicantIndex = -1;
 
         for (let i = 0; i < newApplicants.length; i++)
         {
-            if (newApplicants._id === characterId)
+            if (newApplicants[i]._id === characterId)
             {
-                console.log("found at index " + i);
                 applicantIndex = i;
                 break;
             }
