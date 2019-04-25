@@ -6,7 +6,7 @@ const makeCancelable = (promise) =>
     {
         promise.then(
             // val => hasCanceled_ ? reject({ isCanceled: true }) : resolve(val),
-            val => hasCanceled_ ? console.log("Promise Cancelled.") : resolve(val),
+            val => hasCanceled_ ? null : resolve(val),
             error => hasCanceled_ ? reject({ isCanceled: true }) : reject(error)
         );
     });

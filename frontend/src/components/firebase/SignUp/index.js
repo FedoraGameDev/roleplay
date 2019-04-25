@@ -94,6 +94,8 @@ class SignUpFormBase extends Component
                     <Form.Group>
                         <Form.Input name="username" value={username} onChange={this.onChange} type="text" placeholder="Username" />
                         <Form.Input name="email" value={email} onChange={this.onChange} type="text" placeholder="Email" />
+                    </Form.Group>
+                    <Form.Group>
                         <Form.Input name="passwordOne" value={passwordOne} onChange={this.onChange} type="password" placeholder="Password" />
                         <Form.Input name="passwordTwo" value={passwordTwo} onChange={this.onChange} type="password" placeholder="Confirm Password" />
                     </Form.Group>

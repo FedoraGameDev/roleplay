@@ -5,9 +5,9 @@ import { compose } from "recompose";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import Book from "./Book";
-import { Container, Button, Modal, Segment, Card, Checkbox } from "semantic-ui-react";
+import { Container, Button, Modal, Segment, Card, Message } from "semantic-ui-react";
 import StoryForm from "./StoryForm";
-import { BACKEND, STORY_VIEW, LIST_STORY, LIST_STORY_PART } from "../../constants/routes";
+import { BACKEND, STORY_VIEW, LIST_STORY } from "../../constants/routes";
 import { makeCancelable } from "../../constants/extensions";
 import GenreList from "./GenreList";
 import BookCover from "../../images/bookCover.jpg";
@@ -123,8 +123,6 @@ class StoryList extends Component
     {
         if (this.fetchStoriesPromise)
             return;
-        //this.fetchStoriesPromise.cancel();
-        console.log(`Fetching ${this.state.loadedQty} - ${this.state.loadedQty + 10}...`);
         this.PullDataPart(this.state.loadedQty, 10);
     }
 
@@ -164,46 +162,50 @@ class StoryList extends Component
             <Container>
                 {
                     this.props.userInfo ?
-                        <Modal trigger={<center><Button primary>New Story</Button></center>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
-                            <Modal.Header>New Story</Modal.Header>
-                            <Modal.Content>
-                                <StoryForm genres={genres} onStorySubmit={this.onStoryCreateSubmit} actionText="Create" />
-                            </Modal.Content>
-                        </Modal>
+                        <Message attached="top">
+                            <Modal trigger={<center><Button primary>New Story</Button></center>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
+                                <Modal.Header>New Story</Modal.Header>
+                                <Modal.Content>
+                                    <StoryForm genres={genres} onStorySubmit={this.onStoryCreateSubmit} actionText="Create" />
+                                </Modal.Content>
+                            </Modal>
+                        </Message>
                         :
                         null
                 }
                 {
                     !!genres ?
-                        <Segment>
+                        <Message attached>
                             <GenreList genres={genres} onChange={this.onGenreChange} />
-                        </Segment>
+                        </Message>
                         :
                         null
 
                 }
                 {
                     !!stories ?
-                        <InfiniteScroll
-                            className="ui centered cards"
-                            style={{ marginTop: "20px" }}
-                            dataLength={stories.length}
-                            next={this.fetchData}
-                            hasMore={hasMore}
-                            hasChildren={true}>
-                            {
-                                filteredStories.map((story, index) =>
-                                    (
-                                        <Book key={index} story={story} />
-                                    ))
-                            }
-                            {
-                                hasMore ?
-                                    <Book loader />
-                                    :
-                                    null
-                            }
-                        </InfiniteScroll>
+                        <Message attached="bottom">
+                            <InfiniteScroll
+                                className="ui centered cards"
+                                style={{ marginTop: "20px" }}
+                                dataLength={stories.length}
+                                next={this.fetchData}
+                                hasMore={hasMore}
+                                hasChildren={true}>
+                                {
+                                    filteredStories.map((story, index) =>
+                                        (
+                                            <Book key={index} story={story} />
+                                        ))
+                                }
+                                {
+                                    hasMore ?
+                                        <Book loader />
+                                        :
+                                        null
+                                }
+                            </InfiniteScroll>
+                        </Message>
                         :
                         <Card.Group centered>
                             <Book loader />

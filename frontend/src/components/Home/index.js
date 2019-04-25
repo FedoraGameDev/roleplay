@@ -10,7 +10,8 @@ class HomePage extends React.Component
         return (
             <Segment>
                 <Header as="h1"><center>Welcome, {this.props.userInfo.user.username}!</center></Header>
-                <Message>
+                <Message attached="top"><Message.Header><center style={{ color: "red" }}>Note: this site is in beta.</center></Message.Header></Message>
+                <Message attached>
                     <Message.Header>A few things to keep in mind</Message.Header>
                     <Message.List>
                         <Message.Item>This site is subject to change.</Message.Item>
@@ -19,13 +20,13 @@ class HomePage extends React.Component
                         <Message.Item>You may add suggestions to the bug reporting page, as well.</Message.Item>
                     </Message.List>
                 </Message>
-                <Message>
+                <Message attached>
                     <Message.Header>
                         Feel free to poke around the site and try some things out. If you think of any additions that you would like to see,
                         Add them to the bug tracker as a feature.
                     </Message.Header>
                 </Message>
-                <Message>
+                <Message attached="bottom">
                     <Message.Header>Planned Features</Message.Header>
                     <Message.List>
                         <Message.Item>Mobile-friendly interface</Message.Item>

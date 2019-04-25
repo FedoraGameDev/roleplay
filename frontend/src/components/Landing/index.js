@@ -8,23 +8,23 @@ class Landing extends React.Component
     {
         return (
             <Segment>
+                <Header as="h1"><center>Welcome to the roleplay website!</center></Header>
+                <Message attached="top"><Message.Header><center style={{ color: "red" }}>Note: this site is in beta.</center></Message.Header></Message>
                 {
                     this.props.userInfo ?
-                        <Message>
+                        <Message attached>
                             <Message.Header>
                                 I see you've logged in. Head over to the characters page to create a character. Or, if you would like to see the stories, go to that page.
                             </Message.Header>
                         </Message>
                         :
-                        <Message>
+                        <Message attached>
                             <Message.Header>
                                 Head over to the log in page and click 'Sign Up' to create a new account.
                             </Message.Header>
                         </Message>
                 }
-                <Header as="h1"><center>Welcome to the roleplay website!</center></Header>
-                <Header as="h3" style={{ color: "red" }}><center>Note: this site is in beta.</center></Header>
-                <Message>
+                <Message attached>
                     <Message.Header>A few things to keep in mind</Message.Header>
                     <Message.List>
                         <Message.Item>This site is subject to change.</Message.Item>
@@ -33,14 +33,14 @@ class Landing extends React.Component
                         <Message.Item>You may add suggestions to the bug reporting page, as well.</Message.Item>
                     </Message.List>
                 </Message>
-                <Message>
+                <Message attached>
                     <Message.Header>
                         The purpose of this site is to bring the community to a well-formatted site for roleplaying.
                     It was built on React to have a modern, snappy front-end experience. I am a solo developer, however, so updates may take time.
                     I will keep all user suggestions in mind while building more features into the site.
                     </Message.Header>
                 </Message>
-                <Message>
+                <Message attached="bottom">
                     <Message.Header>Planned Features</Message.Header>
                     <Message.List>
                         <Message.Item>Mobile-friendly interface</Message.Item>
