@@ -5,7 +5,6 @@ import GenreList from "./GenreList";
 
 const INITIAL_STATE = {
     story: {
-        _id: "",
         author: {},
         chapters: [],
         characters: [],
@@ -61,7 +60,6 @@ class StoryForm extends Component
     onChange = event =>
     {
         let story = { ...this.state.story };
-        console.log(story[event.target.name]);
         story[event.target.name] = event.target.value;
         this.setState({ story: story });
     }

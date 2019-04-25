@@ -362,7 +362,7 @@ class StoryView extends Component
                                         </Modal.Content>
                                     </Modal>
                                     {
-                                        loadedCharacters ?
+                                        loadedCharacters && characterList ?
                                             <Modal trigger={
                                                 <Button secondary>
                                                     {
