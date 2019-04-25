@@ -10,7 +10,7 @@ module.exports = {
 
         const { start, quantity } = req.params;
 
-        models.Story.find({}, "title date_created replies genres author color latest_reply_date").sort({ latest_reply_date: 1 }).populate("author")
+        models.Story.find({}, "title date_created replies genres author color latest_reply_date").sort({ latest_reply_date: -1 }).populate("author")
             .then(stories =>
             {
                 let end = "";
@@ -108,8 +108,7 @@ module.exports = {
                                 if (`${user._id}` == `${character.user._id}`)
                                 {
                                     console.log("User verified owner of character.");
-                                    console.log(chapter);
-                                    models.Story.updateOne({ _id: story._id }, { $push: { "chapters.$[i].posts": post } }, { arrayFilters: [{ "i._id": chapter._id }] })
+                                    models.Story.updateOne({ _id: story._id }, { $push: { "chapters.$[i].posts": post }, $inc: { replies: 1 }, $set: { latest_reply_date: Date.now() } }, { arrayFilters: [{ "i._id": chapter._id }] })
                                         .then(story =>
                                         {
                                             console.log("Post added.");
