@@ -355,6 +355,7 @@ module.exports = {
                 console.log(error);
             });
     },
+
     create_chapter: (req, res) =>
     {
         console.log(`Retrieving chapter for story "${req.body.story.title}"`);
@@ -362,21 +363,45 @@ module.exports = {
             .then(decodedToken =>
             {
                 console.log("User authenticated from firebase.");
-                models.User.findOne({ uuid: decodedToken.uid }, (err, user) =>
-                {
-                    if (err) { res.status(500).json({ "ERROR": err }); };
-                    console.log(`User "${user.username}" authenticated.`);
-
-                    console.log(req.body.story._id);
-
-                    models.Story.updateOne({ _id: req.body.story._id }, { $push: { chapters: req.body.chapter } }, (err, updatedStory) =>
+                models.User.findOne({ uuid: decodedToken.uid })
+                    .then(user =>
                     {
-                        if (err) { res.status(500).json({ "ERROR": err }) };
+                        //TODO: check if user owns story
+                        console.log(`User "${user.username}" authenticated.`);
 
-                        console.log("Story updated with new chapter.");
-                        res.json({ updatedStory: updatedStory });
+                        models.Story.findOne({ _id: req.body.story._id })
+                            .then(story =>
+                            {
+                                console.log(`story "${story.title}" found.`);
+                                if (`${story.author._id}` == `${user._id}`)
+                                {
+                                    models.Story.updateOne({ _id: req.body.story._id }, { $push: { chapters: req.body.chapter } }, (err, updatedStory) =>
+                                    {
+                                        if (err) { res.status(500).json({ "ERROR": err }) };
+
+                                        console.log("Story updated with new chapter.");
+                                        story.chapters.splice(story.chapters.length, 0, req.body.chapter);
+                                        res.json({ story: story });
+                                    });
+                                }
+                                else
+                                {
+                                    error = "User attempted updating story not owned by them.";
+                                    console.log(error);
+                                    res.status(500).json({ "ERROR": error });
+                                }
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                                res.status(500).json({ "ERROR": error });
+                            });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                        res.status(500).json({ "ERROR": error });
                     });
-                });
             })
             .catch(error =>
             {

@@ -4,7 +4,7 @@ import { withAuthStatic } from "../firebase/Session";
 import { compose } from "recompose";
 import axios from "axios";
 import { Table, Loader, Header, Modal, Button, Icon, Card, Container } from "semantic-ui-react";
-import { BACKEND, STORY_VIEW, LIST_CHARACTERS, CHAPTER_VIEW, APPLY_CHARACTER, DENY_CHARACTER, ACCEPT_CHARACTER } from "../../constants/routes";
+import { BACKEND, STORY_VIEW, LIST_CHARACTERS, CHAPTER_VIEW, CREATE_CHAPTER, APPLY_CHARACTER, DENY_CHARACTER, ACCEPT_CHARACTER } from "../../constants/routes";
 import { makeCancelable } from "../../constants/extensions";
 import { CharacterGrid, CharacterCard } from "../Character";
 import ChapterForm from "./ChapterForm";
@@ -113,7 +113,7 @@ class StoryView extends Component
     {
         event.stopPropagation();
 
-        axios.post(`${BACKEND}${ACCEPT_CHARACTER}`, { token: localStorage.token, character_id: character._id, story_id: this.state.story._id })
+        axios.post(`${BACKEND}${ACCEPT_CHARACTER}`, { token: localStorage.getItem("token"), character_id: character._id, story_id: this.state.story._id })
             .then(res =>
             {
                 this.addToRoster(character);
@@ -129,7 +129,7 @@ class StoryView extends Component
     {
         event.stopPropagation();
 
-        axios.post(`${BACKEND}${DENY_CHARACTER}`, { token: localStorage.token, character_id: character._id, story_id: this.state.story._id })
+        axios.post(`${BACKEND}${DENY_CHARACTER}`, { token: localStorage.getItem("token"), character_id: character._id, story_id: this.state.story._id })
             .then(res =>
             {
                 this.removeFromApplicants(character);
@@ -188,6 +188,22 @@ class StoryView extends Component
         this.setState({ story: story });
     }
 
+    submitChapter = chapter =>
+    {
+        axios.post(`${BACKEND}${CREATE_CHAPTER}`, { token: localStorage.getItem("token"), chapter: chapter, story: this.state.story })
+            .then(res =>
+            {
+                let story = { ...this.state.story };
+                let newChapters = story.chapters ? story.chapters : [];
+                story.chapters = res.data.story.chapters;
+                this.setState({ story: story });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+            });
+    }
+
     render()
     {
         const { story, characterList, loadedStory, loadedCharacters } = this.state;
@@ -234,37 +250,53 @@ class StoryView extends Component
                                 <Table.Row><Table.Cell>
                                     {
                                         isCreator ?
-                                            [
+                                            <span>
                                                 <Modal key={0} trigger={<Button primary><Icon name="bookmark" />Add Chapter</Button>}>
                                                     <Modal.Header>New Chapter</Modal.Header>
                                                     <Modal.Content>
-                                                        <ChapterForm />
-                                                    </Modal.Content>
-                                                </Modal>,
-                                                <Modal key={1} trigger={<Button primary><Icon name="address book" />Applicants</Button>}>
-                                                    <Modal.Header>Applicants</Modal.Header>
-                                                    <Modal.Content>
-                                                        <Container className="character-grid">
-                                                            <Card.Group centered>
-                                                                {
-                                                                    story.applicantcharacters.map((character, index) =>
-                                                                        (
-                                                                            <CharacterCard key={index} character={character} actionButtons={
-                                                                                <Button.Group>
-                                                                                    <Button key={0} icon color="blue" onClick={event => this.onAccept(event, character)}>
-                                                                                        <Icon name="check" />
-                                                                                    </Button>
-                                                                                    <Button key={1} icon color="red" onClick={event => this.onDeny(event, character)}>
-                                                                                        <Icon name="close" />
-                                                                                    </Button>
-                                                                                </Button.Group>} />
-                                                                        ))
-                                                                }
-                                                            </Card.Group>
-                                                        </Container>
+                                                        <ChapterForm onSubmit={this.submitChapter} chapter={{ title: `Chapter ${story.chapters.length + 1}` }} />
                                                     </Modal.Content>
                                                 </Modal>
-                                            ]
+                                                {
+                                                    story.closed_group ?
+                                                        <Modal key={1} trigger={<Button primary><Icon name="address book" />Applicants</Button>}>
+                                                            <Modal.Header>Applicants</Modal.Header>
+                                                            <Modal.Content>
+                                                                <Container className="character-grid">
+                                                                    {
+                                                                        story.applicantcharacters.length > 0 ?
+                                                                            <Card.Group centered>
+                                                                                {
+                                                                                    story.applicantcharacters.map((character, index) =>
+                                                                                        (
+                                                                                            <CharacterCard key={index} character={character} actionButtons={
+                                                                                                <Button.Group>
+                                                                                                    <Button key={0} icon color="blue" onClick={event => this.onAccept(event, character)}>
+                                                                                                        <Icon name="check" />
+                                                                                                    </Button>
+                                                                                                    <Button key={1} icon color="red" onClick={event => this.onDeny(event, character)}>
+                                                                                                        <Icon name="close" />
+                                                                                                    </Button>
+                                                                                                </Button.Group>} />
+                                                                                        ))
+                                                                                }
+                                                                            </Card.Group>
+                                                                            :
+                                                                            <Card.Group centered>
+                                                                                <Card>
+                                                                                    <Card.Content>
+                                                                                        <Card.Header><center>No More Applicants</center></Card.Header>
+                                                                                    </Card.Content>
+                                                                                </Card>
+                                                                            </Card.Group>
+                                                                    }
+                                                                </Container>
+                                                            </Modal.Content>
+                                                        </Modal>
+                                                        :
+                                                        null
+                                                }
+                                            </span>
                                             :
                                             null
                                     }
