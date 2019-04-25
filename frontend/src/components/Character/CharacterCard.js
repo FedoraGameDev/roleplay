@@ -13,12 +13,12 @@ import { VIEW_CHARACTER } from "../../constants/routes";
 
 class CharacterCard extends Component
 {
-    onClick = () =>
+    onClick = character =>
     {
         if (this.props.onClick)
-            this.props.onClick(this.props.character._id);
+            this.props.onClick(character);
         else
-            this.goToPage(VIEW_CHARACTER.replace(":character_id", this.props.character._id))
+            this.goToPage(VIEW_CHARACTER.replace(":character_id", character._id))
     }
 
     goToPage = to =>
@@ -28,13 +28,13 @@ class CharacterCard extends Component
 
     render()
     {
-        const { actionButtons } = this.props;
+        const { actionButtons, character } = this.props;
 
         return (
-            <Card link className="character-card" onClick={this.onClick}>
-                <Image src={this.props.character.appearance.image} />
+            <Card link className="character-card" onClick={() => this.onClick(character)}>
+                <Image src={character.appearance.image} />
                 <Card.Content>
-                    <Card.Header>{this.props.character.name}</Card.Header>
+                    <Card.Header>{character.name}</Card.Header>
                     {actionButtons}
                 </Card.Content>
             </Card>

@@ -7,9 +7,11 @@ import { Table, Loader, Header, Modal, Button, Icon, Card, Container } from "sem
 import { BACKEND, STORY_VIEW, LIST_CHARACTERS, CHAPTER_VIEW, APPLY_CHARACTER, DENY_CHARACTER, ACCEPT_CHARACTER } from "../../constants/routes";
 import { makeCancelable } from "../../constants/extensions";
 import { CharacterGrid, CharacterCard } from "../Character";
+import ChapterForm from "./ChapterForm";
 
 const INITIAL_STATE = {
     story: {
+        _id: "",
         author: {},
         chapters: [],
         characters: [],
@@ -77,18 +79,20 @@ class StoryView extends Component
         this.props.history.push(to);
     }
 
-    onCharacterApplyClick = characterId =>
+    onCharacterApplyClick = character =>
     {
-        axios.post(`${BACKEND}${APPLY_CHARACTER}`, { token: localStorage.token, character_id: characterId, story_id: this.props.match.params.story_id })
+        axios.post(`${BACKEND}${APPLY_CHARACTER}`, { token: localStorage.token, character_id: character._id, story_id: this.props.match.params.story_id })
             .then(res =>
             {
                 switch (res.data.status)
                 {
                     case "applied":
                         console.log(res.data.message);
+                        this.addToApplicants(character);
                         break;
                     case "added":
                         console.log(res.data.message);
+                        this.addToRosterFree(character);
                         break;
                     case "error":
                         console.log(res.data.message);
@@ -105,14 +109,15 @@ class StoryView extends Component
             });
     }
 
-    onAccept = (event, characterId) =>
+    onAccept = (event, character) =>
     {
         event.stopPropagation();
 
-        axios.post(`${BACKEND}${ACCEPT_CHARACTER}`, { token: localStorage.token, character_id: characterId, story_id: this.state.story._id })
+        axios.post(`${BACKEND}${ACCEPT_CHARACTER}`, { token: localStorage.token, character_id: character._id, story_id: this.state.story._id })
             .then(res =>
             {
-                this.addToRoster(characterId);
+                this.addToRoster(character);
+                this.removeFromApplicants(character);
             })
             .catch(error =>
             {
@@ -120,14 +125,14 @@ class StoryView extends Component
             });
     }
 
-    onDeny = (event, characterId) =>
+    onDeny = (event, character) =>
     {
         event.stopPropagation();
 
-        axios.post(`${BACKEND}${DENY_CHARACTER}`, { token: localStorage.token, character_id: characterId, story_id: this.state.story._id })
+        axios.post(`${BACKEND}${DENY_CHARACTER}`, { token: localStorage.token, character_id: character._id, story_id: this.state.story._id })
             .then(res =>
             {
-                this.removeFromApplicants(characterId);
+                this.removeFromApplicants(character);
             })
             .catch(error =>
             {
@@ -135,30 +140,35 @@ class StoryView extends Component
             });
     }
 
-    addToRoster = characterId =>
+    addToApplicants = character =>
     {
         let story = { ...this.state.story };
-        let newApplicants = story.applicantcharacters;
+        let newApplicants = story.applicantcharacters ? story.applicantcharacters : [];
+        newApplicants.splice(newApplicants.length, 0, character);
+        story.applicantcharacters = newApplicants;
+        this.setState({ story: story });
+    }
+
+    addToRosterFree = character =>
+    {
+        let story = { ...this.state.story };
         let newRoster = story.characters ? story.characters : [];
-        let applicantIndex = -1;
-
-        for (let i = 0; i < newApplicants.length; i++)
-        {
-            if (newApplicants[i]._id === characterId)
-            {
-                applicantIndex = i;
-                break;
-            }
-        }
-
-        newRoster.splice(newRoster.length, 0, newApplicants[applicantIndex]);
+        newRoster.splice(newRoster.length, 0, character);
         story.characters = newRoster;
         this.setState({ story: story });
-
-        this.removeFromApplicants(characterId);
     }
 
-    removeFromApplicants = characterId =>
+    addToRoster = character =>
+    {
+        let story = { ...this.state.story };
+        let newRoster = story.characters ? story.characters : [];
+
+        newRoster.splice(newRoster.length, 0, character);
+        story.characters = newRoster;
+        this.setState({ story: story });
+    }
+
+    removeFromApplicants = character =>
     {
         let story = { ...this.state.story };
         let newApplicants = story.applicantcharacters;
@@ -166,7 +176,7 @@ class StoryView extends Component
 
         for (let i = 0; i < newApplicants.length; i++)
         {
-            if (newApplicants[i]._id === characterId)
+            if (newApplicants[i]._id === character._id)
             {
                 applicantIndex = i;
                 break;
@@ -228,7 +238,7 @@ class StoryView extends Component
                                                 <Modal key={0} trigger={<Button primary><Icon name="bookmark" />Add Chapter</Button>}>
                                                     <Modal.Header>New Chapter</Modal.Header>
                                                     <Modal.Content>
-                                                        {null}
+                                                        <ChapterForm />
                                                     </Modal.Content>
                                                 </Modal>,
                                                 <Modal key={1} trigger={<Button primary><Icon name="address book" />Applicants</Button>}>
@@ -241,10 +251,10 @@ class StoryView extends Component
                                                                         (
                                                                             <CharacterCard key={index} character={character} actionButtons={
                                                                                 <Button.Group>
-                                                                                    <Button key={0} icon color="blue" onClick={event => this.onAccept(event, character._id)}>
+                                                                                    <Button key={0} icon color="blue" onClick={event => this.onAccept(event, character)}>
                                                                                         <Icon name="check" />
                                                                                     </Button>
-                                                                                    <Button key={1} icon color="red" onClick={event => this.onDeny(event, character._id)}>
+                                                                                    <Button key={1} icon color="red" onClick={event => this.onDeny(event, character)}>
                                                                                         <Icon name="close" />
                                                                                     </Button>
                                                                                 </Button.Group>} />
