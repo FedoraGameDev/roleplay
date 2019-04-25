@@ -3,13 +3,14 @@ import { withRouter } from "react-router-dom";
 import { compose } from "recompose";
 import axios from "axios";
 import withAuthStatic from "../firebase/Session/withAuthStatic";
-import { Table, Placeholder, Button, Header, Image } from "semantic-ui-react";
-import { BACKEND, CHAPTER_VIEW } from "../../constants/routes";
+import { Table, Placeholder, Button, Header, Image, Modal } from "semantic-ui-react";
+import { BACKEND, CHAPTER_VIEW, STORY_VIEW, CREATE_REPLY } from "../../constants/routes";
 import { makeCancelable } from "../../constants/extensions";
+import ReplyForm from "./ReplyForm";
 
 const INITIAL_STATE = {
     chapter: null,
-    showReplyForm: false
+    story: null
 }
 
 class ChapterView extends Component
@@ -26,10 +27,20 @@ class ChapterView extends Component
     componentDidMount()
     {
         const { story_id, chapter_name } = this.props.match.params;
-        this.promises.splice(this.promises.length - 1, 0, makeCancelable(axios.get(`${BACKEND}${CHAPTER_VIEW.replace(":story_id", story_id).replace(":chapter_name", chapter_name)}`)
+        this.promises.splice(this.promises.length, 0, makeCancelable(axios.get(`${BACKEND}${CHAPTER_VIEW.replace(":story_id", story_id).replace(":chapter_name", chapter_name)}`)
             .then(res =>
             {
                 this.setState({ chapter: res.data.chapter });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+            })));
+
+        this.promises.splice(this.promises.length, 0, makeCancelable(axios.get(`${BACKEND}${STORY_VIEW.replace(":story_id", story_id)}`)
+            .then(res =>
+            {
+                this.setState({ story: res.data.story });
             })
             .catch(error =>
             {
@@ -42,28 +53,43 @@ class ChapterView extends Component
         this.promises.forEach(promise => promise.cancel());
     }
 
+    onSubmitPost = post =>
+    {
+        if (post.author && post.description)
+        {
+            axios.post(`${BACKEND}${CREATE_REPLY}`, { token: localStorage.getItem("token"), post: post, story: this.state.story, chapter: this.state.chapter })
+                .then(res =>
+                {
+                    console.log(res);
+                })
+                .catch(error =>
+                {
+                    console.log(error);
+                });
+        }
+    }
+
     render()
     {
         const { state, props } = this;
-        const { chapter, showReplyForm } = state;
+        const { chapter, story } = state;
         const { userInfo } = props;
 
         return (
             <div>
-                {!!state.chapter ?
+                {!!chapter && !!story ?
                     <Table className="basic-table">
                         <Table.Body>
                             <Table.Row><Table.Cell>
                                 {!!userInfo ?
-                                    <Button primary={!showReplyForm} secondary={showReplyForm} onClick={this.createParagraphClick}>
-                                        {showReplyForm ? "Cancel" : "Create Paragraph"}
-                                    </Button> :
+                                    <Modal trigger={<Button primary>New Reply</Button>}>
+                                        <Modal.Header>New Reply</Modal.Header>
+                                        <Modal.Content>
+                                            <ReplyForm story={story} onSubmit={this.onSubmitPost} />
+                                        </Modal.Content>
+                                    </Modal>
+                                    :
                                     null
-                                }
-                                {
-                                    showReplyForm ?
-                                        null ://<CreatePost /> :
-                                        null
                                 }
                             </Table.Cell></Table.Row>
                             {

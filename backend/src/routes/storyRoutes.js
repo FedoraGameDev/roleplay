@@ -11,9 +11,9 @@ module.exports = router
     .post("/apply", controllers.story.apply)
     .post("/accept", controllers.story.acceptApplication)
     .post("/deny", controllers.story.denyApplication)
+    .post("/chapter/post", controllers.story.createPost)
 
     .get("/:genre", controllers.story.genre)
-    //.get("/", controllers.story.index)
     .post("/create", controllers.story.create)
     .get("/view/:story_id", controllers.story.story)
     .post("/chapter/create", controllers.story.create_chapter)

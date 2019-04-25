@@ -10,7 +10,7 @@ module.exports = {
 
         const { start, quantity } = req.params;
 
-        models.Story.find({}, "title date_created replies genres author color latest_reply_date").sort({ latest_reply_date: 1 }).populate("author")
+        models.Story.find({}, "title date_created replies genres author color latest_reply_date").sort({ latest_reply_date: -1 }).populate("author")
             .then(stories =>
             {
                 let end = "";
@@ -86,6 +86,64 @@ module.exports = {
                 console.log(error);
                 res.status(500).json({ "ERROR": error });
             })
+    },
+
+    createPost: (req, res) =>
+    {
+        console.log("New post received.");
+        const { post, chapter, story, token } = req.body;
+
+        firebaseAdmin.auth().verifyIdToken(token)
+            .then(decodedToken =>
+            {
+                console.log("User authenticated from firebase.");
+                models.User.findOne({ uuid: decodedToken.uid })
+                    .then(user =>
+                    {
+                        console.log(`${user.username} authenticated.`);
+                        models.Character.findOne({ _id: post.author._id })
+                            .then(character =>
+                            {
+                                console.log(`Character "${character.name}" found.`);
+                                if (`${user._id}` == `${character.user._id}`)
+                                {
+                                    console.log("User verified owner of character.");
+                                    models.Story.updateOne({ _id: story._id }, { $push: { "chapters.$[i].posts": post }, $inc: { replies: 1 }, $set: { latest_reply_date: Date.now() } }, { arrayFilters: [{ "i._id": chapter._id }] })
+                                        .then(story =>
+                                        {
+                                            console.log("Post added.");
+                                            res.json({ "status": "OK" });
+                                        })
+                                        .catch(error =>
+                                        {
+                                            console.log(error);
+                                            res.status(500).json({ "ERROR": error });
+                                        });
+                                }
+                                else
+                                {
+                                    error = "User attempted replying with character they don't own.";
+                                    console.log(error);
+                                    res.status(500).json({ "ERROR": error });
+                                }
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                                res.status(500).json({ "ERROR": error });
+                            });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                        res.status(500).json({ "ERROR": error });
+                    });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+                res.status(500).json({ "ERROR": error });
+            });
     },
 
     apply: (req, res) =>
