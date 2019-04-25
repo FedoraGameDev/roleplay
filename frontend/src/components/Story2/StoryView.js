@@ -3,10 +3,10 @@ import { withRouter } from "react-router-dom";
 import { withAuthStatic } from "../firebase/Session";
 import { compose } from "recompose";
 import axios from "axios";
-import { Table, Loader, Header, Modal, Button, Icon } from "semantic-ui-react";
-import { BACKEND, STORY_VIEW, LIST_CHARACTERS, CHAPTER_VIEW, APPLY_CHARACTER } from "../../constants/routes";
+import { Table, Loader, Header, Modal, Button, Icon, Card, Container } from "semantic-ui-react";
+import { BACKEND, STORY_VIEW, LIST_CHARACTERS, CHAPTER_VIEW, APPLY_CHARACTER, DENY_CHARACTER, ACCEPT_CHARACTER } from "../../constants/routes";
 import { makeCancelable } from "../../constants/extensions";
-import { CharacterGrid } from "../Character";
+import { CharacterGrid, CharacterCard } from "../Character";
 
 const INITIAL_STATE = {
     story: {
@@ -16,7 +16,6 @@ const INITIAL_STATE = {
         description: "",
         genres: [],
         subscribers: [],
-        applicantusers: [],
         applicantcharacters: [],
         title: ""
     },
@@ -80,7 +79,7 @@ class StoryView extends Component
 
     onCharacterApplyClick = characterId =>
     {
-        axios.post(`${BACKEND}${APPLY_CHARACTER}`, { token: localStorage.token, character_id: characterId, story_id: this.state.story._id })
+        axios.post(`${BACKEND}${APPLY_CHARACTER}`, { token: localStorage.token, character_id: characterId, story_id: this.props.match.params.story_id })
             .then(res =>
             {
                 switch (res.data.status)
@@ -104,6 +103,85 @@ class StoryView extends Component
             {
                 console.log(error);
             });
+    }
+
+    onAccept = (event, characterId) =>
+    {
+        event.stopPropagation();
+
+        axios.post(`${BACKEND}${ACCEPT_CHARACTER}`, { token: localStorage.token, character_id: characterId, story_id: this.state.story._id })
+            .then(res =>
+            {
+                this.addToRoster(characterId);
+            })
+            .catch(error =>
+            {
+                console.log(error);
+            });
+    }
+
+    onDeny = (event, characterId) =>
+    {
+        event.stopPropagation();
+
+        axios.post(`${BACKEND}${DENY_CHARACTER}`, { token: localStorage.token, character_id: characterId, story_id: this.state.story._id })
+            .then(res =>
+            {
+                this.removeFromApplicants(characterId);
+            })
+            .catch(error =>
+            {
+                console.log(error);
+            });
+    }
+
+    addToRoster = characterId =>
+    {
+        console.log("Adding to roster...");
+        let story = { ...this.state.story };
+        let newRoster = story.characters ? story.characters : [];
+        let newApplicants = story.applicantcharacters;
+        const applicantIndex = -1;
+
+        for (let i = 0; i < newApplicants.length; i++)
+        {
+            if (newApplicants._id === characterId)
+            {
+                console.log("found at index " + i);
+                applicantIndex = i;
+                break;
+            }
+        }
+
+        console.log(newApplicants[applicantIndex]);
+
+        newRoster.splice(newRoster.length, 0, newApplicants[applicantIndex]);
+        story.characters = newRoster;
+        this.setState({ story: story });
+
+        this.removeFromApplicants(characterId);
+    }
+
+    removeFromApplicants = characterId =>
+    {
+        console.log("Removing from applicants...");
+        let story = { ...this.state.story };
+        let newApplicants = story.applicantcharacters;
+        const applicantIndex = -1;
+
+        for (let i = 0; i < newApplicants.length; i++)
+        {
+            if (newApplicants._id === characterId)
+            {
+                console.log("found at index " + i);
+                applicantIndex = i;
+                break;
+            }
+        }
+
+        newApplicants.splice(applicantIndex, 1);
+        story.applicantcharacters = newApplicants;
+        this.setState({ story: story });
     }
 
     render()
@@ -152,12 +230,37 @@ class StoryView extends Component
                                 <Table.Row><Table.Cell>
                                     {
                                         isCreator ?
-                                            <Modal trigger={<Button primary><Icon name="bookmark" />Add Chapter</Button>}>
-                                                <Modal.Header>New Chapter</Modal.Header>
-                                                <Modal.Content>
-                                                    {null}
-                                                </Modal.Content>
-                                            </Modal>
+                                            [
+                                                <Modal key={0} trigger={<Button primary><Icon name="bookmark" />Add Chapter</Button>}>
+                                                    <Modal.Header>New Chapter</Modal.Header>
+                                                    <Modal.Content>
+                                                        {null}
+                                                    </Modal.Content>
+                                                </Modal>,
+                                                <Modal key={1} trigger={<Button primary><Icon name="address book" />Applicants</Button>}>
+                                                    <Modal.Header>Applicants</Modal.Header>
+                                                    <Modal.Content>
+                                                        <Container className="character-grid">
+                                                            <Card.Group centered>
+                                                                {
+                                                                    story.applicantcharacters.map((character, index) =>
+                                                                        (
+                                                                            <CharacterCard key={index} character={character} actionButtons={
+                                                                                <Button.Group>
+                                                                                    <Button key={0} icon color="blue" onClick={event => this.onAccept(event, character._id)}>
+                                                                                        <Icon name="check" />
+                                                                                    </Button>
+                                                                                    <Button key={1} icon color="red" onClick={event => this.onDeny(event, character._id)}>
+                                                                                        <Icon name="close" />
+                                                                                    </Button>
+                                                                                </Button.Group>} />
+                                                                        ))
+                                                                }
+                                                            </Card.Group>
+                                                        </Container>
+                                                    </Modal.Content>
+                                                </Modal>
+                                            ]
                                             :
                                             null
                                     }

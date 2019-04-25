@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
-import { Card, Container } from "semantic-ui-react";
+import { Card, Container, Image } from "semantic-ui-react";
 import { VIEW_CHARACTER } from "../../constants/routes";
 
 /*<Card
@@ -23,18 +23,21 @@ class CharacterCard extends Component
 
     goToPage = to =>
     {
-        this.props.history.history.push(to);
+        this.props.history.push(to);
     }
 
     render()
     {
+        const { actionButtons } = this.props;
+
         return (
-            <Card
-                className="character-card"
-                image={this.props.character.appearance.image}
-                header={this.props.character.name}
-                link
-                onClick={event => { this.onClick(); }} />
+            <Card link className="character-card" onClick={this.onClick}>
+                <Image src={this.props.character.appearance.image} />
+                <Card.Content>
+                    <Card.Header>{this.props.character.name}</Card.Header>
+                    {actionButtons}
+                </Card.Content>
+            </Card>
         )
     }
 }
@@ -43,8 +46,9 @@ class CharacterGridBase extends Component
 {
     render()
     {
+        const { actionButtons } = this.props;
         const characterList = this.props.characters.map((character, index) => (
-            <CharacterCard key={index} character={character} history={{ history: this.props.history }} onClick={this.props.onClick} />
+            <CharacterCard key={index} character={character} history={this.props.history} onClick={this.props.onClick} actionButtons={actionButtons} />
         ));
 
         return (<Container className="character-grid"><Card.Group centered>{characterList}</Card.Group></Container>);
