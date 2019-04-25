@@ -503,7 +503,6 @@ module.exports = {
                 models.User.findOne({ uuid: decodedToken.uid })
                     .then(user =>
                     {
-                        //TODO: check if user owns story
                         console.log(`User "${user.username}" authenticated.`);
 
                         models.Story.findOne({ _id: req.body.story._id })
@@ -519,6 +518,59 @@ module.exports = {
                                         console.log("Story updated with new chapter.");
                                         story.chapters.splice(story.chapters.length, 0, req.body.chapter);
                                         res.json({ story: story });
+                                    });
+                                }
+                                else
+                                {
+                                    error = "User attempted updating story not owned by them.";
+                                    console.log(error);
+                                    res.status(500).json({ "ERROR": error });
+                                }
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                                res.status(500).json({ "ERROR": error });
+                            });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                        res.status(500).json({ "ERROR": error });
+                    });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+                res.status(500).json({ "ERROR": error });
+            })
+    },
+
+    updateChapter: (req, res) =>
+    {
+        console.log(`Retrieving chapter for story "${req.body.story.title}"`);
+        firebaseAdmin.auth().verifyIdToken(req.body.token)
+            .then(decodedToken =>
+            {
+                console.log("User authenticated from firebase.");
+                models.User.findOne({ uuid: decodedToken.uid })
+                    .then(user =>
+                    {
+                        console.log(`User "${user.username}" authenticated.`);
+
+                        models.Story.findOne({ _id: req.body.story._id })
+                            .then(story =>
+                            {
+                                console.log(`story "${story.title}" found.`);
+
+                                if (`${story.author._id}` == `${user._id}`)
+                                {
+                                    models.Story.updateOne({ _id: req.body.story._id }, { $set: { "chapters.$[i]": req.body.chapter } }, { arrayFilters: [{ "i._id": req.body.chapter._id }] }, (err, updatedStory) =>
+                                    {
+                                        if (err) { res.status(500).json({ "ERROR": err }) };
+
+                                        console.log("Chapter Updated.");
+                                        res.json({ "Status": "OK" });
                                     });
                                 }
                                 else

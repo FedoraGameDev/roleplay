@@ -12,6 +12,7 @@ module.exports = router
     .post("/accept", controllers.story.acceptApplication)
     .post("/deny", controllers.story.denyApplication)
     .post("/update/chapter/post", controllers.story.updatePost)
+    .post("/update/chapter", controllers.story.updateChapter)
     .post("/chapter/post", controllers.story.createPost)
 
     .get("/:genre", controllers.story.genre)

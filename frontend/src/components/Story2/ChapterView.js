@@ -60,7 +60,9 @@ class ChapterView extends Component
             axios.post(`${BACKEND}${CREATE_REPLY}`, { token: localStorage.getItem("token"), post: post, story: this.state.story, chapter: this.state.chapter })
                 .then(res =>
                 {
-                    console.log(res);
+                    const place = this.props.history.location.pathname;
+                    this.props.history.push("/");
+                    this.props.history.push(place);
                 })
                 .catch(error =>
                 {
@@ -76,7 +78,9 @@ class ChapterView extends Component
             axios.post(`${BACKEND}${UPDATE_REPLY}`, { token: localStorage.getItem("token"), post: post, story: this.state.story, chapter: this.state.chapter })
                 .then(res =>
                 {
-                    console.log(res);
+                    const place = this.props.history.location.pathname;
+                    this.props.history.push("/");
+                    this.props.history.push(place);
                 })
                 .catch(error =>
                 {
