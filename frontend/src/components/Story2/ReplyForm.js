@@ -26,6 +26,8 @@ class ReplyForm extends Component
 
     componentDidMount()
     {
+        if (this.props.reply)
+            this.setState({ reply: this.props.reply });
         this.promises.splice(this.promises.length - 1, 0, makeCancelable(axios.post(`${BACKEND}${LIST_CHARACTERS}`, { token: localStorage.getItem("token") })
             .then(res =>
             {
@@ -77,8 +79,8 @@ class ReplyForm extends Component
                         :
                         null
                 }
-                <TextArea placeholder="Description..." onChange={this.onChange} />
-                <Button type="submit" primary>Submit</Button>
+                <TextArea placeholder="Description..." value={this.state.reply.description} onChange={this.onChange} />
+                <Button type="submit" primary>{this.props.actionText}</Button>
                 <Table>
                     <Table.Body>
                         <Table.Row>

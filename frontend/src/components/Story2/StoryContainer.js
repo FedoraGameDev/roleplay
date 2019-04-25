@@ -62,7 +62,7 @@ class StoryContainer extends Component
                     (genres) ?
                         [
                             <Route key={0} path={LIST_STORY} component={() => { return (<StoryList genres={genres} />); }} />,
-                            <Route key={1} path={STORY_VIEW} component={() => { return (<StoryView />); }} />,
+                            <Route key={1} path={STORY_VIEW} component={() => { return (<StoryView genres={genres} />); }} />,
                             <Route key={2} path={CHAPTER_VIEW} component={() => { return (<ChapterView />); }} />
                         ]
                         :

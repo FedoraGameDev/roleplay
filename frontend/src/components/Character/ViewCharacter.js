@@ -209,9 +209,9 @@ class ViewCharacter extends Component
                                 this.props.userInfo ?
                                     <Table.Row>
                                         <Table.Cell>
-                                            <Modal key={0} trigger={<center><Button primary>Modify Character</Button></center>}>
+                                            <Modal key={0} trigger={<center><Button primary>Modify Character</Button></center>} closeOnDimmerClick={false} closeIcon>
                                                 <Modal.Header>Modify {character.name}</Modal.Header>
-                                                <Modal.Content>
+                                                <Modal.Content scrolling>
                                                     <CharacterForm character={character} onSubmit={this.onSubmit} actionName="Update Character" />
                                                 </Modal.Content>
                                             </Modal>

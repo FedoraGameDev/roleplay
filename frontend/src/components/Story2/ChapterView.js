@@ -4,7 +4,7 @@ import { compose } from "recompose";
 import axios from "axios";
 import withAuthStatic from "../firebase/Session/withAuthStatic";
 import { Table, Placeholder, Button, Header, Image, Modal } from "semantic-ui-react";
-import { BACKEND, CHAPTER_VIEW, STORY_VIEW, CREATE_REPLY } from "../../constants/routes";
+import { BACKEND, CHAPTER_VIEW, STORY_VIEW, CREATE_REPLY, UPDATE_REPLY } from "../../constants/routes";
 import { makeCancelable } from "../../constants/extensions";
 import ReplyForm from "./ReplyForm";
 
@@ -60,7 +60,27 @@ class ChapterView extends Component
             axios.post(`${BACKEND}${CREATE_REPLY}`, { token: localStorage.getItem("token"), post: post, story: this.state.story, chapter: this.state.chapter })
                 .then(res =>
                 {
-                    console.log(res);
+                    const place = this.props.history.location.pathname;
+                    this.props.history.push("/");
+                    this.props.history.push(place);
+                })
+                .catch(error =>
+                {
+                    console.log(error);
+                });
+        }
+    }
+
+    onUpdatePost = post =>
+    {
+        if (post.author && post.description)
+        {
+            axios.post(`${BACKEND}${UPDATE_REPLY}`, { token: localStorage.getItem("token"), post: post, story: this.state.story, chapter: this.state.chapter })
+                .then(res =>
+                {
+                    const place = this.props.history.location.pathname;
+                    this.props.history.push("/");
+                    this.props.history.push(place);
                 })
                 .catch(error =>
                 {
@@ -82,10 +102,10 @@ class ChapterView extends Component
                         <Table.Body>
                             <Table.Row><Table.Cell>
                                 {!!userInfo ?
-                                    <Modal trigger={<Button primary>New Reply</Button>}>
+                                    <Modal trigger={<Button primary>New Reply</Button>} closeOnDimmerClick={false} closeIcon>
                                         <Modal.Header>New Reply</Modal.Header>
-                                        <Modal.Content>
-                                            <ReplyForm story={story} onSubmit={this.onSubmitPost} />
+                                        <Modal.Content scrolling>
+                                            <ReplyForm story={story} onSubmit={post => { this.onSubmitPost(post) }} actionText="Submit" />
                                         </Modal.Content>
                                     </Modal>
                                     :
@@ -97,6 +117,21 @@ class ChapterView extends Component
                                 {
                                     const TableBody = (post) => (
                                         <Table.Body>
+                                            {
+                                                userInfo && userInfo.username === post.author.user.username ?
+                                                    <Table.Row>
+                                                        <Table.Cell>
+                                                            <Modal trigger={<Button>Edit</Button>} closeOnDimmerClick={false} closeIcon>
+                                                                <Modal.Header>Edit Reply</Modal.Header>
+                                                                <Modal.Content scrolling>
+                                                                    <ReplyForm story={story} reply={post} onSubmit={this.onUpdatePost} actionText="Update" />
+                                                                </Modal.Content>
+                                                            </Modal>
+                                                        </Table.Cell>
+                                                    </Table.Row>
+                                                    :
+                                                    null
+                                            }
                                             <Table.Row>
                                                 <Table.Cell>
                                                     <div className="characterPlacard" style={{ width: "150px", float: "left", marginRight: "15px" }}>

@@ -4,10 +4,11 @@ import { withAuthStatic } from "../firebase/Session";
 import { compose } from "recompose";
 import axios from "axios";
 import { Table, Loader, Header, Modal, Button, Icon, Card, Container } from "semantic-ui-react";
-import { BACKEND, STORY_VIEW, LIST_CHARACTERS, CHAPTER_VIEW, CREATE_CHAPTER, APPLY_CHARACTER, DENY_CHARACTER, ACCEPT_CHARACTER } from "../../constants/routes";
+import { BACKEND, STORY_VIEW, UPDATE_STORY, LIST_CHARACTERS, CHAPTER_VIEW, CREATE_CHAPTER, UPDATE_CHAPTER, APPLY_CHARACTER, DENY_CHARACTER, ACCEPT_CHARACTER } from "../../constants/routes";
 import { makeCancelable } from "../../constants/extensions";
 import { CharacterGrid, CharacterCard } from "../Character";
 import ChapterForm from "./ChapterForm";
+import StoryForm from "./StoryForm";
 
 const INITIAL_STATE = {
     story: {
@@ -193,15 +194,59 @@ class StoryView extends Component
         axios.post(`${BACKEND}${CREATE_CHAPTER}`, { token: localStorage.getItem("token"), chapter: chapter, story: this.state.story })
             .then(res =>
             {
-                let story = { ...this.state.story };
-                let newChapters = story.chapters ? story.chapters : [];
-                story.chapters = res.data.story.chapters;
-                this.setState({ story: story });
+                const place = this.props.history.location.pathname;
+                this.props.history.push("/");
+                this.props.history.push(place);
             })
             .catch(error =>
             {
                 console.log(error);
             });
+    }
+
+    updateChapter = chapter =>
+    {
+        axios.post(`${BACKEND}${UPDATE_CHAPTER}`, { token: localStorage.getItem("token"), chapter: chapter, story: this.state.story })
+            .then(res =>
+            {
+                const place = this.props.history.location.pathname;
+                this.props.history.push("/");
+                this.props.history.push(place);
+            })
+            .catch(error =>
+            {
+                console.log(error);
+            });
+    }
+
+    onChapterClick = (id, index) =>
+    {
+        this.goToLink(CHAPTER_VIEW.replace(":story_id", id).replace(":chapter_name", index));
+    }
+
+    onUpdateStory = story =>
+    {
+        const updateStory = {
+            _id: story._id,
+            title: story.title,
+            description: story.description,
+            genres: story.genres,
+            closed_group: story.closed_group,
+            color: story.color
+        };
+
+        axios.post(`${BACKEND}${UPDATE_STORY}`, {
+            token: localStorage.getItem("token"),
+            story: updateStory
+        }).then(res =>
+        {
+            const place = this.props.history.location.pathname;
+            this.props.history.push("/");
+            this.props.history.push(place);
+        }).catch(error =>
+        {
+            this.setState({ error: error });
+        });
     }
 
     render()
@@ -251,15 +296,21 @@ class StoryView extends Component
                                     {
                                         isCreator ?
                                             <span>
-                                                <Modal key={0} trigger={<Button primary><Icon name="bookmark" />Add Chapter</Button>}>
+                                                <Modal trigger={<Button primary>Edit Story</Button>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
+                                                    <Modal.Header>Edit Story</Modal.Header>
+                                                    <Modal.Content>
+                                                        <StoryForm genres={this.props.genres} story={this.state.story} actionText="Update" onStorySubmit={this.onUpdateStory} />
+                                                    </Modal.Content>
+                                                </Modal>
+                                                <Modal trigger={<Button primary><Icon name="bookmark" />Add Chapter</Button>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
                                                     <Modal.Header>New Chapter</Modal.Header>
                                                     <Modal.Content>
-                                                        <ChapterForm onSubmit={this.submitChapter} chapter={{ title: `Chapter ${story.chapters.length + 1}` }} />
+                                                        <ChapterForm onSubmit={this.submitChapter} chapter={{ title: `Chapter ${story.chapters.length + 1}` }} actionText="Create Chapter" />
                                                     </Modal.Content>
                                                 </Modal>
                                                 {
                                                     story.closed_group ?
-                                                        <Modal key={1} trigger={<Button primary><Icon name="address book" />Applicants</Button>}>
+                                                        <Modal trigger={<Button primary><Icon name="address book" />Applicants</Button>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
                                                             <Modal.Header>Applicants</Modal.Header>
                                                             <Modal.Content>
                                                                 <Container className="character-grid">
@@ -300,7 +351,7 @@ class StoryView extends Component
                                             :
                                             null
                                     }
-                                    <Modal trigger={<Button secondary><Icon name="spy" />Roster</Button>}>
+                                    <Modal trigger={<Button secondary><Icon name="spy" />Roster</Button>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
                                         <Modal.Header>Character Roster</Modal.Header>
                                         <Modal.Content>
                                             <Modal.Description>
@@ -321,7 +372,7 @@ class StoryView extends Component
                                                             <span><Icon name="lock open" />Join</span>
                                                     }
                                                 </Button>
-                                            }>
+                                            } dimmer="blurring" closeOnDimmerClick={false} closeIcon>
                                                 <Modal.Header>{story.closed_group ? "Apply Character" : "Add Character to Roster"}</Modal.Header>
                                                 <Modal.Content>
                                                     <CharacterGrid characters={characterList} onClick={this.onCharacterApplyClick} />
@@ -336,9 +387,22 @@ class StoryView extends Component
                                 {
                                     story.chapters.map((chapter, index) =>
                                         (
-                                            <Table.Row key={index} onClick={() => { this.goToLink(CHAPTER_VIEW.replace(":story_id", story._id).replace(":chapter_name", index)) }}>
-                                                <Table.Cell>{chapter.title}</Table.Cell>
-                                                <Table.Cell>{chapter.description}</Table.Cell>
+                                            <Table.Row key={index}>
+                                                <Table.Cell onClick={() => { this.onChapterClick(story._id, index) }}>{chapter.title}</Table.Cell>
+                                                <Table.Cell onClick={() => { this.onChapterClick(story._id, index) }}>{chapter.description}</Table.Cell>
+                                                {
+                                                    userInfo && userInfo.user._id === story.author._id ?
+                                                        <Table.Cell collapsing>
+                                                            <Modal trigger={<Button onClick={event => event.stopPropagation()}>Edit</Button>} closeOnDimmerClick={false} closeIcon>
+                                                                <Modal.Header>Edit Chapter</Modal.Header>
+                                                                <Modal.Content>
+                                                                    <ChapterForm chapter={chapter} onSubmit={this.updateChapter} actionText="Update Chapter" />
+                                                                </Modal.Content>
+                                                            </Modal>
+                                                        </Table.Cell>
+                                                        :
+                                                        null
+                                                }
                                             </Table.Row>
                                         ))
                                 }

@@ -5,7 +5,7 @@ class GenreList extends Component
 {
     render()
     {
-        const { genres, onChange } = this.props;
+        const { genres, onChange, selections } = this.props;
 
         return (
             <Card.Group centered>
@@ -17,6 +17,8 @@ class GenreList extends Component
                                     toggle
                                     name={genre.name}
                                     label={genre.name}
+                                    checked={selections && selections[genre.name]}
+                                    // defaultChecked={selections && selections[genre.name]}
                                     onChange={event => { onChange(genre.name) }} />
                             </Card>
                         ))
