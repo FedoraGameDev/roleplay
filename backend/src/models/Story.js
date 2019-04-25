@@ -46,7 +46,10 @@ const storySchema = new Schema({
     date_created: Date,
     latest_reply_date: Date,
     replies: Number,
-    closed_group: Boolean
+    closed_group: {
+        type: Boolean,
+        default: false
+    }
 });
 
 const Story = mongoose.model("Story", storySchema);

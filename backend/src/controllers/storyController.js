@@ -59,7 +59,7 @@ module.exports = {
     story: (req, res) =>
     {
         console.log(`Retrieving story ${req.params.story_id}...`);
-        models.Story.findOne({ _id: req.params.story_id }, "title author genres description chapters characters").populate("genres").populate("subscribers").populate("author").populate("characters")
+        models.Story.findOne({ _id: req.params.story_id }, "title author genres description chapters characters closed_group applicantusers applicantcharacters").populate("genres").populate("subscribers").populate("author").populate("characters").populate("applicantusers").populate("applicantcharacters")
             .then(story =>
             {
                 console.log(`Returning story "${story.title}".`);
@@ -116,7 +116,7 @@ module.exports = {
                                                 if (story.closed_group)
                                                 {
                                                     models.Story.updateOne({ _id: story_id },
-                                                        { $push: { applicantusers: user._id, applicantcharacters: character_id } }, (err, action) =>
+                                                        { $push: { applicantcharacters: character_id } }, (err, action) =>
                                                         {
                                                             if (err) { console.log(err); res.status(500).json({ "ERROR": err }); };
 
@@ -162,6 +162,141 @@ module.exports = {
                         console.log(error);
                         res.status(500).json({ "ERROR": error });
                     });
+            });
+    },
+
+    denyApplication: (req, res) =>
+    {
+        console.log("Denying application...");
+        const { token, character_id, story_id } = req.body;
+        firebaseAdmin.auth().verifyIdToken(token)
+            .then(decodedToken =>
+            {
+                console.log("User authenticated from firebase.");
+                models.User.findOne({ uuid: decodedToken.uid })
+                    .then(user =>
+                    {
+                        console.log(`${user.username} authenticated.`);
+
+                        models.Character.findOne({ _id: character_id })
+                            .then(character =>
+                            {
+                                console.log(`${character.name} found.`);
+                                models.Story.findOne({ _id: story_id })
+                                    .then(story =>
+                                    {
+                                        console.log(`Story "${story.title}" found.`);
+                                        if (`${story.author._id}` === `${user._id}`)
+                                        {
+                                            models.Story.updateOne({ _id: story_id }, { $pullAll: { applicantcharacters: [character] } })
+                                                .then(result =>
+                                                {
+                                                    console.log(result);
+                                                    res.json({ "status": "OK" });
+                                                })
+                                                .catch(error =>
+                                                {
+                                                    console.log(error);
+                                                    res.status(500).json({ "ERROR": error });
+                                                });
+                                        }
+                                        else
+                                        {
+                                            const error = "User attempted adding character to story they don't own.";
+                                            console.log(error);
+                                            res.status(500).json({ "ERROR": error });
+                                        }
+                                    }).catch(error =>
+                                    {
+                                        console.log(error);
+                                        res.status(500).json({ "ERROR": error });
+                                    });
+
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                                res.status(500).json({ "ERROR": error });
+                            });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                        res.status(500).json({ "ERROR": error });
+                    });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+                res.status(500).json({ "ERROR": error });
+            });
+    },
+
+    acceptApplication: (req, res) =>
+    {
+        console.log("Accepting application...");
+        const { token, character_id, story_id } = req.body;
+        firebaseAdmin.auth().verifyIdToken(token)
+            .then(decodedToken =>
+            {
+                console.log("User authenticated from firebase.");
+                models.User.findOne({ uuid: decodedToken.uid })
+                    .then(user =>
+                    {
+                        console.log(`${user.username} authenticated.`);
+
+                        models.Character.findOne({ _id: character_id })
+                            .then(character =>
+                            {
+                                console.log(`${character.name} found.`);
+                                models.Story.findOne({ _id: story_id })
+                                    .then(story =>
+                                    {
+                                        console.log(`Story "${story.title}" found.`);
+                                        if (`${story.author._id}` === `${user._id}`)
+                                        {
+                                            models.Story.updateOne({ _id: story_id }, { $pullAll: { applicantcharacters: [character] }, $push: { characters: character } })
+                                                .then(result =>
+                                                {
+                                                    console.log(result);
+                                                    res.json({ "status": "OK" });
+                                                })
+                                                .catch(error =>
+                                                {
+                                                    console.log(error);
+                                                    res.status(500).json({ "ERROR": error });
+                                                });
+
+                                        }
+                                        else
+                                        {
+                                            const error = "User attempted adding character to story they don't own.";
+                                            console.log(error);
+                                            res.status(500).json({ "ERROR": error });
+                                        }
+                                    })
+                                    .catch(error =>
+                                    {
+                                        console.log(error);
+                                        res.status(500).json({ "ERROR": error });
+                                    });
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                                res.status(500).json({ "ERROR": error });
+                            });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                        res.status(500).json({ "ERROR": error });
+                    });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+                res.status(500).json({ "ERROR": error });
             });
     },
 
@@ -220,6 +355,7 @@ module.exports = {
                 console.log(error);
             });
     },
+
     create_chapter: (req, res) =>
     {
         console.log(`Retrieving chapter for story "${req.body.story.title}"`);
@@ -227,21 +363,45 @@ module.exports = {
             .then(decodedToken =>
             {
                 console.log("User authenticated from firebase.");
-                models.User.findOne({ uuid: decodedToken.uid }, (err, user) =>
-                {
-                    if (err) { res.status(500).json({ "ERROR": err }); };
-                    console.log(`User "${user.username}" authenticated.`);
-
-                    console.log(req.body.story._id);
-
-                    models.Story.updateOne({ _id: req.body.story._id }, { $push: { chapters: req.body.chapter } }, (err, updatedStory) =>
+                models.User.findOne({ uuid: decodedToken.uid })
+                    .then(user =>
                     {
-                        if (err) { res.status(500).json({ "ERROR": err }) };
+                        //TODO: check if user owns story
+                        console.log(`User "${user.username}" authenticated.`);
 
-                        console.log("Story updated with new chapter.");
-                        res.json({ updatedStory: updatedStory });
+                        models.Story.findOne({ _id: req.body.story._id })
+                            .then(story =>
+                            {
+                                console.log(`story "${story.title}" found.`);
+                                if (`${story.author._id}` == `${user._id}`)
+                                {
+                                    models.Story.updateOne({ _id: req.body.story._id }, { $push: { chapters: req.body.chapter } }, (err, updatedStory) =>
+                                    {
+                                        if (err) { res.status(500).json({ "ERROR": err }) };
+
+                                        console.log("Story updated with new chapter.");
+                                        story.chapters.splice(story.chapters.length, 0, req.body.chapter);
+                                        res.json({ story: story });
+                                    });
+                                }
+                                else
+                                {
+                                    error = "User attempted updating story not owned by them.";
+                                    console.log(error);
+                                    res.status(500).json({ "ERROR": error });
+                                }
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                                res.status(500).json({ "ERROR": error });
+                            });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                        res.status(500).json({ "ERROR": error });
                     });
-                });
             })
             .catch(error =>
             {

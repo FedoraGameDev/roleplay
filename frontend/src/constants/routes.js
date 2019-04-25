@@ -14,9 +14,11 @@ export const STORY_VIEW = "/story/view/:story_id";
 export const CHAPTER_VIEW = "/story/chapter/view/:story_id/:chapter_name";
 export const CREATE_POST = "/story/post/:story_id";
 export const APPLY_CHARACTER = "/story/apply";
+export const ACCEPT_CHARACTER = "/story/accept";
+export const DENY_CHARACTER = "/story/deny";
 
 export const CREATE_STORY = "/story/create";
-export const CREATE_CHAPTER = "/story/chapter/create/:story_id";
+export const CREATE_CHAPTER = "/story/chapter/create";
 
 export const LIST_CHARACTERS = "/character/list";
 export const VIEW_CHARACTER = "/character/view/:character_id";

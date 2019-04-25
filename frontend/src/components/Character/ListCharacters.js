@@ -99,7 +99,7 @@ class ListCharacters extends Component
                     <Modal trigger={<center><Button primary>Create Character</Button></center>}>
                         <Modal.Header>New Character</Modal.Header>
                         <Modal.Content>
-                            <CharacterForm onSubmit={this.onSubmit} />
+                            <CharacterForm onSubmit={this.onSubmit} actionName="Create Character" />
                         </Modal.Content>
                     </Modal>
                     {!!this.state.characters ?

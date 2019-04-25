@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import axios from "axios";
 import { Header, Label, Loader, Image, Container, Table, Modal, Button } from "semantic-ui-react";
 import { BACKEND, VIEW_CHARACTER, UPDATE_CHARACTER } from "../../constants/routes";
+import { withAuthStatic } from "../firebase/Session";
 import Months from "../../constants/months";
 import CharacterForm from "./CharacterForm";
 import cloudinary from "cloudinary/lib/cloudinary";
@@ -196,12 +197,6 @@ class ViewCharacter extends Component
             <Container>
                 {ready ?
                     [
-                        <Modal key={0} trigger={<center><Button primary>Modify Character</Button></center>}>
-                            <Modal.Header>Modify {character.name}</Modal.Header>
-                            <Modal.Content>
-                                <CharacterForm character={character} onSubmit={this.onSubmit} />
-                            </Modal.Content>
-                        </Modal>,
                         <Table key={1} inverted attached="top"><Table.Body>
                             <Table.Row>
                                 <Table.Cell>
@@ -210,6 +205,21 @@ class ViewCharacter extends Component
                             </Table.Row>
                         </Table.Body></Table>,
                         <Table key={2} attached="bottom"><Table.Body>
+                            {
+                                this.props.userInfo ?
+                                    <Table.Row>
+                                        <Table.Cell>
+                                            <Modal key={0} trigger={<center><Button primary>Modify Character</Button></center>}>
+                                                <Modal.Header>Modify {character.name}</Modal.Header>
+                                                <Modal.Content>
+                                                    <CharacterForm character={character} onSubmit={this.onSubmit} actionName="Update Character" />
+                                                </Modal.Content>
+                                            </Modal>
+                                        </Table.Cell>
+                                    </Table.Row>
+                                    :
+                                    null
+                            }
                             <Table.Row>
                                 <Table.Cell>
                                     <Table fixed basic="very">
@@ -286,4 +296,4 @@ class ViewCharacter extends Component
     }
 }
 
-export default ViewCharacter;
+export default withAuthStatic(ViewCharacter);

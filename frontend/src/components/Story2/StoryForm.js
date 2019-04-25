@@ -25,6 +25,12 @@ class StoryForm extends Component
         this.setState({ [event.target.name]: event.target.value });
     }
 
+    onCheckboxChange = (event, { checked }) =>
+    {
+        console.log(checked);
+        this.setState({ closed_group: checked });
+    }
+
     onGenreChange = genre =>
     {
         const genresSelection = { ...this.state.genresSelection };
@@ -105,7 +111,7 @@ class StoryForm extends Component
                         </Table.Row>
                         <Table.Row>
                             <Table.Cell textAlign="right">
-                                <Checkbox onChange={this.onChange} name="closed_group" toggle label="Require Character Approval" />
+                                <Checkbox onChange={this.onCheckboxChange} name="closed_group" defaultChecked={closed_group} toggle label="Require Character Approval" />
                             </Table.Cell>
                         </Table.Row>
                         <Table.Row>

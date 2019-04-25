@@ -9,6 +9,7 @@ class StoryCard extends Component
     {
         const { story } = this.props;
         const date = new Date(story.date_created);
+
         return (
             <Table.Row>
                 <Table.Cell width={10}>
