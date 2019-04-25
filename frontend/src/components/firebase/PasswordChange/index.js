@@ -47,8 +47,10 @@ class PasswordChangeForm extends Component
         return (
             <Segment>
                 <Form onSubmit={this.onSubmit}>
-                    <Input name="passwordOne" value={passwordOne} onChange={this.onChange} type="password" placeholder="New Password" />
-                    <Input name="passwordTwo" value={passwordTwo} onChange={this.onChange} type="password" placeholder="Verify Password" />
+                    <Form.Group>
+                        <Form.Input name="passwordOne" value={passwordOne} onChange={this.onChange} type="password" placeholder="New Password" />
+                        <Form.Input name="passwordTwo" value={passwordTwo} onChange={this.onChange} type="password" placeholder="Verify Password" />
+                    </Form.Group>
                     <Button primary disabled={isInvalid} type="submit">Update My Password</Button>
 
                     {error && <p>{error.message}</p>}

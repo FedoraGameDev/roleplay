@@ -4,13 +4,14 @@ import axios from "axios";
 import { compose } from "recompose";
 import { withFirebase } from "../Firebase";
 import * as ROUTES from "../../../constants/routes";
+import { Form, Message, Button, Segment } from "semantic-ui-react";
 
 const SignUpPage = () =>
     (
-        <div>
-            <h1>Sign Up</h1>
+        <Segment>
+            <Message attached="top"><Message.Header>Sign Up</Message.Header></Message>
             <SignUpForm />
-        </div>
+        </Segment>
     );
 
 const INITIAL_STATE = {
@@ -88,15 +89,19 @@ class SignUpFormBase extends Component
             username === "";
 
         return (
-            <form onSubmit={this.onSubmit}>
-                <input name="username" value={username} onChange={this.onChange} type="text" placeholder="Username" />
-                <input name="email" value={email} onChange={this.onChange} type="text" placeholder="Email" />
-                <input name="passwordOne" value={passwordOne} onChange={this.onChange} type="password" placeholder="Password" />
-                <input name="passwordTwo" value={passwordTwo} onChange={this.onChange} type="password" placeholder="Confirm Password" />
-                <button disabled={isInvalid} type="submit">Sign Up</button>
+            <Segment attached="bottom">
+                <Form onSubmit={this.onSubmit}>
+                    <Form.Group>
+                        <Form.Input name="username" value={username} onChange={this.onChange} type="text" placeholder="Username" />
+                        <Form.Input name="email" value={email} onChange={this.onChange} type="text" placeholder="Email" />
+                        <Form.Input name="passwordOne" value={passwordOne} onChange={this.onChange} type="password" placeholder="Password" />
+                        <Form.Input name="passwordTwo" value={passwordTwo} onChange={this.onChange} type="password" placeholder="Confirm Password" />
+                    </Form.Group>
+                    <Button disabled={isInvalid} type="submit" primary>Sign Up</Button>
 
-                {error && <p>{error.message}</p>}
-            </form>
+                    {error && <p>{error.message}</p>}
+                </Form>
+            </Segment>
         );
     }
 }
