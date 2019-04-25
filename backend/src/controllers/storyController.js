@@ -451,20 +451,29 @@ module.exports = {
                     console.log(`${user.username} authenticated.`);
                     req.body.story.author = user;
                     req.body.story.date_created = Date.now();
+                    req.body.story.latest_reply_date = Date.now();
 
-                    models.Story.create(req.body.story, (err, newStory) =>
-                    {
-                        if (err) { res.status(500).json({ "ERROR": err }); };
-
-                        console.log(`New story "${newStory.title}" created with id ${newStory._id}.`);
-
-                        models.User.updateOne({ uuid: decodedToken.uid }, { $push: { stories: newStory } }, (err, updatedUser) =>
+                    models.Story.create(req.body.story)
+                        .then(newStory =>
                         {
-                            if (err) { res.status(500).json({ "ERROR": err }); };
+                            console.log(`New story "${newStory.title}" created with id ${newStory._id}.`);
 
-                            res.json({ newStory: newStory });
+                            models.User.updateOne({ uuid: decodedToken.uid }, { $push: { stories: newStory } })
+                                .then(updatedUser =>
+                                {
+                                    res.json({ newStory: newStory });
+                                })
+                                .catch(error =>
+                                {
+                                    console.log(error);
+                                    res.status(500).json({ "ERROR": error });
+                                });
+                        })
+                        .catch(error =>
+                        {
+                            console.log(error);
+                            res.status(500).json({ "ERROR": error });
                         });
-                    });
                 });
             })
             .catch(error =>
@@ -524,10 +533,6 @@ module.exports = {
                 res.status(500).json({ "ERROR": error });
             });
     },
-
-
-
-
 
     genre: (req, res) =>
     {

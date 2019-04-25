@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 import { withFirebase } from "../Firebase";
 import * as ROUTES from "../../../constants/routes";
+import { Form, Input, Button, Segment } from "semantic-ui-react";
 
 const PasswordForgetPage = () =>
     (
@@ -53,12 +54,16 @@ class PasswordForgetFormBase extends Component
         const isInvalid = (email === "");
 
         return (
-            <form onSubmit={this.onSubmit}>
-                <input name="email" value={this.state.email} onChange={this.onChange} type="text" placeholder="Email" />
-                <button disabled={isInvalid} type="submit">Reset Password</button>
+            <Segment>
+                <Form onSubmit={this.onSubmit}>
+                    <Form.Group>
+                        <Form.Input name="email" value={this.state.email} onChange={this.onChange} type="text" placeholder="Email" />
+                    </Form.Group>
+                    <Button primary disabled={isInvalid} type="submit">Reset Password</Button>
 
-                {error && <p></p>}
-            </form>
+                    {error && <p></p>}
+                </Form>
+            </Segment>
         );
     }
 }

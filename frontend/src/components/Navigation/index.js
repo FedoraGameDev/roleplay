@@ -80,6 +80,10 @@ class Navigation extends React.Component
                             <Menu.Item key={loggedInItems.length} onClick={event => { firebase.doSignOut(); history.push("/"); }} >
                                 <Icon name="sign out alternate" size="large" />
                                 Log Out
+                            </Menu.Item>,
+                            <Menu.Item key={loggedInItems.length + 1} onClick={event => { window.open("https://github.com/FedoraGameDev/roleplay/issues/new", "_blank").focus(); }}>
+                                <Icon name="bug" size="large" />
+                                Report a Bug
                             </Menu.Item>
                         ]
                         :

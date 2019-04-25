@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Form, Button, TextArea, Table, Header, Image } from "semantic-ui-react";
+import { Form, Button, TextArea, Table, Header, Image, Message, Segment } from "semantic-ui-react";
 import axios from "axios";
 import { makeCancelable } from "../../constants/extensions";
 import { BACKEND, LIST_CHARACTERS } from "../../constants/routes";
@@ -74,37 +74,44 @@ class ReplyForm extends Component
         return (
             <Form onSubmit={this.onSubmit}>
                 {
-                    loadedCharacters ?
-                        <CharacterGrid characters={characterList} onClick={this.onCharacterApplyClick} />
+                    loadedCharacters && characterList ? [
+                        <CharacterGrid key={0} characters={characterList} onClick={this.onCharacterApplyClick} />,
+                        <TextArea key={1} placeholder="Description..." value={this.state.reply.description} onChange={this.onChange} />,
+                        <Button key={2} type="submit" primary>{this.props.actionText}</Button>,
+                        <Table key={3}>
+                            <Table.Body>
+                                <Table.Row>
+                                    {
+                                        !!reply.author ?
+                                            <Table.Cell>
+                                                <div className="characterPlacard" style={{ width: "150px", float: "left", marginRight: "15px" }}>
+                                                    <center><Header>{reply.author.name}</Header></center>
+                                                    <Image floated='left' src={reply.author.appearance.image} style={{ width: "150px" }} />
+                                                </div>
+                                                <pre style={{ margin: "0" }}>{reply.description}</pre>
+                                            </Table.Cell>
+                                            :
+                                            <Table.Cell>
+                                                <div className="characterPlacard" style={{ width: "150px", float: "left", marginRight: "15px" }}>
+                                                    <center><Header>Choose a Character</Header></center>
+                                                    <Image floated='left' src={null} style={{ width: "150px" }} />
+                                                </div>
+                                                <pre style={{ margin: "0" }}>{reply.description}</pre>
+                                            </Table.Cell>
+                                    }
+                                </Table.Row>
+                            </Table.Body>
+                        </Table>
+                    ]
                         :
-                        null
+                        <Segment>
+                            <Message>
+                                <Message.Header>
+                                    No characters to reply with!
+                            </Message.Header>
+                            </Message>
+                        </Segment>
                 }
-                <TextArea placeholder="Description..." value={this.state.reply.description} onChange={this.onChange} />
-                <Button type="submit" primary>{this.props.actionText}</Button>
-                <Table>
-                    <Table.Body>
-                        <Table.Row>
-                            {
-                                !!reply.author ?
-                                    <Table.Cell>
-                                        <div className="characterPlacard" style={{ width: "150px", float: "left", marginRight: "15px" }}>
-                                            <center><Header>{reply.author.name}</Header></center>
-                                            <Image floated='left' src={reply.author.appearance.image} style={{ width: "150px" }} />
-                                        </div>
-                                        <pre style={{ margin: "0" }}>{reply.description}</pre>
-                                    </Table.Cell>
-                                    :
-                                    <Table.Cell>
-                                        <div className="characterPlacard" style={{ width: "150px", float: "left", marginRight: "15px" }}>
-                                            <center><Header>Choose a Character</Header></center>
-                                            <Image floated='left' src={null} style={{ width: "150px" }} />
-                                        </div>
-                                        <pre style={{ margin: "0" }}>{reply.description}</pre>
-                                    </Table.Cell>
-                            }
-                        </Table.Row>
-                    </Table.Body>
-                </Table>
             </Form>
         );
     }

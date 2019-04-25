@@ -1,18 +1,21 @@
 import React, { Component } from "react";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 import { compose } from "recompose";
 import { SignUpLink } from "../SignUp";
 import { PasswordForgetLink } from "../PasswordForget";
 import { withFirebase } from "../Firebase";
 import * as ROUTES from "../../../constants/routes";
+import { Form, Icon, Button, Segment, Message } from "semantic-ui-react";
 
 const SignInPage = () => (
-    <div>
-        <h1>Sign In</h1>
+    <Segment>
+        <Message attached="top"><Message.Header>Sign In</Message.Header></Message>
         <SignInForm />
-        <PasswordForgetLink />
-        <SignUpLink />
-    </div>
+        <Message attached="bottom" warning>
+            <Icon name="help" />
+            Don't have an account? <Link to={ROUTES.SIGN_UP}>Sign Up</Link>
+        </Message>
+    </Segment>
 );
 
 const INITIAL_STATE = {
@@ -82,13 +85,14 @@ class SignInFormBase extends Component
         const isInvalid = password === "" || email === "";
 
         return (
-            <form onSubmit={this.onSubmit}>
-                <input name="email" value={email} onChange={this.onChange} type="text" placeholder="Email" />
-                <input name="password" value={password} onChange={this.onChange} type="password" placeholder="Password" />
-                <button disabled={isInvalid} type="submit">Sign In</button>
-
-                {error && <p>{error.message}</p>}
-            </form>
+            <Form onSubmit={this.onSubmit} className="attached fluid segment">
+                <Form.Group>
+                    <Form.Input name="email" value={email} onChange={this.onChange} type="text" placeholder="Email" />
+                    <Form.Input name="password" value={password} onChange={this.onChange} type="password" placeholder="Password" />
+                </Form.Group>
+                <Button primary disabled={isInvalid} type="submit">Sign In</Button>
+                <Button secondary onClick={() => this.props.history.push(ROUTES.PASSWORD_FORGET)}>Forgot Password?</Button>
+            </Form>
         );
     }
 }

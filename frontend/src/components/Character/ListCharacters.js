@@ -96,7 +96,7 @@ class ListCharacters extends Component
         return (
             <div>
                 <Container>
-                    <Modal trigger={<center><Button primary>Create Character</Button></center>} closeOnDimmerClick={false} closeIcon>
+                    <Modal trigger={<center><Button primary>Create Character</Button></center>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
                         <Modal.Header>New Character</Modal.Header>
                         <Modal.Content scrolling>
                             <CharacterForm onSubmit={this.onSubmit} actionName="Create Character" />

@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
+import { withAuthStatic } from "../firebase/Session";
+import { compose } from "recompose";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import Book from "./Book";
@@ -160,12 +162,17 @@ class StoryList extends Component
 
         return (
             <Container>
-                <Modal trigger={<center><Button primary>New Story</Button></center>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
-                    <Modal.Header>New Story</Modal.Header>
-                    <Modal.Content>
-                        <StoryForm genres={genres} onStorySubmit={this.onStoryCreateSubmit} actionText="Create" />
-                    </Modal.Content>
-                </Modal>
+                {
+                    this.props.userInfo ?
+                        <Modal trigger={<center><Button primary>New Story</Button></center>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
+                            <Modal.Header>New Story</Modal.Header>
+                            <Modal.Content>
+                                <StoryForm genres={genres} onStorySubmit={this.onStoryCreateSubmit} actionText="Create" />
+                            </Modal.Content>
+                        </Modal>
+                        :
+                        null
+                }
                 {
                     !!genres ?
                         <Segment>
@@ -207,4 +214,4 @@ class StoryList extends Component
     }
 }
 
-export default withRouter(StoryList);
+export default compose(withRouter, withAuthStatic)(StoryList);

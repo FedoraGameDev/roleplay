@@ -206,10 +206,10 @@ class ViewCharacter extends Component
                         </Table.Body></Table>,
                         <Table key={2} attached="bottom"><Table.Body>
                             {
-                                this.props.userInfo ?
+                                this.props.userInfo && `${this.props.userInfo.user._id}` === `${character.user}` ?
                                     <Table.Row>
                                         <Table.Cell>
-                                            <Modal key={0} trigger={<center><Button primary>Modify Character</Button></center>} closeOnDimmerClick={false} closeIcon>
+                                            <Modal key={0} trigger={<center><Button primary>Modify Character</Button></center>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
                                                 <Modal.Header>Modify {character.name}</Modal.Header>
                                                 <Modal.Content scrolling>
                                                     <CharacterForm character={character} onSubmit={this.onSubmit} actionName="Update Character" />
