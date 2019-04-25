@@ -150,7 +150,14 @@ class ViewStory extends Component
                                     {!!characterList ?
                                         <Form onSubmit={myself.onApplyCharacter}>
                                             <myself.listCharacterOptions info={{ myself: myself }} />
-                                            <Button primary type="submit">Apply</Button>
+                                            <Button primary type="submit">
+                                                {
+                                                    story.closed_group ?
+                                                        "Apply"
+                                                        :
+                                                        "Join"
+                                                }
+                                            </Button>
                                         </Form> :
                                         <div>Loading...</div>}
                                 </ModalDescription>

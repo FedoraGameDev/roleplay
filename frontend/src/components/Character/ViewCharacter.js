@@ -199,7 +199,7 @@ class ViewCharacter extends Component
                         <Modal key={0} trigger={<center><Button primary>Modify Character</Button></center>}>
                             <Modal.Header>Modify {character.name}</Modal.Header>
                             <Modal.Content>
-                                <CharacterForm character={character} onSubmit={this.onSubmit} />
+                                <CharacterForm character={character} onSubmit={this.onSubmit} actionName="Update Character" />
                             </Modal.Content>
                         </Modal>,
                         <Table key={1} inverted attached="top"><Table.Body>

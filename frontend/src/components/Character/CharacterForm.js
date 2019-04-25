@@ -134,6 +134,7 @@ class CharacterForm extends Component
     render()
     {
         const { character, hasSubmittedAtLeastOnce } = this.state;
+        const { actionName } = this.props;
         const isInvalid = (
             character.name === "" ||
             character.age === null
@@ -308,7 +309,7 @@ class CharacterForm extends Component
                             </Grid>
                         </Grid.Column>
                     </Grid.Row>
-                    <Button disabled={isInvalid} type="submit">Create Character</Button>
+                    <Button disabled={isInvalid} type="submit" primary>{actionName}</Button>
                 </Grid>
             </Form>
         );
