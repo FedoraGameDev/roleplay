@@ -393,7 +393,7 @@ class StoryView extends Component
                                                 {
                                                     userInfo && userInfo.user._id === story.author._id ?
                                                         <Table.Cell collapsing>
-                                                            <Modal trigger={<Button onClick={event => event.stopPropagation()}>Edit</Button>} closeOnDimmerClick={false} closeIcon>
+                                                            <Modal trigger={<Button secondary onClick={event => event.stopPropagation()}>Edit</Button>} closeOnDimmerClick={false} closeIcon>
                                                                 <Modal.Header>Edit Chapter</Modal.Header>
                                                                 <Modal.Content>
                                                                     <ChapterForm chapter={chapter} onSubmit={this.updateChapter} actionText="Update Chapter" />

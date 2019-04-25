@@ -451,6 +451,7 @@ module.exports = {
                     console.log(`${user.username} authenticated.`);
                     req.body.story.author = user;
                     req.body.story.date_created = Date.now();
+                    req.body.story.latest_reply_date = Date.now();
 
                     models.Story.create(req.body.story)
                         .then(newStory =>
