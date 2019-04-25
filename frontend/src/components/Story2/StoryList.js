@@ -3,10 +3,11 @@ import { withRouter } from "react-router-dom";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import Book from "./Book";
-import { Container, Button, Modal, Loader, Card } from "semantic-ui-react";
+import { Container, Button, Modal, Segment, Card, Checkbox } from "semantic-ui-react";
 import StoryForm from "./StoryForm";
 import { BACKEND, STORY_VIEW, LIST_STORY, LIST_STORY_PART } from "../../constants/routes";
 import { makeCancelable } from "../../constants/extensions";
+import GenreList from "./GenreList";
 import BookCover from "../../images/bookCover.jpg";
 
 const INITIAL_STATE = {
@@ -60,6 +61,16 @@ class StoryList extends Component
             this.fetchStoriesPromise.cancel();
     }
 
+    onGenreChange = genre =>
+    {
+        if (!!this.timeout)
+            clearTimeout(this.timeout);
+        const genreChecks = { ...this.state.genreChecks };
+        genreChecks[genre] = !genreChecks[genre];
+        this.setState({ genreChecks: genreChecks });
+        this.timeout = setTimeout(this.filterStories, 500);
+    }
+
     /* filterStories
      * Sets state.filteredStories to all stories that have all genreChecks assigned to them.
     */
@@ -97,7 +108,7 @@ class StoryList extends Component
     */
     checkFilters = () =>
     {
-        for (let i = 0; i < this.state.genres.length; i++)
+        for (let i = 0; i < this.props.genres.length; i++)
         {
             const check = this.state.genreChecks[this.props.genres[i].name];
             if (check === undefined) continue;
@@ -133,7 +144,7 @@ class StoryList extends Component
                 });
                 this.fetchStoriesPromise = null;
                 //TODO: filter the stories
-                //this.filterStories();
+                this.filterStories();
             })
             .catch(error =>
             {
@@ -147,7 +158,7 @@ class StoryList extends Component
     render()
     {
         const { genres } = this.props;
-        const { stories, hasMore } = this.state;
+        const { stories, hasMore, filteredStories } = this.state;
 
         return (
             <Container>
@@ -158,6 +169,15 @@ class StoryList extends Component
                     </Modal.Content>
                 </Modal>
                 {
+                    !!genres ?
+                        <Segment>
+                            <GenreList genres={genres} onChange={this.onGenreChange} />
+                        </Segment>
+                        :
+                        null
+
+                }
+                {
                     !!stories ?
                         <InfiniteScroll
                             className="ui centered cards"
@@ -167,7 +187,7 @@ class StoryList extends Component
                             hasMore={hasMore}
                             hasChildren={true}>
                             {
-                                stories.map((story, index) =>
+                                filteredStories.map((story, index) =>
                                     (
                                         <Book key={index} story={story} />
                                     ))

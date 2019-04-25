@@ -73,5 +73,98 @@ module.exports = {
             console.log(`Character "${character.name}" found.`);
             res.json({ "character": character });
         });
+    },
+    update: (req, res) =>
+    {
+        console.log("Updating Character...");
+
+        firebaseAdmin.auth().verifyIdToken(req.body.token)
+            .then(decodedToken =>
+            {
+                console.log("User authenticated through firebase...");
+                models.User.findOne({ uuid: decodedToken.uid })
+                    .then(user =>
+                    {
+                        console.log(`User ${user.username} authenticated...`);
+                        models.Character.findOne({ _id: req.body.character._id }).populate("user")
+                            .then(character =>
+                            {
+                                console.log(`Character ${character.name} found...`);
+                                console.log(`${character.user._id} === ${user._id}: ${`${character.user._id}` === `${user._id}`}`);
+                                if (`${character.user._id}` === `${user._id}`)
+                                {
+                                    let modifiedCharacter = {
+                                        name: `${character.name}`,
+                                        basicinfo: { ...character.basicinfo },
+                                        appearance: { ...character.appearance },
+                                        personality: { ...character.personality },
+                                        _id: character._id
+                                    };
+                                    const basicLines = ["age", "gender", "birthmonth", "birthday", "relationships", "backstory"];
+                                    const appearanceLines = ["hair", "eyes", "description", "image"];
+                                    const personalityLines = ["traits", "likes", "dislikes", "habits", "quirks"];
+
+                                    if (req.body.character.name)
+                                        modifiedCharacter.name = req.body.character.name;
+
+                                    if (req.body.character.basicinfo)
+                                    {
+                                        basicLines.forEach(element =>
+                                        {
+                                            if (req.body.character.basicinfo[element])
+                                                modifiedCharacter.basicinfo[element] = req.body.character.basicinfo[element];
+                                        });
+                                    }
+
+                                    if (req.body.character.appearance)
+                                    {
+                                        appearanceLines.forEach(element =>
+                                        {
+                                            if (req.body.character.appearance[element])
+                                                modifiedCharacter.appearance[element] = req.body.character.appearance[element];
+                                        });
+                                    }
+
+                                    if (req.body.character.personality)
+                                    {
+                                        personalityLines.forEach(element =>
+                                        {
+                                            if (req.body.character.personality[element])
+                                                modifiedCharacter.personality[element] = req.body.character.personality[element];
+                                        })
+                                    }
+
+                                    models.Character.updateOne({ _id: character._id }, { $set: modifiedCharacter }, (err, modifyMessage) =>
+                                    {
+                                        if (err) { res.status(500).json({ "ERROR": err }) };
+
+                                        console.log(`Character "${character.name}" modified.`);
+                                        res.json({ "message": modifyMessage });
+                                    })
+                                }
+                                else
+                                {
+                                    const message = `User "${user.username}" attempted modification of character owned by "${character.user.username}".`;
+                                    console.log(message);
+                                    res.status(500).json({ "ERROR": message });
+                                }
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                                res.status(500).json({ "ERROR": error });
+                            });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                        res.status(500).json({ "ERROR": error });
+                    });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+                res.status(500).json({ "ERROR": error });
+            });
     }
 }
