@@ -162,7 +162,7 @@ class StoryList extends Component
 
         return (
             <Container>
-                <Modal trigger={<center><Button primary>New Story</Button></center>} dimmer="blurring" >
+                <Modal trigger={<center><Button primary>New Story</Button></center>} dimmer="blurring" closeOnDimmerClick={false} closeIcon>
                     <Modal.Header>New Story</Modal.Header>
                     <Modal.Content>
                         <StoryForm genres={genres} onStorySubmit={this.onStoryCreateSubmit} />

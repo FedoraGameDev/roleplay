@@ -251,7 +251,7 @@ class StoryView extends Component
                                     {
                                         isCreator ?
                                             <span>
-                                                <Modal key={0} trigger={<Button primary><Icon name="bookmark" />Add Chapter</Button>}>
+                                                <Modal key={0} trigger={<Button primary><Icon name="bookmark" />Add Chapter</Button>} closeOnDimmerClick={false} closeIcon>
                                                     <Modal.Header>New Chapter</Modal.Header>
                                                     <Modal.Content>
                                                         <ChapterForm onSubmit={this.submitChapter} chapter={{ title: `Chapter ${story.chapters.length + 1}` }} />
@@ -259,7 +259,7 @@ class StoryView extends Component
                                                 </Modal>
                                                 {
                                                     story.closed_group ?
-                                                        <Modal key={1} trigger={<Button primary><Icon name="address book" />Applicants</Button>}>
+                                                        <Modal key={1} trigger={<Button primary><Icon name="address book" />Applicants</Button>} closeOnDimmerClick={false} closeIcon>
                                                             <Modal.Header>Applicants</Modal.Header>
                                                             <Modal.Content>
                                                                 <Container className="character-grid">
@@ -300,7 +300,7 @@ class StoryView extends Component
                                             :
                                             null
                                     }
-                                    <Modal trigger={<Button secondary><Icon name="spy" />Roster</Button>}>
+                                    <Modal trigger={<Button secondary><Icon name="spy" />Roster</Button>} closeOnDimmerClick={false} closeIcon>
                                         <Modal.Header>Character Roster</Modal.Header>
                                         <Modal.Content>
                                             <Modal.Description>
@@ -321,7 +321,7 @@ class StoryView extends Component
                                                             <span><Icon name="lock open" />Join</span>
                                                     }
                                                 </Button>
-                                            }>
+                                            } closeOnDimmerClick={false} closeIcon>
                                                 <Modal.Header>{story.closed_group ? "Apply Character" : "Add Character to Roster"}</Modal.Header>
                                                 <Modal.Content>
                                                     <CharacterGrid characters={characterList} onClick={this.onCharacterApplyClick} />

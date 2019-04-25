@@ -108,10 +108,89 @@ module.exports = {
                                 if (`${user._id}` == `${character.user._id}`)
                                 {
                                     console.log("User verified owner of character.");
-                                    models.Story.updateOne({ _id: story._id }, { $push: { "chapters.$[i].posts": post }, $inc: { replies: 1 }, $set: { latest_reply_date: Date.now() } }, { arrayFilters: [{ "i._id": chapter._id }] })
+
+                                    models.Story.findOne({ _id: story._id })
                                         .then(story =>
                                         {
-                                            console.log("Post added.");
+                                            const charIds = story.characters.map(character => `${character._id}`);
+                                            if (charIds.indexOf(`${character._id}`) !== -1)
+                                            {
+                                                models.Story.updateOne({ _id: story._id }, { $push: { "chapters.$[i].posts": post }, $inc: { replies: 1 }, $set: { latest_reply_date: Date.now() } }, { arrayFilters: [{ "i._id": chapter._id }] })
+                                                    .then(story =>
+                                                    {
+                                                        console.log("Post added.");
+                                                        res.json({ "status": "OK" });
+                                                    })
+                                                    .catch(error =>
+                                                    {
+                                                        console.log(error);
+                                                        res.status(500).json({ "ERROR": error });
+                                                    });
+                                            }
+                                            else
+                                            {
+                                                error = "User attempted replying with character not permitted in story.";
+                                                console.log(error);
+                                                res.status(500).json({ "ERROR": error });
+                                            }
+                                        })
+                                        .catch(error =>
+                                        {
+                                            console.log(error);
+                                            res.status(500).json({ "ERROR": error });
+                                        });
+
+                                }
+                                else
+                                {
+                                    error = "User attempted replying with character they don't own.";
+                                    console.log(error);
+                                    res.status(500).json({ "ERROR": error });
+                                }
+                            })
+                            .catch(error =>
+                            {
+                                console.log(error);
+                                res.status(500).json({ "ERROR": error });
+                            });
+                    })
+                    .catch(error =>
+                    {
+                        console.log(error);
+                        res.status(500).json({ "ERROR": error });
+                    });
+            })
+            .catch(error =>
+            {
+                console.log(error);
+                res.status(500).json({ "ERROR": error });
+            });
+    },
+
+    updatePost: (req, res) =>
+    {
+        console.log("New post received.");
+        const { post, chapter, story, token } = req.body;
+
+        firebaseAdmin.auth().verifyIdToken(token)
+            .then(decodedToken =>
+            {
+                console.log("User authenticated from firebase.");
+                models.User.findOne({ uuid: decodedToken.uid })
+                    .then(user =>
+                    {
+                        console.log(`${user.username} authenticated.`);
+                        models.Character.findOne({ _id: post.author._id })
+                            .then(character =>
+                            {
+                                console.log(`Character "${character.name}" found.`);
+                                if (`${user._id}` == `${character.user._id}`)
+                                {
+                                    console.log("User verified owner of character.");
+                                    models.Story.updateOne({ _id: story._id }, { $set: { "chapters.$[i].posts.$[j]": post } }, { arrayFilters: [{ "i._id": chapter._id }, { "j._id": post._id }] })
+                                        .then(story =>
+                                        {
+                                            console.log("Post updated.");
                                             res.json({ "status": "OK" });
                                         })
                                         .catch(error =>

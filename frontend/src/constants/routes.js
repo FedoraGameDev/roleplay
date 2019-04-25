@@ -20,6 +20,7 @@ export const DENY_CHARACTER = "/story/deny";
 export const CREATE_STORY = "/story/create";
 export const CREATE_CHAPTER = "/story/chapter/create";
 export const CREATE_REPLY = "/story/chapter/post";
+export const UPDATE_REPLY = "/story/update/chapter/post";
 
 export const LIST_CHARACTERS = "/character/list";
 export const VIEW_CHARACTER = "/character/view/:character_id";
