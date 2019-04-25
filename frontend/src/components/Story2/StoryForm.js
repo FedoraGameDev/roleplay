@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import { Form, Button, Table, TextArea, Input, Placeholder, Checkbox, Card } from "semantic-ui-react"
 import BookCover from "../../images/bookCover.jpg";
+import GenreList from "./GenreList";
 
 const INITIAL_STATE = {
     title: "",
@@ -99,20 +100,7 @@ class StoryForm extends Component
                     <Table.Body>
                         <Table.Row>
                             <Table.Cell textAlign="center">
-                                <Card.Group>
-                                    {
-                                        genres.map((genre, index) =>
-                                            (
-                                                <Card key={index} style={{ width: "auto", padding: "5px 10px" }}>
-                                                    <Checkbox
-                                                        toggle
-                                                        name={genre.name}
-                                                        label={genre.name}
-                                                        onChange={event => { this.onGenreChange(genre.name) }} />
-                                                </Card>
-                                            ))
-                                    }
-                                </Card.Group>
+                                <GenreList genres={genres} onChange={this.onGenreChange} />
                             </Table.Cell>
                         </Table.Row>
                         <Table.Row>

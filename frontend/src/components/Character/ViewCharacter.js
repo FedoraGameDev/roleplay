@@ -1,8 +1,10 @@
 import React, { Component } from "react";
-import Axios from "axios";
-import { Header, Label, Loader, Image, Container, Table } from "semantic-ui-react";
-import { BACKEND, VIEW_CHARACTER } from "../../constants/routes";
+import axios from "axios";
+import { Header, Label, Loader, Image, Container, Table, Modal, Button } from "semantic-ui-react";
+import { BACKEND, VIEW_CHARACTER, UPDATE_CHARACTER } from "../../constants/routes";
 import Months from "../../constants/months";
+import CharacterForm from "./CharacterForm";
+import cloudinary from "cloudinary/lib/cloudinary";
 
 const INITIAL_STATE = {
     character: {
@@ -36,6 +38,8 @@ const INITIAL_STATE = {
 
 class ViewCharacter extends Component
 {
+    initialCharacter;
+
     constructor(props)
     {
         super(props);
@@ -45,18 +49,25 @@ class ViewCharacter extends Component
 
     componentDidMount()
     {
-        Axios.post(`${BACKEND}${VIEW_CHARACTER.replace(":character_id", this.props.match.params.character_id)}`,
+        axios.post(`${BACKEND}${VIEW_CHARACTER.replace(":character_id", this.props.match.params.character_id)}`,
             { token: localStorage.token })
             .then(res =>
             {
                 this.setState({ character: res.data.character });
+                this.initialCharacter = {
+                    _id: this.state.character._id,
+                    name: `${this.state.character.name}`,
+                    basicinfo: { ...this.state.character.basicinfo },
+                    appearance: { ...this.state.character.appearance },
+                    personality: { ...this.state.character.personality }
+                };
 
-                Axios.get(`https://www.thecolorapi.com/id?format=json&hex=${this.state.character.appearance.eyes.replace("#", "")}`)
+                axios.get(`https://www.thecolorapi.com/id?format=json&hex=${this.state.character.appearance.eyes.replace("#", "")}`)
                     .then(res =>
                     {
                         this.setState({ eyeColor: res.data });
 
-                        Axios.get(`https://www.thecolorapi.com/id?format=json&hex=${this.state.character.appearance.hair.replace("#", "")}`)
+                        axios.get(`https://www.thecolorapi.com/id?format=json&hex=${this.state.character.appearance.hair.replace("#", "")}`)
                             .then(res =>
                             {
                                 this.setState({ hairColor: res.data, ready: true });
@@ -77,6 +88,105 @@ class ViewCharacter extends Component
             });
     }
 
+    onSubmit = (state, imageRef) =>
+    {
+        const { character, pixelCrop, crop } = state;
+        let modifiedCharacter = { _id: character._id };
+        const basicLines = ["age", "gender", "birthmonth", "birthday", "relationships", "backstory"];
+        const appearanceLines = ["hair", "eyes", "description", "image"];
+        const personalityLines = ["traits", "likes", "dislikes", "habits", "quirks"];
+
+        if (character.name !== this.initialCharacter.name)
+            modifiedCharacter.name = character.name;
+
+        basicLines.forEach(element =>
+        {
+            if (character.basicinfo[element] !== this.initialCharacter.basicinfo[element])
+            {
+                if (modifiedCharacter.basicinfo == null)
+                    modifiedCharacter.basicinfo = {};
+                modifiedCharacter.basicinfo[element] = character.basicinfo[element];
+            }
+        });
+
+        appearanceLines.forEach(element =>
+        {
+            if (character.appearance[element] !== this.initialCharacter.appearance[element])
+            {
+                if (modifiedCharacter.appearance == null)
+                    modifiedCharacter.appearance = {};
+                modifiedCharacter.appearance[element] = character.appearance[element];
+            }
+        });
+
+        personalityLines.forEach(element =>
+        {
+            if (character.personality[element] !== this.initialCharacter.personality[element])
+            {
+                if (modifiedCharacter.personality == null)
+                    modifiedCharacter.personality = {};
+                modifiedCharacter.personality[element] = character.personality[element];
+            }
+        });
+
+        if (imageRef && crop.width && crop.height)
+        {
+            const canvas = document.createElement('canvas');
+            canvas.width = 250;
+            canvas.height = 250;
+            const ctx = canvas.getContext('2d');
+
+            ctx.drawImage(
+                imageRef,
+                pixelCrop.x,
+                pixelCrop.y,
+                pixelCrop.width,
+                pixelCrop.height,
+                0,
+                0,
+                250,
+                250
+            );
+
+            cloudinary.config({
+                cloud_name: process.env.REACT_APP_CLOUDINARY_NAME,
+                api_key: process.env.REACT_APP_CLOUDINARY_KEY,
+                api_secret: process.env.REACT_APP_CLOUDINARY_SECRET
+            });
+
+            cloudinary.uploader.upload(canvas.toDataURL(), { tags: "user_image" })
+                .then(image =>
+                {
+                    if (modifiedCharacter.appearance == null)
+                        modifiedCharacter.appearance = {};
+                    modifiedCharacter.appearance.image = image.url;
+                    this.sendModifiedCharacter(modifiedCharacter);
+                })
+                .catch(error =>
+                {
+                    console.log(error);
+                });
+        }
+        else
+        {
+            this.sendModifiedCharacter(modifiedCharacter);
+        }
+    }
+
+    sendModifiedCharacter = modifiedCharacter =>
+    {
+        console.log(modifiedCharacter);
+        axios.post(`${BACKEND}${UPDATE_CHARACTER}`, { token: localStorage.token, character: modifiedCharacter })
+            .then(res =>
+            {
+                this.props.history.push(VIEW_CHARACTER.replace(":character_id", this.state.character._id));
+            })
+            .catch(error =>
+            {
+                console.log(error);
+            });
+    }
+
     render()
     {
         const { character, ready, eyeColor, hairColor } = this.state;
@@ -86,6 +196,12 @@ class ViewCharacter extends Component
             <Container>
                 {ready ?
                     [
+                        <Modal key={0} trigger={<center><Button primary>Modify Character</Button></center>}>
+                            <Modal.Header>Modify {character.name}</Modal.Header>
+                            <Modal.Content>
+                                <CharacterForm character={character} onSubmit={this.onSubmit} />
+                            </Modal.Content>
+                        </Modal>,
                         <Table key={1} inverted attached="top"><Table.Body>
                             <Table.Row>
                                 <Table.Cell>
