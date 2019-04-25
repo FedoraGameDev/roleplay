@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { withRouter } from "react-router-dom";
+import { withAuthStatic } from "../firebase/Session";
+import { compose } from "recompose";
 import InfiniteScroll from "react-infinite-scroll-component";
 import axios from "axios";
 import Book from "./Book";
@@ -207,4 +209,4 @@ class StoryList extends Component
     }
 }
 
-export default withRouter(StoryList);
+export default compose(withRouter, withAuthStatic)(StoryList);
