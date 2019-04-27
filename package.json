@@ -1,6 +1,22 @@
 {
-  "name": "roleplay",
-  "author": "Fedora Dev",
+  "name": "roleplay-backend",
   "version": "0.1.0",
-  "dependencies": {}
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node .",
+    "dev": "nodemon ."
+  },
+  "author": "Fedora Dev",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "firebase-admin": "^7.1.1",
+    "mongoose": "^5.4.19"
+  },
+  "devDependencies": {
+    "axios": "^0.18.0"
+  }
 }

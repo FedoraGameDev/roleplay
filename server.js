@@ -49,6 +49,11 @@ app.use("/user", routes.user);
 app.use("/story", routes.story);
 app.use("/character", routes.character);
 
+if (process.env.NODE_ENV === "production")
+{
+    app.use(express.static("../frontend/build"));
+}
+
 let port = process.env.PORT || 3001;
 app.listen(port, () =>
 {
