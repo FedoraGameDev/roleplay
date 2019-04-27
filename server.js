@@ -24,7 +24,9 @@ else
 }
 
 const allowedOrigins = [
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "http://localhost:3001",
+    "http://simply-roleplay.herokuapp.com/"
 ];
 
 app.use(cors({
@@ -44,15 +46,10 @@ app.use(cors({
 app.use(bodyparser.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use("/api", routes.api);
-app.use("/user", routes.user);
-app.use("/story", routes.story);
-app.use("/character", routes.character);
-
-if (process.env.NODE_ENV === "production")
-{
-    app.use(express.static("../frontend/build"));
-}
+app.use("/api/user", routes.user);
+app.use("/api/story", routes.story);
+app.use("/api/character", routes.character);
+app.use("/", express.static("frontend/build"));
 
 let port = process.env.PORT || 3001;
 app.listen(port, () =>
