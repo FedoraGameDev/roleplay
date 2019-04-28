@@ -1,3 +1,4 @@
+const os = require("os");
 const express = require("express");
 const routes = require("./src/routes");
 const path = require("path");
@@ -11,8 +12,16 @@ if (process.env.NODE_ENV === "production")
 {
     const serviceAccount = require("./serviceAccount.json");
     firbaseadmin.initializeApp({
-        credential: firbaseadmin.credential.cert(serviceAccount),
-        databaseURL: "https://roleplay-e19d6.firebaseio.com"
+        apiKey: os.environ["REACT_APP_API_KEY"],
+        authDomain: os.environ["REACT_APP_AUTH_DOMAIN"],
+        databaseURL: "https://roleplay-e19d6.firebaseio.com",
+        serviceAccount: {
+            client_email: os.environ["CLIENT_EMAIL"],
+            client_id: os.environ["CLIENT_ID"],
+            private_key: os.environ["PRIVATE_KEY"],
+            private_key_id: os.environ["PRIVATE_KEY_ID"],
+            type: os.environ["TYPE"]
+        }
     });
 }
 else
