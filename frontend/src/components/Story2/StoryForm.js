@@ -122,7 +122,7 @@ class StoryForm extends Component
                                     style={{
                                         width: "150px",
                                         height: "175px",
-                                        backgroundImage: `url(${BookCover})`,
+                                        backgroundImage: `url(https://res.cloudinary.com/dbfb8rwim/image/upload/v1556447856/bookCover.jpg)`,
                                         backgroundSize: "150px auto"
                                     }}>
                                     <div className="Content" style={{ backgroundColor: `${color}55`, height: "100%" }} />

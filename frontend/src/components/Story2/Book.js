@@ -65,7 +65,7 @@ class Book extends Component
                 style={{
                     width: "150px",
                     height: "175px",
-                    backgroundImage: `url(${BookCover})`,
+                    backgroundImage: `url(https://res.cloudinary.com/dbfb8rwim/image/upload/v1556447856/bookCover.jpg)`,
                     color: fontColor,
                     backgroundSize: "150px auto"
                 }}

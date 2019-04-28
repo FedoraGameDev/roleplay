@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "mongod & sleep 5; node . & sleep 10; cd frontend; npm start; cd ..",
+    "start": "node . & cd frontend; npm start; cd ..",
     "dev": "nodemon ."
   },
   "author": "Fedora Dev",
