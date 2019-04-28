@@ -12,8 +12,8 @@ if (process.env.NODE_ENV === "production")
 {
     //const serviceAccount = require("./serviceAccount.json");
     firbaseadmin.initializeApp({
-        apiKey: os.environ["REACT_APP_API_KEY"],
-        authDomain: os.environ["REACT_APP_AUTH_DOMAIN"],
+        apiKey: os.environ["API_KEY"],
+        authDomain: os.environ["AUTH_DOMAIN"],
         databaseURL: "https://roleplay-e19d6.firebaseio.com",
         serviceAccount: {
             client_email: os.environ["CLIENT_EMAIL"],
