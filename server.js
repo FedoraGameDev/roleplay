@@ -10,7 +10,7 @@ const app = express();
 
 if (process.env.NODE_ENV === "production")
 {
-    const serviceAccount = require("./serviceAccount.json");
+    //const serviceAccount = require("./serviceAccount.json");
     firbaseadmin.initializeApp({
         apiKey: os.environ["REACT_APP_API_KEY"],
         authDomain: os.environ["REACT_APP_AUTH_DOMAIN"],
