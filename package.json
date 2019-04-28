@@ -4,7 +4,7 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "node . & cd frontend; npm start; cd ..",
+    "start": "node .",
     "dev": "nodemon ."
   },
   "author": "Fedora Dev",

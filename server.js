@@ -1,5 +1,6 @@
 const express = require("express");
 const routes = require("./src/routes");
+const path = require("path");
 const cors = require("cors");
 const bodyparser = require("body-parser");
 const firbaseadmin = require("firebase-admin");
@@ -51,7 +52,11 @@ app.use(express.json());
 app.use("/api/user", routes.user);
 app.use("/api/story", routes.story);
 app.use("/api/character", routes.character);
-//app.use(express.static("frontend/build"));
+app.use(express.static(path.join(__dirname, 'frontend/build')));
+app.get('/*', function (req, res)
+{
+    res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
+});
 
 let port = process.env.PORT || 3001;
 app.listen(port, () =>
