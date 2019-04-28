@@ -49,7 +49,7 @@ app.use(express.json());
 app.use("/api/user", routes.user);
 app.use("/api/story", routes.story);
 app.use("/api/character", routes.character);
-app.use("/", express.static("frontend/build"));
+app.use(express.static("frontend/build"));
 
 let port = process.env.PORT || 3001;
 app.listen(port, () =>
