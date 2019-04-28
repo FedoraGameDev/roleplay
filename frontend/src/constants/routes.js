@@ -29,4 +29,4 @@ export const VIEW_CHARACTER = "/character/view/:character_id";
 export const CREATE_CHARACTER = "/character/create";
 export const UPDATE_CHARACTER = "/character/update"
 
-export const BACKEND = "http://localhost:3001/api";
+export const BACKEND = "http://simply-roleplay.herokuapp.com/api";
