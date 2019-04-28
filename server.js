@@ -36,7 +36,7 @@ const allowedOrigins = [
     "http://localhost:3000",
     "http://localhost:3001",
     "http://50.39.111.27:3000",
-    "http://simply-roleplay.herokuapp.com/",
+    "https://simply-roleplay.herokuapp.com/",
     "*"
 ];
 
