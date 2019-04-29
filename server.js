@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === "production")
         apiKey: process.env.API_KEY,
         authDomain: process.env.AUTH_DOMAIN,
         databaseURL: "https://roleplay-e19d6.firebaseio.com",
-        credential: firebaseadmin.credential.cert(serviceAccount),
+        credential: firbaseadmin.credential.cert(serviceAccount),
         serviceAccount: serviceAccount
     });
 }
