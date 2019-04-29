@@ -43,6 +43,7 @@ const allowedOrigins = [
 app.use(cors({
     origin: (origin, callback) =>
     {
+        console.log("Request from " + origin);
         if (!origin) return callback(null, true);
         if (allowedOrigins.indexOf(origin) === -1)
         {
