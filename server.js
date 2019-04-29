@@ -9,18 +9,19 @@ const app = express();
 
 if (process.env.NODE_ENV === "production")
 {
-    //const serviceAccount = require("./serviceAccount.json");
+    const serviceAccount = {
+        client_email: process.env.CLIENT_EMAIL,
+        client_id: process.env.CLIENT_ID,
+        private_key: process.env.PRIVATE_KEY,
+        private_key_id: process.env.PRIVATE_KEY_ID,
+        type: process.env.TYPE
+    }
     firbaseadmin.initializeApp({
         apiKey: process.env.API_KEY,
         authDomain: process.env.AUTH_DOMAIN,
         databaseURL: "https://roleplay-e19d6.firebaseio.com",
-        serviceAccount: {
-            client_email: process.env.CLIENT_EMAIL,
-            client_id: process.env.CLIENT_ID,
-            private_key: process.env.PRIVATE_KEY,
-            private_key_id: process.env.PRIVATE_KEY_ID,
-            type: process.env.TYPE
-        }
+        credential: firbaseadmin.credential.cert(serviceAccount),
+        serviceAccount: serviceAccount
     });
 }
 else
